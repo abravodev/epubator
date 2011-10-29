@@ -32,7 +32,7 @@ import android.widget.TextView;
 public class Convert extends Activity {
 	private static StringBuilder progressSb;
 	private static TextView progressTv;
-	private static Button backBt;
+	private static Button okBt;
 	private static boolean backBtEnabled = true;
 	private static boolean conversionStarted = false;
 
@@ -46,20 +46,20 @@ public class Convert extends Activity {
 		setContentView(R.layout.progressview);
 
 		progressTv = ((TextView)findViewById(R.id.progress));
-		backBt = (Button)findViewById(R.id.back);
-		backBt.setOnClickListener(mBackListener);
+		okBt = (Button)findViewById(R.id.back);
+		okBt.setOnClickListener(mBackListener);
 
 		if (conversionStarted) {
 			// Conversion already started, update screen
 			progressTv.setText(progressSb);
-			backBt.setEnabled(backBtEnabled);
+			okBt.setEnabled(backBtEnabled);
 		} else {
 			// Start conversion
 			new convert().execute();
 		}
 	}
 
-	// Button pressed
+	// Ok button pressed
 	private OnClickListener mBackListener = new OnClickListener()
 	{
 		public void onClick(View v)
@@ -142,14 +142,14 @@ public class Convert extends Activity {
 		protected void onPreExecute() {
 			progressSb = new StringBuilder();
 			progressSb.append(getResources().getString(R.string.heading));
-			backBt.setEnabled(backBtEnabled = false);
+			okBt.setEnabled(backBtEnabled = false);
 			conversionStarted = true;	
 		}
 
 		// Background task ended
 		@Override
 		protected void onPostExecute(Void params) {
-			backBt.setEnabled(backBtEnabled = true);
+			okBt.setEnabled(backBtEnabled = true);
 		}
 
 		// Show error message

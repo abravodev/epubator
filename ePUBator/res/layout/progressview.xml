@@ -32,5 +32,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		android:id="@+id/back"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:text="@string/back" />
+		android:text="@string/ok" />
 </LinearLayout>

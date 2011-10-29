@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="select">Seleziona un file PDF per\niniziare la conversione in ePUB</string>
 	<string name="cip">Conversione in corso</string>
 	<string name="path">Percorso:</string>
-	<string name="back">Indietro</string>
+	<string name="ok">OK</string>
 	<string name="heading">"ePUBator - Convertitore da PDF a ePUB minimale per Android\n&#169;2011 Ezio Querini &lt;iiizio&#64;users.sf.net&gt;\n\n"</string>
 	<string name="deleted">File ePUB rimosso</string>
 	<string name="load">Carico:</string>
