@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C)2011 Ezio Querini <iiizio AT users.sf.net>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="app_name">ePUBator</string>
+	<string name="select">Select a PDF file to start\nthe conversion to ePUB</string>
+	<string name="cip">Conversion in progress</string>
+	<string name="path">Path:</string>
+	<string name="back">Back</string>
+	<string name="heading">"ePUBator - Minimal offline PDF to ePUB converter for Android\n&#169;2011 Ezio Querini &lt;iiizio&#64;users.sf.net&gt;\n\n"</string>
+	<string name="deleted">ePUB file deleted</string>
+	<string name="load">Loading:</string>
+	<string name="file">ePUB file:</string>
+	<string name="open">Open ePUB file</string>
+	<string name="mimetype">Add mimetype</string>
+	<string name="container">Add container.xml</string>
+	<string name="content">Add content.opf</string>
+	<string name="toc">Add toc.ncx</string>
+	<string name="page">Add page</string>
+	<string name="close">Close file</string>
+	<string-array name="message">
+		<item>Conversion completed</item>
+		<item>PDF file not found</item>
+		<item>Failed to read PDF file</item>
+		<item>Failed to write ePUB file</item>
+		<item>Failed to extract text</item>
+	</string-array>
+</resources>
