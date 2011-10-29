@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="ok">OK</string>
 	<string name="heading">"ePUBator - Minimal offline PDF to ePUB converter for Android\n&#169;2011 Ezio Querini &lt;iiizio&#64;users.sf.net&gt;\n\n"</string>
 	<string name="deleted">ePUB file deleted</string>
+	<string name="pages">Number of pages:</string>
 	<string name="load">Loading:</string>
 	<string name="file">ePUB file:</string>
 	<string name="open">Open ePUB file</string>
@@ -30,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="container">Add container.xml</string>
 	<string name="content">Add content.opf</string>
 	<string name="toc">Add toc.ncx</string>
-	<string name="page">Add page</string>
+	<string name="html">Add page</string>
 	<string name="close">Close file</string>
 	<string-array name="message">
 		<item>Conversion completed</item>

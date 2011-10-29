@@ -36,8 +36,8 @@ public class Convert extends Activity {
 	private static boolean backBtEnabled = true;
 	private static boolean conversionStarted = false;
 
-	private int pagesPerFile = 10;
-	private String BookId;
+	private static String BookId;
+	private static int pagesPerFile = 10;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -159,6 +159,11 @@ public class Convert extends Activity {
 
 		// Fill ePUB file
 		private int fillEPUB(String filename) {
+			int pages = ReadPdf.getPages();
+			publishProgress(getResources().getString(R.string.pages) + " " + pages);
+			int totalFiles = 1 + pages / pagesPerFile;
+			int writedFiles = 0;
+			
 			publishProgress(getResources().getString(R.string.open));
 			if (WriteZip.create(filename)) {
 				return 3;
@@ -174,7 +179,6 @@ public class Convert extends Activity {
 				return 3;
 			}
 
-			int pages = ReadPdf.getPages();
 			publishProgress(getResources().getString(R.string.content));
 			if (WriteZip.addEntry("OEBPS/content.opf", createContent(pages), false)) {
 				return 3;
@@ -186,7 +190,7 @@ public class Convert extends Activity {
 			}
 
 			for(int i = 1; i <= pages; i += pagesPerFile) {
-				publishProgress(getResources().getString(R.string.page) + i + ".html");
+				publishProgress(getResources().getString(R.string.html) + i + ".html   " + (int)(100 * (++writedFiles) / totalFiles) + "%");
 				String text = ReadPdf.extractText(i, i + pagesPerFile - 1);
 				if (text == "") {
 					return 4;
