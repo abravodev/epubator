@@ -47,12 +47,12 @@ public class ReadPdf {
 
 		try {
 			for (int i = startPage; i <= endPage; i++) {
-				text += PdfTextExtractor.getTextFromPage(reader,i) + "\n";
+				text += stringToHTMLString(PdfTextExtractor.getTextFromPage(reader,i) + "\n");
 			}
 		} catch(Exception e) {
 			return "";
 		}
-		return stringToHTMLString(text);
+		return text;
 	}
 
 	// Number of pages
