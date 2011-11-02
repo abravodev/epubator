@@ -39,7 +39,7 @@ public class ReadPdf {
 
 	// Extract text
 	public static String extractText(int startPage, int endPage) {
-		String text = "";
+		StringBuilder text = new StringBuilder();
 
 		if (endPage > reader.getNumberOfPages()) {
 			endPage = reader.getNumberOfPages();
@@ -47,12 +47,12 @@ public class ReadPdf {
 
 		try {
 			for (int i = startPage; i <= endPage; i++) {
-				text += stringToHTMLString(PdfTextExtractor.getTextFromPage(reader,i) + "\n");
+				text.append(stringToHTMLString(PdfTextExtractor.getTextFromPage(reader,i) + "\n"));
 			}
 		} catch(Exception e) {
 			return "";
 		}
-		return text;
+		return text.toString();
 	}
 
 	// Number of pages
@@ -74,7 +74,7 @@ public class ReadPdf {
 	//  http://www.rgagnon.com/javadetails/java-0306.html
 	//	Author: S. Bayer.
 	private static String stringToHTMLString(String string) {
-		StringBuffer sb = new StringBuffer(string.length());
+		StringBuilder sb = new StringBuilder();
 		// true if last char was blank
 		boolean lastWasBlankChar = false;
 		int len = string.length();
