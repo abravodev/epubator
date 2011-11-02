@@ -163,7 +163,7 @@ public class Convert extends Activity {
 			publishProgress(getResources().getString(R.string.pages) + " " + pages);
 			int totalFiles = 1 + pages / pagesPerFile;
 			int writedFiles = 0;
-			
+
 			publishProgress(getResources().getString(R.string.open));
 			if (WriteZip.create(filename)) {
 				return 3;
@@ -190,14 +190,24 @@ public class Convert extends Activity {
 			}
 
 			for(int i = 1; i <= pages; i += pagesPerFile) {
-				publishProgress(getResources().getString(R.string.html) + i + ".html   " + (int)(100 * (++writedFiles) / totalFiles) + "%");
-				String text = ReadPdf.extractText(i, i + pagesPerFile - 1);
-				if (text == "") {
+				StringBuilder text = new StringBuilder();
+
+				int endPage = i + pagesPerFile - 1;
+				if (endPage > pages) {
+					endPage = pages;
+				}
+
+				for (int j = i; j <= endPage; j++) {
+					text.append(stringToHTMLString(ReadPdf.extractText(j)));
+				}
+
+				if (text.length() == 0) {
 					return 4;
 				}
-				if (WriteZip.addEntry("OEBPS/page" + i + ".html", createPages(i, text) , false)) {
+				if (WriteZip.addEntry("OEBPS/page" + i + ".html", createPages(i, text.toString()) , false)) {
 					return 3;
 				}
+				publishProgress(getResources().getString(R.string.html) + i + ".html   " + (int)(100 * (++writedFiles) / totalFiles) + "%");
 			}
 
 			publishProgress(getResources().getString(R.string.close));
@@ -293,6 +303,65 @@ public class Convert extends Activity {
 			html += "</body>\n";
 			html += "</html>\n";
 			return html;
+		}
+
+		//  stringToHTMLString found on the web, no license indicated
+		//  http://www.rgagnon.com/javadetails/java-0306.html
+		//	Author: S. Bayer.
+		private  String stringToHTMLString(String string) {
+			StringBuilder sb = new StringBuilder(); // changed StringBuffer to StringBuilder to prevent buffer overflow
+			// true if last char was blank
+			boolean lastWasBlankChar = false;
+			int len = string.length();
+			char c;
+
+			for (int i = 0; i < len; i++)
+			{
+				c = string.charAt(i);
+				if (c == ' ') {
+					// blank gets extra work,
+					// this solves the problem you get if you replace all
+					// blanks with &nbsp;, if you do that you loss 
+					// word breaking
+					if (lastWasBlankChar) {
+						lastWasBlankChar = false;
+						sb.append("&nbsp;");
+					}
+					else {
+						lastWasBlankChar = true;
+						sb.append(' ');
+					}
+				}
+				else {
+					lastWasBlankChar = false;
+					//
+					// HTML Special Chars
+					if (c == '"')
+						sb.append("&quot;");
+					else if (c == '&')
+						sb.append("&amp;");
+					else if (c == '<')
+						sb.append("&lt;");
+					else if (c == '>')
+						sb.append("&gt;");
+					else if (c == '\n')
+						// Handle Newline
+						sb.append("<br/>");
+					else {
+						int ci = 0xffff & c;
+						if (ci < 160 )
+							// nothing special only 7 Bit
+							sb.append(c);
+						else {
+							// Not 7 Bit use the unicode system
+							sb.append("&#");
+							sb.append(new Integer(ci).toString());
+							sb.append(';');
+						}
+					}
+				}
+			}
+			return sb.toString();
 		}
 	}
 }
