@@ -21,6 +21,9 @@ import java.io.File;
 import java.util.Date;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -36,9 +39,11 @@ public class Convert extends Activity {
 	private static boolean backBtEnabled = true;
 	private static boolean conversionStarted = false;
 
+	private int pagesPerFile = 10;
+	private static int result;
 	private static String BookId;
-	private static int pagesPerFile = 10;
-
+	private static String epubFilename;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -55,7 +60,7 @@ public class Convert extends Activity {
 			okBt.setEnabled(backBtEnabled);
 		} else {
 			// Start conversion
-			new convert().execute();
+			new convertTask().execute();
 		}
 	}
 
@@ -81,8 +86,49 @@ public class Convert extends Activity {
 		return !backBtEnabled;
 	}
 
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        if (id == 0) {
+            return new AlertDialog.Builder(Convert.this)
+              .setTitle(getResources().getString(R.string.error))
+              .setMessage(getResources().getString(R.string.keep))
+              .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+                  public void onClick(DialogInterface dialog, int whichButton) {
+                	  keepEpub();
+                  }
+              })
+              .setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                  public void onClick(DialogInterface dialog, int whichButton) {
+                	  new File(epubFilename).delete();
+                	  progressSb.append("\n" + getResources().getStringArray(R.array.message)[4] + "\n");
+                	  progressSb.append(getResources().getString(R.string.deleted));
+                	  progressTv.setText(progressSb);
+                	  scroll_up();
+                  }
+              })
+              .create();
+        } else
+            return null;
+    }
+
+	private void keepEpub() {
+  	  progressSb.append("\n" + getResources().getStringArray(R.array.message)[0] + "\n");
+	  progressSb.append(getResources().getString(R.string.marked) + getResources().getString(R.string.marker) + "\n");
+	  progressSb.append(getResources().getString(R.string.file) + " " + epubFilename);
+	  progressTv.setText(progressSb);
+	  scroll_up();
+	}
+
+	private void scroll_up() {
+		((ScrollView)findViewById(R.id.scroll)).post(new Runnable() {
+			public void run() {
+				((ScrollView)findViewById(R.id.scroll)).fullScroll(ScrollView.FOCUS_DOWN);
+			}
+		});
+	}
+
 	// Start background task
-	private class convert extends AsyncTask<Void, String, Void> {
+	private class convertTask extends AsyncTask<Void, String, Void> {
 		// Background task
 		@Override
 		protected Void doInBackground(Void... params) {
@@ -98,25 +144,16 @@ public class Convert extends Activity {
 
 			File pdfFile = new File(pdfFilename);
 			BookId = pdfFile.getName().substring(0, pdfFile.getName().lastIndexOf(".pdf")).replaceAll("[^\\p{ASCII}]", "")+ " - " + new Date().hashCode();
-			String epubFilename = pdfFilename.substring(0, pdfFilename.lastIndexOf(".pdf")) + " - ePUBator.epub";
+			epubFilename = pdfFilename.substring(0, pdfFilename.lastIndexOf(".pdf")) + " - ePUBator.epub";
 
 			if (!pdfFile.exists()) {
 				// PDF file not found
-				errorMessage(1);
+				result = 1;
 			} else if (ReadPdf.open(pdfFilename)) {
 				// Failed to read PDF file
-				errorMessage(2);
+				result = 2;
 			} else {
-				int result = fillEPUB(epubFilename);
-				errorMessage(result);
-
-				if (result > 0) {
-					// delete bad file
-					new File(epubFilename).delete();
-					publishProgress(getResources().getString(R.string.deleted));
-				} else {
-					publishProgress(getResources().getString(R.string.file) + " " + epubFilename);
-				}
+				result = fillEPUB(epubFilename);
 			}
 
 			return null;
@@ -130,11 +167,7 @@ public class Convert extends Activity {
 				progressSb.append(message + "\n");
 			}
 			progressTv.setText(progressSb);
-			((ScrollView)findViewById(R.id.scroll)).post(new Runnable() {
-				public void run() {
-					((ScrollView)findViewById(R.id.scroll)).fullScroll(ScrollView.FOCUS_DOWN);
-				}
-			});
+			scroll_up();
 		}
 
 		// Prepare background task
@@ -149,12 +182,23 @@ public class Convert extends Activity {
 		// Background task ended
 		@Override
 		protected void onPostExecute(Void params) {
+			if (result == 4) {
+				if (!isFinishing()) {
+				showDialog(0);
+				} else {
+					keepEpub();
+				}
+			} else {
+				publishProgress("\n" + getResources().getStringArray(R.array.message)[result]);
+				if (result > 0) {
+					// delete bad file
+					new File(epubFilename).delete();
+					publishProgress(getResources().getString(R.string.deleted));
+				} else {
+					publishProgress(getResources().getString(R.string.file) + epubFilename);
+				}
+			}
 			okBt.setEnabled(backBtEnabled = true);
-		}
-
-		// Show error message
-		private void errorMessage(int errorCode) {
-			publishProgress("\n" + getResources().getStringArray(R.array.message)[errorCode]);
 		}
 
 		// Fill ePUB file
@@ -163,6 +207,8 @@ public class Convert extends Activity {
 			publishProgress(getResources().getString(R.string.pages) + " " + pages);
 			int totalFiles = 1 + pages / pagesPerFile;
 			int writedFiles = 0;
+			String marker = stringToHTMLString(getResources().getString(R.string.marker));
+			boolean extractionErrorFlag = false;
 
 			publishProgress(getResources().getString(R.string.open));
 			if (WriteZip.create(filename)) {
@@ -190,24 +236,32 @@ public class Convert extends Activity {
 			}
 
 			for(int i = 1; i <= pages; i += pagesPerFile) {
-				StringBuilder text = new StringBuilder();
+				StringBuilder textSb = new StringBuilder();
 
+				publishProgress(getResources().getString(R.string.html) + i + ".html   " + (int)(100 * (++writedFiles) / totalFiles) + "%");
 				int endPage = i + pagesPerFile - 1;
 				if (endPage > pages) {
 					endPage = pages;
 				}
 
 				for (int j = i; j <= endPage; j++) {
-					text.append(stringToHTMLString(ReadPdf.extractText(j)));
+					String page = stringToHTMLString(ReadPdf.extractText(j));
+					if (page.length() == 0) {
+						textSb.append(marker);
+						extractionErrorFlag = true;
+					} else {
+						if (page.matches(".*\\p{Cntrl}.*")) {
+							textSb.append(page.replaceAll("\\p{Cntrl}+", marker));
+							extractionErrorFlag = true;
+						} else {
+							textSb.append(page);
+						}
+					}
 				}
 
-				if (text.length() == 0) {
-					return 4;
-				}
-				if (WriteZip.addEntry("OEBPS/page" + i + ".html", createPages(i, text.toString()) , false)) {
+				if (WriteZip.addEntry("OEBPS/page" + i + ".html", createPages(i, textSb.toString()) , false)) {
 					return 3;
 				}
-				publishProgress(getResources().getString(R.string.html) + i + ".html   " + (int)(100 * (++writedFiles) / totalFiles) + "%");
 			}
 
 			publishProgress(getResources().getString(R.string.close));
@@ -215,7 +269,11 @@ public class Convert extends Activity {
 				return 3;
 			}
 
-			return 0;
+			if (extractionErrorFlag) {
+				return 4;
+			} else {
+				return 0;
+			}
 		}
 
 		// Create container.xml
@@ -298,7 +356,7 @@ public class Convert extends Activity {
 			html += "</head>\n";
 			html += "<body>\n";
 			html += "  <p>\n";
-			html += text.replaceAll("<br/>(?=[a-z])","&nbsp;");
+			html += text.replaceAll("<br/>(?=[a-z])", "&nbsp;");
 			html += "  </p>\n";
 			html += "</body>\n";
 			html += "</html>\n";
