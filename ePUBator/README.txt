@@ -6,11 +6,16 @@ PDF extraction based on iText library <http://itextpdf.com/>.
 - ePUBator doesn't need internet connection.
 - ePUBator extract only text (no pictures, no text in pictures).
 - ePUBator works fine with single column PDF (can work bad with multi column or tables).
-- ePUBator can fail extraction (tried 50 books, failed 11: I'm still working on it).
-- ePUBator can crash (try again, sometime is enough: I'm still working on it).
 
 For comment/feedback/bug/suggestion visit the project page: http://sourceforge.net/projects/epubator/
 
+History:
+v0.1
+- Initial release
+v0.2
+- Add 'keep errored file' dialog
+- Add marker on error
+- Fixed some bugs
 
 #########################################################################################################
 
@@ -23,7 +28,13 @@ L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/>.
 - ePUBator non necessita di una connessione internet.
 - ePUBator estrae solo il testo (nessuna figura, nessun testo dalle figure).
 - ePUBator funziona bene con i PDF a singola colonna (può essere pessimo con quelli multicolonna o le tabelle).
-- ePUBator può fallire l'estrazione (su 50 libri ne ha fallite 11: ci stò lavorando su).
-- ePUBator può piantarsi (riprova, qualche volta è sufficente: ci stò lavorando su).
 
 Per commenti/feedback/bug/suggerimenti visita la pagina web del progetto: http://sourceforge.net/projects/epubator/
+
+Storia:
+v0.1
+- Rilascio iniziale
+v0.2
+- Aggiunto dialogo 'conserva file errorato'
+- Aggiunto marcatore in caso di errore
+- Corretti alcuni bug

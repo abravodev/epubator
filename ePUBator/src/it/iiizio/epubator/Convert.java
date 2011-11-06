@@ -90,7 +90,7 @@ public class Convert extends Activity {
     protected Dialog onCreateDialog(int id) {
         if (id == 0) {
             return new AlertDialog.Builder(Convert.this)
-              .setTitle(getResources().getString(R.string.error))
+              .setTitle(getResources().getString(R.string.extactionerror))
               .setMessage(getResources().getString(R.string.keep))
               .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
                   public void onClick(DialogInterface dialog, int whichButton) {

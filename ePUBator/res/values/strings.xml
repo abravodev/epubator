@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="heading">"ePUBator - &#169;2011 Ezio Querini\nMinimal offline PDF to ePUB converter for Android\n\n"</string>
 	<string name="deleted">ePUB file deleted</string>
 	<string name="pages">Number of pages:</string>
-	<string name="error">Extraction error: text can be incomplete</string>
+	<string name="extactionerror">Extraction error: text can be incomplete</string>
 	<string name="keep">I have to keep the ePUB file?</string>
 	<string name="ok">OK</string>
 	<string name="cancel">Cancel</string>
