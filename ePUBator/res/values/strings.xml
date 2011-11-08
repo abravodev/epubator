@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="deleted">ePUB file deleted</string>
 	<string name="pages">Number of pages:</string>
 	<string name="extactionerror">Extraction error: text can be incomplete</string>
-	<string name="keep">I have to keep the ePUB file?</string>
+	<string name="keep">Have I to keep the ePUB file?</string>
 	<string name="ok">OK</string>
 	<string name="cancel">Cancel</string>
 	<string name="marker">"&lt;&lt;!&gt;&gt;"</string>
