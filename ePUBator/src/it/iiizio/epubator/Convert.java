@@ -43,7 +43,7 @@ public class Convert extends Activity {
 	private static int result;
 	private static String BookId;
 	private static String epubFilename;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -86,39 +86,47 @@ public class Convert extends Activity {
 		return !backBtEnabled;
 	}
 
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        if (id == 0) {
-            return new AlertDialog.Builder(Convert.this)
-              .setTitle(getResources().getString(R.string.extactionerror))
-              .setMessage(getResources().getString(R.string.keep))
-              .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
-                  public void onClick(DialogInterface dialog, int whichButton) {
-                	  keepEpub();
-                  }
-              })
-              .setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                  public void onClick(DialogInterface dialog, int whichButton) {
-                	  new File(epubFilename).delete();
-                	  progressSb.append("\n" + getResources().getStringArray(R.array.message)[4] + "\n");
-                	  progressSb.append(getResources().getString(R.string.deleted));
-                	  progressTv.setText(progressSb);
-                	  scroll_up();
-                  }
-              })
-              .create();
-        } else
-            return null;
-    }
-
-	private void keepEpub() {
-  	  progressSb.append("\n" + getResources().getStringArray(R.array.message)[0] + "\n");
-	  progressSb.append(getResources().getString(R.string.marked) + getResources().getString(R.string.marker) + "\n");
-	  progressSb.append(getResources().getString(R.string.file) + " " + epubFilename);
-	  progressTv.setText(progressSb);
-	  scroll_up();
+	// Keep file dialog
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		if (id == 0) {
+			return new AlertDialog.Builder(Convert.this)
+			.setTitle(getResources().getString(R.string.extactionerror))
+			.setMessage(getResources().getString(R.string.keep))
+			.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					keepEpub();
+				}
+			})
+			.setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					progressSb.append("\n" + getResources().getStringArray(R.array.message)[4] + "\n");
+					deleteEpub();
+					progressTv.setText(progressSb);
+					scroll_up();
+				}
+			})
+			.create();
+		} else
+			return null;
 	}
 
+	// Delete file
+	private void deleteEpub() {
+		new File(epubFilename).delete();
+		progressSb.append(getResources().getString(R.string.deleted));
+	}
+
+	// Keep file
+	private void keepEpub() {
+		progressSb.append("\n" + getResources().getStringArray(R.array.message)[0] + "\n");
+		progressSb.append(getResources().getString(R.string.marked) + getResources().getString(R.string.marker) + "\n");
+		progressSb.append(getResources().getString(R.string.file) + " " + epubFilename);
+		progressTv.setText(progressSb);
+		scroll_up();
+	}
+
+	// Scroll scroll view up
 	private void scroll_up() {
 		((ScrollView)findViewById(R.id.scroll)).post(new Runnable() {
 			public void run() {
@@ -153,7 +161,7 @@ public class Convert extends Activity {
 				// Failed to read PDF file
 				result = 2;
 			} else {
-				result = fillEPUB(epubFilename);
+				result = fillEpub(epubFilename);
 			}
 
 			return null;
@@ -184,16 +192,14 @@ public class Convert extends Activity {
 		protected void onPostExecute(Void params) {
 			if (result == 4) {
 				if (!isFinishing()) {
-				showDialog(0);
+					showDialog(0);
 				} else {
 					keepEpub();
 				}
 			} else {
 				publishProgress("\n" + getResources().getStringArray(R.array.message)[result]);
 				if (result > 0) {
-					// delete bad file
-					new File(epubFilename).delete();
-					publishProgress(getResources().getString(R.string.deleted));
+					deleteEpub();
 				} else {
 					publishProgress(getResources().getString(R.string.file) + epubFilename);
 				}
@@ -202,19 +208,24 @@ public class Convert extends Activity {
 		}
 
 		// Fill ePUB file
-		private int fillEPUB(String filename) {
+		private int fillEpub(String filename) {
+			// Set up counter
 			int pages = ReadPdf.getPages();
 			publishProgress(getResources().getString(R.string.pages) + " " + pages);
 			int totalFiles = 1 + pages / pagesPerFile;
 			int writedFiles = 0;
+
+			// Get marker
 			String marker = stringToHTMLString(getResources().getString(R.string.marker));
 			boolean extractionErrorFlag = false;
 
+			// Create ePUB file
 			publishProgress(getResources().getString(R.string.open));
 			if (WriteZip.create(filename)) {
 				return 3;
 			}
 
+			// Add required files
 			publishProgress(getResources().getString(R.string.mimetype));
 			if (WriteZip.addEntry("mimetype", "application/epub+zip", true)) {
 				return 3;
@@ -235,6 +246,7 @@ public class Convert extends Activity {
 				return 3;
 			}
 
+			// Add extracted text
 			for(int i = 1; i <= pages; i += pagesPerFile) {
 				StringBuilder textSb = new StringBuilder();
 
@@ -264,6 +276,7 @@ public class Convert extends Activity {
 				}
 			}
 
+			// Close ePUB file
 			publishProgress(getResources().getString(R.string.close));
 			if (WriteZip.close()) {
 				return 3;
