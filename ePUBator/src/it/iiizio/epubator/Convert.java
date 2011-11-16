@@ -120,7 +120,8 @@ public class Convert extends Activity {
 	// Keep file
 	private void keepEpub() {
 		progressSb.append("\n" + getResources().getStringArray(R.array.message)[0] + "\n");
-		progressSb.append(getResources().getString(R.string.marked) + getResources().getString(R.string.marker) + "\n");
+		progressSb.append(getResources().getString(R.string.pagelost) + "<<# page>>\n");
+		progressSb.append(getResources().getString(R.string.errors) + "<<! page>>\n");
 		progressSb.append(getResources().getString(R.string.file) + " " + epubFilename);
 		progressTv.setText(progressSb);
 		scroll_up();
@@ -215,8 +216,7 @@ public class Convert extends Activity {
 			int totalFiles = 1 + pages / pagesPerFile;
 			int writedFiles = 0;
 
-			// Get marker
-			String marker = stringToHTMLString(getResources().getString(R.string.marker));
+			// Set flag
 			boolean extractionErrorFlag = false;
 
 			// Create ePUB file
@@ -259,11 +259,11 @@ public class Convert extends Activity {
 				for (int j = i; j <= endPage; j++) {
 					String page = stringToHTMLString(ReadPdf.extractText(j));
 					if (page.length() == 0) {
-						textSb.append(marker);
+						textSb.append("&lt;&lt;# " + j + "&gt;&gt;");
 						extractionErrorFlag = true;
 					} else {
 						if (page.matches(".*\\p{Cntrl}.*")) {
-							textSb.append(page.replaceAll("\\p{Cntrl}+", marker));
+							textSb.append(page.replaceAll("\\p{Cntrl}+", "&lt;&lt;! " + j + "&gt;&gt;"));
 							extractionErrorFlag = true;
 						} else {
 							textSb.append(page);

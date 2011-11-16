@@ -27,8 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="keep">Have I to keep the ePUB file?</string>
 	<string name="ok">OK</string>
 	<string name="cancel">Cancel</string>
-	<string name="marker">"&lt;&lt;!&gt;&gt;"</string>
-	<string name="marked">"Extraction errors are marked with "</string>
+	<string name="pagelost">"Lost pages are marked with "</string>
+	<string name="errors">"Extraction errors are marked with "</string>
 	<string name="load">Loading:</string>
 	<string name="file">"ePUB file: "</string>
 	<string name="open">Open ePUB file</string>
