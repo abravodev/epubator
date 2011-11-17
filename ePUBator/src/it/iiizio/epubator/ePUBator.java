@@ -35,12 +35,12 @@ public class ePUBator extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		Button bSelect = (Button) findViewById(R.id.select);
-		bSelect.setOnClickListener(mSelectListener);
+		((Button) findViewById(R.id.convert)).setOnClickListener(mConvertListener);
+		((Button) findViewById(R.id.preview)).setOnClickListener(mPreviewListener);
 	}
 
-	// Button pressed
-	View.OnClickListener mSelectListener = new OnClickListener() {
+	// Convert button pressed
+	View.OnClickListener mConvertListener = new OnClickListener() {
 		public void onClick(View v) {
 			if (Convert.started()) {
 				// Conversion already started, show progress
@@ -58,15 +58,32 @@ public class ePUBator extends Activity {
 		}
 	};
 
+	// Preview button pressed
+	View.OnClickListener mPreviewListener = new OnClickListener() {
+		public void onClick(View v) {
+			// Select a file
+			Intent chooseFile = new Intent(ePUBator.this, FileChooser.class);
+			chooseFile.putExtra("path", path);
+			chooseFile.putExtra("filter", "ePUBator.epub");
+			startActivityForResult(chooseFile, 0);
+		}
+	};
+
 	// File selected, start conversion
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
 			filename = data.getAction();
 			path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
 
-			Intent convert = new Intent(ePUBator.this, Convert.class);
-			convert.putExtra("filename", filename);
-			startActivity(convert);
+			if (filename.endsWith("pdf")) {
+				Intent convert = new Intent(ePUBator.this, Convert.class);
+				convert.putExtra("filename", filename);
+				startActivity(convert);
+			} else {
+				Intent preview = new Intent(ePUBator.this, Preview.class);
+				preview.putExtra("filename", filename);
+				startActivity(preview);
+			}
 		}
 	}
 }

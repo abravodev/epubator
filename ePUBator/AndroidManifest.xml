@@ -21,7 +21,8 @@
         </activity>
 		<activity android:name="FileChooser"></activity>
 		<activity android:name="Convert"></activity>
-        </application>
+		<activity android:name="Preview"></activity>
+		</application>
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 </manifest>

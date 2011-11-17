@@ -17,7 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
     <string name="app_name">ePUBator</string>
-	<string name="select">Select a PDF file to start\nthe conversion to ePUB</string>
+	<string name="convert">Convert</string>
+	<string name="preview">Preview</string>
 	<string name="cip">Conversion in progress</string>
 	<string name="path">"Path: "</string>
 	<string name="heading">"ePUBator - &#169;2011 Ezio Querini\nMinimal offline PDF to ePUB converter for Android\n\n"</string>
@@ -38,6 +39,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="toc">Add toc.ncx</string>
 	<string name="html">Add page</string>
 	<string name="close">Close file</string>
+	<string name="index">Index</string>
+	<string name="prev">Previous page</string>
+	<string name="next">Next page</string>
 	<string-array name="message">
 		<item>Conversion completed</item>
 		<item>PDF file not found</item>
