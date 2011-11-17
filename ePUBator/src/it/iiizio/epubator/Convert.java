@@ -86,11 +86,6 @@ public class Convert extends Activity {
 		return !backBtEnabled;
 	}
 
-	// Conversion started?
-	public static boolean started() {
-		return conversionStarted;
-	}
-
 	// Keep file dialog
 	@Override
 	protected Dialog onCreateDialog(int id) {

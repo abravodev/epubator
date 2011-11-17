@@ -42,11 +42,9 @@ public class ePUBator extends Activity {
 	// Button pressed
 	View.OnClickListener mSelectListener = new OnClickListener() {
 		public void onClick(View v) {
-			if (Convert.started()) {
+			if (Convert.working()) {
 				// Conversion already started, show progress
-				if (Convert.working()) {
-					Toast.makeText(getApplicationContext(), getResources().getString(R.string.cip), Toast.LENGTH_LONG).show();
-				}
+				Toast.makeText(getApplicationContext(), getResources().getString(R.string.cip), Toast.LENGTH_LONG).show();
 				startActivity(new Intent(ePUBator.this, Convert.class));
 			} else {
 				// Select a file
