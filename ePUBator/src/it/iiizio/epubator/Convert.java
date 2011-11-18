@@ -96,7 +96,7 @@ public class Convert extends Activity {
 	protected Dialog onCreateDialog(int id) {
 		if (id == 0) {
 			return new AlertDialog.Builder(Convert.this)
-			.setTitle(getResources().getString(R.string.extactionerror))
+			.setTitle(getResources().getString(R.string.extaction_error))
 			.setMessage(getResources().getString(R.string.keep))
 			.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
@@ -125,7 +125,7 @@ public class Convert extends Activity {
 	// Keep file
 	private void keepEpub() {
 		progressSb.append("\n" + getResources().getStringArray(R.array.message)[0] + "\n");
-		progressSb.append(getResources().getString(R.string.pagelost) + "<<# page>>\n");
+		progressSb.append(getResources().getString(R.string.page_lost) + "<<# page>>\n");
 		progressSb.append(getResources().getString(R.string.errors) + "<<! page>>\n");
 		progressSb.append(getResources().getString(R.string.file) + " " + epubFilename);
 		progressTv.setText(progressSb);

@@ -16,12 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
         <Button
-            android:id="@+id/index"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/index"
-            android:layout_weight="1" />
-        <Button
             android:id="@+id/prev"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

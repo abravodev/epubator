@@ -19,16 +19,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="app_name">ePUBator</string>
 	<string name="convert">Convert</string>
 	<string name="preview">Preview</string>
+	<string name="prev">Previous page</string>
+	<string name="next">Next page</string>
+	<string name="read_error">"Can't read ePUB file"</string>
 	<string name="cip">Conversion in progress</string>
 	<string name="path">"Path: "</string>
 	<string name="heading">"ePUBator - &#169;2011 Ezio Querini\nMinimal offline PDF to ePUB converter for Android\n\n"</string>
 	<string name="deleted">ePUB file deleted</string>
 	<string name="pages">Number of pages:</string>
-	<string name="extactionerror">Extraction error: text can be incomplete</string>
+	<string name="extaction_error">Extraction error: text can be incomplete</string>
 	<string name="keep">Have I to keep the ePUB file?</string>
 	<string name="ok">OK</string>
 	<string name="cancel">Cancel</string>
-	<string name="pagelost">"Lost pages are marked with "</string>
+	<string name="page_lost">"Lost pages are marked with "</string>
 	<string name="errors">"Extraction errors are marked with "</string>
 	<string name="load">Loading:</string>
 	<string name="file">"ePUB file: "</string>
@@ -39,9 +42,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="toc">Add toc.ncx</string>
 	<string name="html">Add page</string>
 	<string name="close">Close file</string>
-	<string name="index">Index</string>
-	<string name="prev">Previous page</string>
-	<string name="next">Next page</string>
 	<string-array name="message">
 		<item>Conversion completed</item>
 		<item>PDF file not found</item>
