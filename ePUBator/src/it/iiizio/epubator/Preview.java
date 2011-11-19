@@ -17,7 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package it.iiizio.epubator;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
@@ -32,7 +34,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 public class Preview extends Activity {
-	private static int page = -1;
+	private static int pageNumber = -1;
 	private static ArrayList<String>pageList;
 	private static ZipFile epubFile = null;
 	private static WebView previewWv;
@@ -45,7 +47,7 @@ public class Preview extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.preview);
 		
-		if (page == -1) {
+		if (pageNumber == -1) {
 			previewWv = (WebView)findViewById(R.id.preview);
 			prevBt = (Button)findViewById(R.id.prev);
 			nextBt = (Button)findViewById(R.id.next);
@@ -55,7 +57,7 @@ public class Preview extends Activity {
 				closeEpub();
 				readError();
 			} else {
-				page = 1;
+				pageNumber = 1;
 			}
 		}
 		
@@ -66,20 +68,32 @@ public class Preview extends Activity {
 	
 	// Show page
 	private void showPage(int diff) {
-		page += diff;
+		pageNumber += diff;
 		
-		if (page == 1) {
+		if (pageNumber == 1) {
 			prevBt.setEnabled(false);
 		} else {
 			prevBt.setEnabled(true);
 		}
-		if  (page == pageList.size()) {
+		if  (pageNumber == pageList.size()) {
 			nextBt.setEnabled(false);
 		} else {
 			nextBt.setEnabled(true);
 		}
-		
-		previewWv.loadData("page" + page, "text/html", "utf-8");
+
+		String pageName = pageList.get(pageNumber - 1);
+		StringBuilder htmlPage = new StringBuilder();
+		try {
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry(pageName))));
+			String line;
+			while ((line = bufferedReader.readLine()) != null) {
+				htmlPage.append(line);
+			}
+		} catch (IOException e) {
+			readError();
+		}
+
+		previewWv.loadData(htmlPage.toString(), "text/html", "utf-8");
 	}
 
 	// Prev button pressed
@@ -128,13 +142,13 @@ public class Preview extends Activity {
 
 	// Show error toast
 	private void readError() {
-		Toast.makeText(getApplicationContext(), getResources().getString(R.string.read_error), Toast.LENGTH_LONG).show();
+		Toast.makeText(getApplicationContext(), getResources().getString(R.string.read_error), Toast.LENGTH_SHORT).show();
 		exit();
 	}
 
 	// Activity end
 	private void exit() {
-		page = -1;
+		pageNumber = -1;
 		finish();
 	}
 
