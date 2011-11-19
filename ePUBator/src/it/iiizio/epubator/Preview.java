@@ -35,11 +35,11 @@ import android.widget.Toast;
 
 public class Preview extends Activity {
 	private static int pageNumber = -1;
-	private static ArrayList<String>pageList;
 	private static ZipFile epubFile = null;
-	private static WebView previewWv;
-	private static Button prevBt;
-	private static Button nextBt;
+	private ArrayList<String>pageList;
+	private WebView previewWv;
+	private Button prevBt;
+	private Button nextBt;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -47,18 +47,18 @@ public class Preview extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.preview);
 		
-		if (pageNumber == -1) {
-			previewWv = (WebView)findViewById(R.id.preview);
-			prevBt = (Button)findViewById(R.id.prev);
-			nextBt = (Button)findViewById(R.id.next);
+		previewWv = (WebView)findViewById(R.id.webview);
+		previewWv.setBackgroundColor(0);
+		prevBt = (Button)findViewById(R.id.prev);
+		nextBt = (Button)findViewById(R.id.next);
 
-			fillPageList();
-			if (pageList.isEmpty()) {
-				closeEpub();
-				readError();
-			} else {
-				pageNumber = 1;
-			}
+		// Initialize
+		fillPageList();
+		if (pageList.isEmpty()) {
+			closeEpub();
+			readError();
+		} else if (pageNumber == -1) {
+			pageNumber = 1;
 		}
 		
 		showPage(0);
@@ -70,6 +70,7 @@ public class Preview extends Activity {
 	private void showPage(int diff) {
 		pageNumber += diff;
 		
+		// Set buttons
 		if (pageNumber == 1) {
 			prevBt.setEnabled(false);
 		} else {
@@ -81,19 +82,22 @@ public class Preview extends Activity {
 			nextBt.setEnabled(true);
 		}
 
+		// get html page
 		String pageName = pageList.get(pageNumber - 1);
-		StringBuilder htmlPage = new StringBuilder();
+		StringBuilder htmlPageSb = new StringBuilder();
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry(pageName))));
 			String line;
 			while ((line = bufferedReader.readLine()) != null) {
-				htmlPage.append(line);
+				htmlPageSb.append(line);
 			}
 		} catch (IOException e) {
 			readError();
 		}
 
-		previewWv.loadData(htmlPage.toString(), "text/html", "utf-8");
+		// Show page in white on black
+		String htmlPage = htmlPageSb.toString().replace("<body>", "<body bgcolor=\"Black\"><font color=\"White\">").replace("</body>", "</font></body>");
+		previewWv.loadData(htmlPage, "text/html", "utf-8");
 	}
 
 	// Prev button pressed
