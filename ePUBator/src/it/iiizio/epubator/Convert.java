@@ -36,7 +36,7 @@ public class Convert extends Activity {
 	private static StringBuilder progressSb;
 	private static TextView progressTv;
 	private static Button okBt;
-	private static boolean backBtEnabled = true;
+	private static boolean okBtEnabled = true;
 	private static boolean conversionStarted = false;
 
 	private int pagesPerFile = 10;
@@ -52,12 +52,12 @@ public class Convert extends Activity {
 
 		progressTv = ((TextView)findViewById(R.id.progress));
 		okBt = (Button)findViewById(R.id.back);
-		okBt.setOnClickListener(mBackListener);
+		okBt.setOnClickListener(mOkListener);
 
 		if (conversionStarted) {
 			// Conversion already started, update screen
 			progressTv.setText(progressSb);
-			okBt.setEnabled(backBtEnabled);
+			okBt.setEnabled(okBtEnabled);
 		} else {
 			// Start conversion
 			new convertTask().execute();
@@ -65,7 +65,7 @@ public class Convert extends Activity {
 	}
 
 	// Ok button pressed
-	private OnClickListener mBackListener = new OnClickListener()
+	private OnClickListener mOkListener = new OnClickListener()
 	{
 		public void onClick(View v)
 		{
@@ -83,7 +83,7 @@ public class Convert extends Activity {
 
 	// Conversion in progress?
 	public static boolean working() {
-		return !backBtEnabled;
+		return !okBtEnabled;
 	}
 
 	// Conversion started?
@@ -189,7 +189,7 @@ public class Convert extends Activity {
 		protected void onPreExecute() {
 			progressSb = new StringBuilder();
 			progressSb.append(getResources().getString(R.string.heading));
-			okBt.setEnabled(backBtEnabled = false);
+			okBt.setEnabled(okBtEnabled = false);
 			conversionStarted = true;	
 		}
 
@@ -210,7 +210,7 @@ public class Convert extends Activity {
 					publishProgress(getResources().getString(R.string.file) + epubFilename);
 				}
 			}
-			okBt.setEnabled(backBtEnabled = true);
+			okBt.setEnabled(okBtEnabled = true);
 		}
 
 		// Fill ePUB file
