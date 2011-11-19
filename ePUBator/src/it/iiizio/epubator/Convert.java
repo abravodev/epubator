@@ -34,8 +34,8 @@ import android.widget.TextView;
 
 public class Convert extends Activity {
 	private static StringBuilder progressSb;
-	private static TextView progressTv;
-	private static Button okBt;
+	private TextView progressTv;
+	private Button okBt;
 	private static boolean okBtEnabled = true;
 	private static boolean conversionStarted = false;
 
@@ -43,6 +43,8 @@ public class Convert extends Activity {
 	private static int result;
 	private static String BookId;
 	private static String epubFilename;
+	private static String tmpFilename;
+	private static String oldFilename;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -51,7 +53,7 @@ public class Convert extends Activity {
 		setContentView(R.layout.progressview);
 
 		progressTv = ((TextView)findViewById(R.id.progress));
-		okBt = (Button)findViewById(R.id.back);
+		okBt = (Button)findViewById(R.id.ok);
 		okBt.setOnClickListener(mOkListener);
 
 		if (conversionStarted) {
@@ -106,7 +108,7 @@ public class Convert extends Activity {
 			.setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					progressSb.append("\n" + getResources().getStringArray(R.array.message)[4] + "\n");
-					deleteEpub();
+					deleteTmp();
 					progressTv.setText(progressSb);
 					scroll_up();
 				}
@@ -117,9 +119,14 @@ public class Convert extends Activity {
 	}
 
 	// Delete file
-	private void deleteEpub() {
-		new File(epubFilename).delete();
-		progressSb.append(getResources().getString(R.string.deleted));
+	private void deleteTmp() {
+		new File(tmpFilename).delete();
+		if (new File(oldFilename).exists()) {
+			new File(oldFilename).renameTo(new File(epubFilename));
+			progressSb.append(getResources().getString(R.string.kept_old));
+		} else {
+			progressSb.append(getResources().getString(R.string.deleted));
+		}
 	}
 
 	// Keep file
@@ -127,6 +134,13 @@ public class Convert extends Activity {
 		progressSb.append("\n" + getResources().getStringArray(R.array.message)[0] + "\n");
 		progressSb.append(getResources().getString(R.string.page_lost) + "<<# page>>\n");
 		progressSb.append(getResources().getString(R.string.errors) + "<<! page>>\n");
+		renameFile();
+	}
+
+	// Rename tmp file
+	private void renameFile() {
+		new File(tmpFilename).renameTo(new File(epubFilename));
+		new File(oldFilename).delete();
 		progressSb.append(getResources().getString(R.string.file) + " " + epubFilename);
 		progressTv.setText(progressSb);
 		scroll_up();
@@ -156,18 +170,24 @@ public class Convert extends Activity {
 			}
 			publishProgress(getResources().getString(R.string.load) + " " + pdfFilename);
 
-			File pdfFile = new File(pdfFilename);
-			BookId = pdfFile.getName().substring(0, pdfFile.getName().lastIndexOf(".pdf")).replaceAll("[^\\p{ASCII}]", "")+ " - " + new Date().hashCode();
-			epubFilename = pdfFilename.substring(0, pdfFilename.lastIndexOf(".pdf")) + " - ePUBator.epub";
+			String nameNoExt = pdfFilename.substring(0, pdfFilename.lastIndexOf(".pdf"));
+			BookId = nameNoExt.replaceAll("[^\\p{ASCII}]", "")+ " - " + new Date().hashCode();
+			epubFilename = nameNoExt + " - ePUBator.epub";
+			tmpFilename = nameNoExt + " - ePUBator.tmp";
+			oldFilename = nameNoExt + " - ePUBator.old";
+			
+			if (new File(epubFilename).exists()) {
+				new File(epubFilename).renameTo(new File(oldFilename));
+			}
 
-			if (!pdfFile.exists()) {
+			if (!(new File(pdfFilename).exists())) {
 				// PDF file not found
 				result = 1;
 			} else if (ReadPdf.open(pdfFilename)) {
 				// Failed to read PDF file
 				result = 2;
 			} else {
-				result = fillEpub(epubFilename);
+				result = fillEpub(tmpFilename);
 			}
 
 			return null;
@@ -205,9 +225,9 @@ public class Convert extends Activity {
 			} else {
 				publishProgress("\n" + getResources().getStringArray(R.array.message)[result]);
 				if (result > 0) {
-					deleteEpub();
+					deleteTmp();
 				} else {
-					publishProgress(getResources().getString(R.string.file) + epubFilename);
+					renameFile();
 				}
 			}
 			okBt.setEnabled(okBtEnabled = true);

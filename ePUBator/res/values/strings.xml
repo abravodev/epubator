@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="path">"Path: "</string>
 	<string name="heading">"ePUBator - &#169;2011 Ezio Querini\nMinimal offline PDF to ePUB converter for Android\n\n"</string>
 	<string name="deleted">ePUB file deleted</string>
+	<string name="kept_old">Kept old ePUB file</string>
 	<string name="pages">Number of pages:</string>
 	<string name="extaction_error">Extraction error: text can be incomplete</string>
 	<string name="keep">Have I to keep the ePUB file?</string>
