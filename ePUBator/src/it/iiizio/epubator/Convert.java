@@ -193,9 +193,6 @@ public class Convert extends Activity {
 		progressSv.post(new Runnable() {
 			public void run() {
 				progressSv.fullScroll(ScrollView.FOCUS_DOWN);
-/*		((ScrollView)findViewById(R.id.scroll)).post(new Runnable() {
-			public void run() {
-				((ScrollView)findViewById(R.id.scroll)).fullScroll(ScrollView.FOCUS_DOWN);*/
 			}
 		});
 	}
@@ -295,87 +292,91 @@ public class Convert extends Activity {
 
 		// Fill ePUB file
 		private int fillEpub(String filename) {
-			// Set up counter
-			int pages = ReadPdf.getPages();
-			publishProgress(getResources().getString(R.string.pages) + " " + pages);
-			int totalFiles = 1 + pages / pagesPerFile;
-			int writedFiles = 0;
-
-			// Set flag
-			boolean extractionErrorFlag = false;
-
-			// Create ePUB file
-			publishProgress(getResources().getString(R.string.open));
-			if (WriteZip.create(filename)) {
-				return 3;
-			}
-
-			// Add required files
-			publishProgress(getResources().getString(R.string.mimetype));
-			if (WriteZip.addEntry("mimetype", "application/epub+zip", true)) {
-				return 3;
-			}
-
-			publishProgress(getResources().getString(R.string.container));
-			if (WriteZip.addEntry("META-INF/container.xml", createContainer(), false)) {
-				return 3;
-			}
-
-			publishProgress(getResources().getString(R.string.content));
-			if (WriteZip.addEntry("OEBPS/content.opf", createContent(pages), false)) {
-				return 3;
-			}
-
-			publishProgress(getResources().getString(R.string.toc));
-			if (WriteZip.addEntry("OEBPS/toc.ncx", createToc(pages), false)) {
-				return 3;
-			}
-
-			// Add extracted text
-			for(int i = 1; i <= pages; i += pagesPerFile) {
-				// Stopped?
-				if (result == 5) {
-					return 5;
-				}
-				
-				StringBuilder textSb = new StringBuilder();
-
-				publishProgress(getResources().getString(R.string.html) + i + ".html   " + (int)(100 * (++writedFiles) / totalFiles) + "%");
-				int endPage = i + pagesPerFile - 1;
-				if (endPage > pages) {
-					endPage = pages;
-				}
-
-				for (int j = i; j <= endPage; j++) {
-					String page = stringToHTMLString(ReadPdf.extractText(j));
-					if (page.length() == 0) {
-						textSb.append("&lt;&lt;# " + j + "&gt;&gt;");
-						extractionErrorFlag = true;
-					} else {
-						if (page.matches(".*\\p{Cntrl}.*")) {
-							textSb.append(page.replaceAll("\\p{Cntrl}+", "&lt;&lt;! " + j + "&gt;&gt;"));
-							extractionErrorFlag = true;
-						} else {
-							textSb.append(page);
-						}
-					}
-				}
-
-				if (WriteZip.addEntry("OEBPS/page" + i + ".html", createPages(i, textSb.toString()) , false)) {
+			try {
+				// Set up counter
+				int pages = ReadPdf.getPages();
+				publishProgress(getResources().getString(R.string.pages) + " " + pages);
+				int totalFiles = 1 + pages / pagesPerFile;
+				int writedFiles = 0;
+	
+				// Set flag
+				boolean extractionErrorFlag = false;
+	
+				// Create ePUB file
+				publishProgress(getResources().getString(R.string.open));
+				if (WriteZip.create(filename)) {
 					return 3;
 				}
-			}
-
-			// Close ePUB file
-			publishProgress(getResources().getString(R.string.close));
-			if (WriteZip.close()) {
-				return 3;
-			}
-
-			if (extractionErrorFlag) {
-				return 4;
-			} else {
-				return 0;
+	
+				// Add required files
+				publishProgress(getResources().getString(R.string.mimetype));
+				if (WriteZip.addEntry("mimetype", "application/epub+zip", true)) {
+					return 3;
+				}
+	
+				publishProgress(getResources().getString(R.string.container));
+				if (WriteZip.addEntry("META-INF/container.xml", createContainer(), false)) {
+					return 3;
+				}
+	
+				publishProgress(getResources().getString(R.string.content));
+				if (WriteZip.addEntry("OEBPS/content.opf", createContent(pages), false)) {
+					return 3;
+				}
+	
+				publishProgress(getResources().getString(R.string.toc));
+				if (WriteZip.addEntry("OEBPS/toc.ncx", createToc(pages), false)) {
+					return 3;
+				}
+	
+				// Add extracted text
+				for(int i = 1; i <= pages; i += pagesPerFile) {
+					// Stopped?
+					if (result == 5) {
+						return 5;
+					}
+					
+					StringBuilder textSb = new StringBuilder();
+	
+					publishProgress(getResources().getString(R.string.html) + i + ".html   " + (int)(100 * (++writedFiles) / totalFiles) + "%");
+					int endPage = i + pagesPerFile - 1;
+					if (endPage > pages) {
+						endPage = pages;
+					}
+	
+					for (int j = i; j <= endPage; j++) {
+						String page = stringToHTMLString(ReadPdf.extractText(j));
+						if (page.length() == 0) {
+							textSb.append("&lt;&lt;# " + j + "&gt;&gt;");
+							extractionErrorFlag = true;
+						} else {
+							if (page.matches(".*\\p{Cntrl}.*")) {
+								textSb.append(page.replaceAll("\\p{Cntrl}+", "&lt;&lt;! " + j + "&gt;&gt;"));
+								extractionErrorFlag = true;
+							} else {
+								textSb.append(page);
+							}
+						}
+					}
+	
+					if (WriteZip.addEntry("OEBPS/page" + i + ".html", createPages(i, textSb.toString()) , false)) {
+						return 3;
+					}
+				}
+	
+				// Close ePUB file
+				publishProgress(getResources().getString(R.string.close));
+				if (WriteZip.close()) {
+					return 3;
+				}
+	
+				if (extractionErrorFlag) {
+					return 4;
+				} else {
+					return 0;
+				}
+			} catch(OutOfMemoryError e) {
+				return 6;
 			}
 		}
 

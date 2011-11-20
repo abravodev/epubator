@@ -51,5 +51,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<item>Failed to write ePUB file</item>
 		<item>Failed to extract text</item>
 		<item>Extraction stopped by user</item>
+		<item>Out of memory error</item>
 	</string-array>
 </resources>

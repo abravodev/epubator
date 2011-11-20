@@ -33,6 +33,8 @@ public class ReadPdf {
 			info = reader.getInfo();
 		} catch(Exception e) {
 			return true;
+		} catch(OutOfMemoryError e) {
+			return true;
 		}
 		return false;
 	}

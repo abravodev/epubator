@@ -51,5 +51,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<item>Scrittura del file ePUB fallita</item>
 		<item>Estrazione del testo fallita</item>
 		<item>Estrazione interrotta dal utente</item>
+		<item>Memoria insufficente</item>
 	</string-array>
 </resources>
