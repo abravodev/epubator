@@ -213,8 +213,19 @@ public class Convert extends Activity {
 					pdfFilename = extras.getString("filename");
 				}
 			}
-			publishProgress(getResources().getString(R.string.load) + " " + pdfFilename);
+			
+			// Remove bad files
+			String path = pdfFilename.substring(0, pdfFilename.lastIndexOf('/', pdfFilename.length()) + 1);
+			String[] files = new File(path).list();
+			if(files.length > 0){
+		        for (int i = 0; i < files.length; i++) {
+		            if (files[i].endsWith("ePUBator.tmp") || files[i].endsWith("ePUBator.old")) {
+		            	new File(path + files[i]).delete();
+		            }
+		        }
+	        }
 
+			// Set variables
 			String nameNoExt = pdfFilename.substring(0, pdfFilename.lastIndexOf(".pdf"));
 			BookId = nameNoExt.replaceAll("[^\\p{ASCII}]", "")+ " - " + new Date().hashCode();
 			epubFilename = nameNoExt + " - ePUBator.epub";
@@ -225,6 +236,8 @@ public class Convert extends Activity {
 				new File(epubFilename).renameTo(new File(oldFilename));
 			}
 
+			// Load PDF
+			publishProgress(getResources().getString(R.string.load) + " " + pdfFilename);
 			if (!(new File(pdfFilename).exists())) {
 				// PDF file not found
 				result = 1;
@@ -256,7 +269,7 @@ public class Convert extends Activity {
 			progressSb.append(getResources().getString(R.string.heading));
 			setButtons(false);
 			result = 0;
-			conversionStarted = true;	
+			conversionStarted = true;
 		}
 
 		// Background task ended
