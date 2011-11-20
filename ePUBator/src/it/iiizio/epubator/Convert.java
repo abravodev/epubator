@@ -24,6 +24,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -97,14 +98,17 @@ public class Convert extends Activity {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		if (id == 0) {
+			// Build dialog
 			return new AlertDialog.Builder(Convert.this)
 			.setTitle(getResources().getString(R.string.extaction_error))
 			.setMessage(getResources().getString(R.string.keep))
+			// Ok action
 			.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					keepEpub();
 				}
 			})
+			// Cancel action
 			.setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					progressSb.append("\n" + getResources().getStringArray(R.array.message)[4] + "\n");
@@ -113,11 +117,24 @@ public class Convert extends Activity {
 					scroll_up();
 				}
 			})
+			// Preview action
+			.setNeutralButton(getResources().getString(R.string.preview), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					Intent preview = new Intent(getBaseContext(), Preview.class);
+					preview.putExtra("filename", tmpFilename);
+					startActivityForResult(preview, 0);
+				}
+			})
 			.create();
 		} else
 			return null;
 	}
 
+	// Show dialog again after preview activity
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		showDialog(0);
+	}
+	
 	// Delete file
 	private void deleteTmp() {
 		new File(tmpFilename).delete();
@@ -135,15 +152,15 @@ public class Convert extends Activity {
 		progressSb.append(getResources().getString(R.string.page_lost) + "<<# page>>\n");
 		progressSb.append(getResources().getString(R.string.errors) + "<<! page>>\n");
 		renameFile();
+		progressSb.append(getResources().getString(R.string.file) + " " + epubFilename);
+		progressTv.setText(progressSb);
+		scroll_up();
 	}
 
 	// Rename tmp file
 	private void renameFile() {
 		new File(tmpFilename).renameTo(new File(epubFilename));
 		new File(oldFilename).delete();
-		progressSb.append(getResources().getString(R.string.file) + " " + epubFilename);
-		progressTv.setText(progressSb);
-		scroll_up();
 	}
 
 	// Scroll scroll view up
@@ -228,6 +245,7 @@ public class Convert extends Activity {
 					deleteTmp();
 				} else {
 					renameFile();
+					publishProgress("\n" + getResources().getString(R.string.file) + " " + epubFilename);
 				}
 			}
 			okBt.setEnabled(okBtEnabled = true);
