@@ -45,7 +45,7 @@ public class ePUBator extends Activity {
 			if (Convert.started()) {
 				// Conversion already started, show progress
 				if (Convert.working()) {
-					Toast.makeText(getApplicationContext(), getResources().getString(R.string.cip), Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), getResources().getString(R.string.cip), Toast.LENGTH_SHORT).show();
 				}
 				startActivity(new Intent(ePUBator.this, Convert.class));
 			} else {

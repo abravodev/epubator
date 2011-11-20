@@ -35,8 +35,10 @@ import android.widget.TextView;
 
 public class Convert extends Activity {
 	private static StringBuilder progressSb;
-	private TextView progressTv;
-	private Button okBt;
+	private static ScrollView progressSv;
+	private static TextView progressTv;
+	private static Button okBt;
+	private static Button stopBt;
 	private static boolean okBtEnabled = true;
 	private static boolean conversionStarted = false;
 
@@ -53,18 +55,28 @@ public class Convert extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.progressview);
 
-		progressTv = ((TextView)findViewById(R.id.progress));
+		progressSv = (ScrollView)findViewById(R.id.scroll);
+		progressTv = (TextView)findViewById(R.id.progress);
 		okBt = (Button)findViewById(R.id.ok);
 		okBt.setOnClickListener(mOkListener);
+		stopBt = (Button)findViewById(R.id.stop);
+		stopBt.setOnClickListener(mStopListener);
 
 		if (conversionStarted) {
 			// Conversion already started, update screen
 			progressTv.setText(progressSb);
-			okBt.setEnabled(okBtEnabled);
+			setButtons(okBtEnabled);
 		} else {
 			// Start conversion
 			new convertTask().execute();
 		}
+	}
+
+	// Set buttons state
+	private void setButtons(boolean flag) {
+		okBtEnabled = flag;
+		okBt.setEnabled(okBtEnabled);
+		stopBt.setEnabled(!okBtEnabled);
 	}
 
 	// Ok button pressed
@@ -73,7 +85,19 @@ public class Convert extends Activity {
 		public void onClick(View v)
 		{
 			conversionStarted = false;
+			progressSb = null;
+			progressSv = null;
+			progressTv = null;
 			finish();
+		}
+	};
+
+	// Stop button pressed
+	private OnClickListener mStopListener = new OnClickListener()
+	{
+		public void onClick(View v)
+		{
+			result = 5;
 		}
 	};
 
@@ -113,8 +137,6 @@ public class Convert extends Activity {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					progressSb.append("\n" + getResources().getStringArray(R.array.message)[4] + "\n");
 					deleteTmp();
-					progressTv.setText(progressSb);
-					scroll_up();
 				}
 			})
 			// Preview action
@@ -144,6 +166,9 @@ public class Convert extends Activity {
 		} else {
 			progressSb.append(getResources().getString(R.string.deleted));
 		}
+		System.err.println(progressSb);
+		progressTv.setText(progressSb);
+		scroll_up();
 	}
 
 	// Keep file
@@ -165,9 +190,12 @@ public class Convert extends Activity {
 
 	// Scroll scroll view up
 	private void scroll_up() {
-		((ScrollView)findViewById(R.id.scroll)).post(new Runnable() {
+		progressSv.post(new Runnable() {
 			public void run() {
-				((ScrollView)findViewById(R.id.scroll)).fullScroll(ScrollView.FOCUS_DOWN);
+				progressSv.fullScroll(ScrollView.FOCUS_DOWN);
+/*		((ScrollView)findViewById(R.id.scroll)).post(new Runnable() {
+			public void run() {
+				((ScrollView)findViewById(R.id.scroll)).fullScroll(ScrollView.FOCUS_DOWN);*/
 			}
 		});
 	}
@@ -203,7 +231,7 @@ public class Convert extends Activity {
 			} else if (ReadPdf.open(pdfFilename)) {
 				// Failed to read PDF file
 				result = 2;
-			} else {
+			} else if (result != 5) {
 				result = fillEpub(tmpFilename);
 			}
 
@@ -226,7 +254,8 @@ public class Convert extends Activity {
 		protected void onPreExecute() {
 			progressSb = new StringBuilder();
 			progressSb.append(getResources().getString(R.string.heading));
-			okBt.setEnabled(okBtEnabled = false);
+			setButtons(false);
+			result = 0;
 			conversionStarted = true;	
 		}
 
@@ -248,7 +277,7 @@ public class Convert extends Activity {
 					publishProgress("\n" + getResources().getString(R.string.file) + " " + epubFilename);
 				}
 			}
-			okBt.setEnabled(okBtEnabled = true);
+			setButtons(true);
 		}
 
 		// Fill ePUB file
@@ -291,6 +320,11 @@ public class Convert extends Activity {
 
 			// Add extracted text
 			for(int i = 1; i <= pages; i += pagesPerFile) {
+				// Stopped?
+				if (result == 5) {
+					return 5;
+				}
+				
 				StringBuilder textSb = new StringBuilder();
 
 				publishProgress(getResources().getString(R.string.html) + i + ".html   " + (int)(100 * (++writedFiles) / totalFiles) + "%");

@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="keep">Devo mantenere il file ePUB?</string>
 	<string name="ok">OK</string>
 	<string name="cancel">Annulla</string>
+	<string name="stop">Interrompi</string>
 	<string name="page_lost">"Le pagine mancanti sono indicate con "</string>
 	<string name="errors">"Gli errori di estrazione sono indicati con "</string>
 	<string name="load">Carico:</string>
@@ -49,5 +50,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<item>Lettura del file PDF fallita</item>
 		<item>Scrittura del file ePUB fallita</item>
 		<item>Estrazione del testo fallita</item>
+		<item>Estrazione interrotta dal utente</item>
 	</string-array>
 </resources>

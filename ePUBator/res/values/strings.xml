@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="keep">Have I to keep the ePUB file?</string>
 	<string name="ok">OK</string>
 	<string name="cancel">Cancel</string>
+	<string name="stop">Stop</string>
 	<string name="page_lost">"Lost pages are marked with "</string>
 	<string name="errors">"Extraction errors are marked with "</string>
 	<string name="load">Loading:</string>
@@ -49,5 +50,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<item>Failed to read PDF file</item>
 		<item>Failed to write ePUB file</item>
 		<item>Failed to extract text</item>
+		<item>Extraction stopped by user</item>
 	</string-array>
 </resources>
