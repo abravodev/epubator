@@ -23,6 +23,9 @@ import java.util.Date;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -41,10 +44,12 @@ public class Convert extends Activity {
 	private static Button stopBt;
 	private static boolean okBtEnabled = true;
 	private static boolean conversionStarted = false;
+	static boolean notificationSent = false;
 
 	private int pagesPerFile = 10;
 	private static int result;
 	private static String BookId;
+	private static String pdfFilename = "";
 	private static String epubFilename;
 	private static String tmpFilename;
 	private static String oldFilename;
@@ -55,6 +60,7 @@ public class Convert extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.progressview);
 
+		// Set variables
 		progressSv = (ScrollView)findViewById(R.id.scroll);
 		progressTv = (TextView)findViewById(R.id.progress);
 		okBt = (Button)findViewById(R.id.ok);
@@ -63,13 +69,23 @@ public class Convert extends Activity {
 		stopBt.setOnClickListener(mStopListener);
 
 		if (conversionStarted) {
-			// Conversion already started, update screen
+			// Update screen
 			progressTv.setText(progressSb);
 			setButtons(okBtEnabled);
-		} else {
-			// Start conversion
-			new convertTask().execute();
+		} else if (!notificationSent) {
+			// Get filename
+			Bundle extras = getIntent().getExtras();
+			if (extras != null) {
+				if (extras.containsKey("filename")) {
+					pdfFilename = extras.getString("filename");
+					new convertTask().execute();
+				}
+			}
 		}
+
+		// Remove notification
+		((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).cancel(R.string.app_name);
+		notificationSent = false;
 	}
 
 	// Set buttons state
@@ -174,8 +190,8 @@ public class Convert extends Activity {
 	// Keep file
 	private void keepEpub() {
 		progressSb.append("\n" + getResources().getStringArray(R.array.message)[0] + "\n");
-		progressSb.append(getResources().getString(R.string.page_lost) + "<<# page>>\n");
 		progressSb.append(getResources().getString(R.string.errors) + "<<! page>>\n");
+		progressSb.append(getResources().getString(R.string.page_lost) + "<<# page>>\n");
 		renameFile();
 		progressSb.append(getResources().getString(R.string.file) + " " + epubFilename);
 		progressTv.setText(progressSb);
@@ -197,20 +213,23 @@ public class Convert extends Activity {
 		});
 	}
 
+	// Send notification
+	public void sendNotification() {
+		NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, Convert.class), 0);
+		String message = getResources().getStringArray(R.array.message)[result];
+		String tickerText = getResources().getString(R.string.app_name);
+		Notification notif = new Notification(R.drawable.ic_launcher, message, System.currentTimeMillis());
+		notif.setLatestEventInfo(this, tickerText, message, contentIntent);
+		nm.notify(R.string.app_name, notif);
+		notificationSent = true;
+	}
+
 	// Start background task
 	private class convertTask extends AsyncTask<Void, String, Void> {
 		// Background task
 		@Override
 		protected Void doInBackground(Void... params) {
-			// Get filename
-			String pdfFilename = "";
-			Bundle extras = getIntent().getExtras();
-			if (extras != null) {
-				if (extras.containsKey("filename")) {
-					pdfFilename = extras.getString("filename");
-				}
-			}
-			
 			// Remove bad files
 			String path = pdfFilename.substring(0, pdfFilename.lastIndexOf('/', pdfFilename.length()) + 1);
 			String[] files = new File(path).list();
@@ -273,20 +292,31 @@ public class Convert extends Activity {
 		@Override
 		protected void onPostExecute(Void params) {
 			if (result == 4) {
+				// Ask for keeping errored ePUB
 				if (!isFinishing()) {
 					showDialog(0);
 				} else {
 					keepEpub();
+					result = 0;
 				}
 			} else {
+				// Delete on failure
 				publishProgress("\n" + getResources().getStringArray(R.array.message)[result]);
 				if (result > 0) {
 					deleteTmp();
 				} else {
+					// Keep if ok
 					renameFile();
 					publishProgress("\n" + getResources().getString(R.string.file) + " " + epubFilename);
 				}
 			}
+			
+			if (isFinishing()) {
+				// Send notification
+				sendNotification();
+			}
+			
+			// Enable ok, disable stop
 			setButtons(true);
 		}
 
