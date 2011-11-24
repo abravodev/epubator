@@ -40,13 +40,13 @@ public class Preview extends Activity {
 	private WebView previewWv;
 	private Button prevBt;
 	private Button nextBt;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.preview);
-		
+
 		previewWv = (WebView)findViewById(R.id.webview);
 		previewWv.setBackgroundColor(0);
 		prevBt = (Button)findViewById(R.id.prev);
@@ -60,16 +60,16 @@ public class Preview extends Activity {
 		} else if (pageNumber == -1) {
 			pageNumber = 1;
 		}
-		
+
 		showPage(0);
 		prevBt.setOnClickListener(mPrevListener);
 		nextBt.setOnClickListener(mNextListener);
 	}
-	
+
 	// Show page
 	private void showPage(int diff) {
 		pageNumber += diff;
-		
+
 		// Set buttons
 		if (pageNumber == 1) {
 			prevBt.setEnabled(false);
@@ -106,7 +106,7 @@ public class Preview extends Activity {
 			showPage(-1);
 		}
 	};
-	
+
 	// Next button pressed
 	View.OnClickListener mNextListener = new OnClickListener() {
 		public void onClick(View v) {
@@ -124,24 +124,24 @@ public class Preview extends Activity {
 				filename = extras.getString("filename");
 			}
 		}
-		
+
 		// open ePUB file
 		try {
 			epubFile = new ZipFile(filename);
 		} catch (IOException e) {
 			readError();
 		}
-		
+
 		// Get page list
 		pageList = new ArrayList<String>();
 		Enumeration<? extends ZipEntry>fileList;
 		for (fileList = epubFile.entries(); fileList.hasMoreElements();) {
-            ZipEntry entry = (ZipEntry) fileList.nextElement();
-            String name = entry.getName();
-            if (name.contains("page")) {
-            	pageList.add(name);
-            }
-        }
+			ZipEntry entry = (ZipEntry) fileList.nextElement();
+			String name = entry.getName();
+			if (name.contains("page")) {
+				pageList.add(name);
+			}
+		}
 	}
 
 	// Show error toast

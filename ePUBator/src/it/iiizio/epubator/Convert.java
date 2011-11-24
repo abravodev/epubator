@@ -45,14 +45,14 @@ public class Convert extends Activity {
 	private static boolean okBtEnabled = true;
 	private static boolean conversionStarted = false;
 	static boolean notificationSent = false;
-
-	private int pagesPerFile = 10;
 	private static int result;
-	private static String BookId;
-	private static String pdfFilename = "";
-	private static String epubFilename;
-	private static String tmpFilename;
-	private static String oldFilename;
+	private static String filename = "";
+
+	private final int pagesPerFile = 10;
+	private final String PDF_EXT = ".pdf";
+	private final String EPUB_EXT = " - ePUBator.epub";
+	private final String TEMP_EXT = " - ePUBator.tmp";
+	private final String OLD_EXT = " - ePUBator.old";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -77,7 +77,8 @@ public class Convert extends Activity {
 			Bundle extras = getIntent().getExtras();
 			if (extras != null) {
 				if (extras.containsKey("filename")) {
-					pdfFilename = extras.getString("filename");
+					String pdfFilename = extras.getString("filename");
+					filename = pdfFilename.substring(0, pdfFilename.lastIndexOf(PDF_EXT));
 					new convertTask().execute();
 				}
 			}
@@ -159,7 +160,7 @@ public class Convert extends Activity {
 			.setNeutralButton(getResources().getString(R.string.preview), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					Intent preview = new Intent(getBaseContext(), Preview.class);
-					preview.putExtra("filename", tmpFilename);
+					preview.putExtra("filename", filename + TEMP_EXT);
 					startActivityForResult(preview, 0);
 				}
 			})
@@ -172,17 +173,16 @@ public class Convert extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		showDialog(0);
 	}
-	
+
 	// Delete file
 	private void deleteTmp() {
-		new File(tmpFilename).delete();
-		if (new File(oldFilename).exists()) {
-			new File(oldFilename).renameTo(new File(epubFilename));
+		new File(filename + TEMP_EXT).delete();
+		if (new File(filename + OLD_EXT).exists()) {
+			new File(filename + OLD_EXT).renameTo(new File(filename + EPUB_EXT));
 			progressSb.append(getResources().getString(R.string.kept_old));
 		} else {
 			progressSb.append(getResources().getString(R.string.deleted));
 		}
-		System.err.println(progressSb);
 		progressTv.setText(progressSb);
 		scroll_up();
 	}
@@ -193,15 +193,15 @@ public class Convert extends Activity {
 		progressSb.append(getResources().getString(R.string.errors) + "<<! page>>\n");
 		progressSb.append(getResources().getString(R.string.page_lost) + "<<# page>>\n");
 		renameFile();
-		progressSb.append(getResources().getString(R.string.file) + " " + epubFilename);
+		progressSb.append(getResources().getString(R.string.file) + " " + filename + EPUB_EXT);
 		progressTv.setText(progressSb);
 		scroll_up();
 	}
 
 	// Rename tmp file
 	private void renameFile() {
-		new File(tmpFilename).renameTo(new File(epubFilename));
-		new File(oldFilename).delete();
+		new File(filename + TEMP_EXT).renameTo(new File(filename + EPUB_EXT));
+		new File(filename + OLD_EXT).delete();
 	}
 
 	// Scroll scroll view up
@@ -231,37 +231,31 @@ public class Convert extends Activity {
 		@Override
 		protected Void doInBackground(Void... params) {
 			// Remove bad files
-			String path = pdfFilename.substring(0, pdfFilename.lastIndexOf('/', pdfFilename.length()) + 1);
+			String path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
 			String[] files = new File(path).list();
 			if(files.length > 0){
-		        for (int i = 0; i < files.length; i++) {
-		            if (files[i].endsWith("ePUBator.tmp") || files[i].endsWith("ePUBator.old")) {
-		            	new File(path + files[i]).delete();
-		            }
-		        }
-	        }
+				for (int i = 0; i < files.length; i++) {
+					if (files[i].endsWith(TEMP_EXT) || files[i].endsWith(OLD_EXT)) {
+						new File(path + files[i]).delete();
+					}
+				}
+			}
 
-			// Set variables
-			String nameNoExt = pdfFilename.substring(0, pdfFilename.lastIndexOf(".pdf"));
-			BookId = nameNoExt.replaceAll("[^\\p{ASCII}]", "")+ " - " + new Date().hashCode();
-			epubFilename = nameNoExt + " - ePUBator.epub";
-			tmpFilename = nameNoExt + " - ePUBator.tmp";
-			oldFilename = nameNoExt + " - ePUBator.old";
-			
-			if (new File(epubFilename).exists()) {
-				new File(epubFilename).renameTo(new File(oldFilename));
+			// Save old ePUB
+			if (new File(filename + EPUB_EXT).exists()) {
+				new File(filename + EPUB_EXT).renameTo(new File(filename + OLD_EXT));
 			}
 
 			// Load PDF
-			publishProgress(getResources().getString(R.string.load) + " " + pdfFilename);
-			if (!(new File(pdfFilename).exists())) {
+			publishProgress(getResources().getString(R.string.load) + " " + filename + PDF_EXT);
+			if (!(new File(filename + PDF_EXT).exists())) {
 				// PDF file not found
 				result = 1;
-			} else if (ReadPdf.open(pdfFilename)) {
+			} else if (ReadPdf.open(filename + PDF_EXT)) {
 				// Failed to read PDF file
 				result = 2;
 			} else if (result != 5) {
-				result = fillEpub(tmpFilename);
+				result = fillEpub(filename + TEMP_EXT);
 			}
 
 			return null;
@@ -307,15 +301,15 @@ public class Convert extends Activity {
 				} else {
 					// Keep if ok
 					renameFile();
-					publishProgress("\n" + getResources().getString(R.string.file) + " " + epubFilename);
+					publishProgress("\n" + getResources().getString(R.string.file) + " " + filename + EPUB_EXT);
 				}
 			}
-			
+
 			if (isFinishing()) {
 				// Send notification
 				sendNotification();
 			}
-			
+
 			// Enable ok, disable stop
 			setButtons(true);
 		}
@@ -328,52 +322,53 @@ public class Convert extends Activity {
 				publishProgress(getResources().getString(R.string.pages) + " " + pages);
 				int totalFiles = 1 + pages / pagesPerFile;
 				int writedFiles = 0;
-	
+
 				// Set flag
 				boolean extractionErrorFlag = false;
-	
+
 				// Create ePUB file
 				publishProgress(getResources().getString(R.string.open));
 				if (WriteZip.create(filename)) {
 					return 3;
 				}
-	
+
 				// Add required files
 				publishProgress(getResources().getString(R.string.mimetype));
 				if (WriteZip.addEntry("mimetype", "application/epub+zip", true)) {
 					return 3;
 				}
-	
+
 				publishProgress(getResources().getString(R.string.container));
 				if (WriteZip.addEntry("META-INF/container.xml", createContainer(), false)) {
 					return 3;
 				}
-	
+
+				String bookId = filename.replaceAll("[^\\p{ASCII}]", "")+ " - " + new Date().hashCode();
 				publishProgress(getResources().getString(R.string.content));
-				if (WriteZip.addEntry("OEBPS/content.opf", createContent(pages), false)) {
+				if (WriteZip.addEntry("OEBPS/content.opf", createContent(pages, bookId), false)) {
 					return 3;
 				}
-	
+
 				publishProgress(getResources().getString(R.string.toc));
-				if (WriteZip.addEntry("OEBPS/toc.ncx", createToc(pages), false)) {
+				if (WriteZip.addEntry("OEBPS/toc.ncx", createToc(pages, bookId), false)) {
 					return 3;
 				}
-	
+
 				// Add extracted text
 				for(int i = 1; i <= pages; i += pagesPerFile) {
 					// Stopped?
 					if (result == 5) {
 						return 5;
 					}
-					
+
 					StringBuilder textSb = new StringBuilder();
-	
+
 					publishProgress(getResources().getString(R.string.html) + i + ".html   " + (int)(100 * (++writedFiles) / totalFiles) + "%");
 					int endPage = i + pagesPerFile - 1;
 					if (endPage > pages) {
 						endPage = pages;
 					}
-	
+
 					for (int j = i; j <= endPage; j++) {
 						String page = stringToHTMLString(ReadPdf.extractText(j));
 						if (page.length() == 0) {
@@ -388,18 +383,18 @@ public class Convert extends Activity {
 							}
 						}
 					}
-	
+
 					if (WriteZip.addEntry("OEBPS/page" + i + ".html", createPages(i, textSb.toString()) , false)) {
 						return 3;
 					}
 				}
-	
+
 				// Close ePUB file
 				publishProgress(getResources().getString(R.string.close));
 				if (WriteZip.close()) {
 					return 3;
 				}
-	
+
 				if (extractionErrorFlag) {
 					return 4;
 				} else {
@@ -412,89 +407,93 @@ public class Convert extends Activity {
 
 		// Create container.xml
 		private String createContainer() {
-			String container = "<?xml version=\"1.0\"?>\n";
-			container += "<container version=\"1.0\" xmlns=\"urn:oasis:names:tc:opendocument:xmlns:container\">\n";
-			container += "   <rootfiles>\n";
-			container += "      <rootfile full-path=\"OEBPS/content.opf\" media-type=\"application/oebps-package+xml\"/>\n";
-			container += "   </rootfiles>\n";
-			container += "</container>\n";
-			return container;
+			StringBuilder container = new StringBuilder();
+			container.append("<?xml version=\"1.0\"?>\n");
+			container.append("<container version=\"1.0\" xmlns=\"urn:oasis:names:tc:opendocument:xmlns:container\">\n");
+			container.append("   <rootfiles>\n");
+			container.append("      <rootfile full-path=\"OEBPS/content.opf\" media-type=\"application/oebps-package+xml\"/>\n");
+			container.append("   </rootfiles>\n");
+			container.append("</container>\n");
+			return container.toString();
 		}
 
 		// Create content.opf
-		private String createContent(int pages) {
-			String content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-			content += "<package xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"BookID\" version=\"2.0\">\n";
-			content += "    <metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:opf=\"http://www.idpf.org/2007/opf\">\n";
-			content += "        <dc:title>" + ReadPdf.getTitle() + "</dc:title>\n";
-			content += "        <dc:creator>" + ReadPdf.getAuthor() + "</dc:creator>\n";
-			content += "        <dc:creator opf:role=\"bkp\">ePUBator - Minimal offline PDF to ePUB converter for Android</dc:creator>\n";
-			content += "        <dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + BookId + "</dc:identifier>\n";
-			content += "        <dc:language>en</dc:language>\n";
-			content += "    </metadata>\n";
-			content += "    <manifest>\n";
+		private String createContent(int pages, String id) {
+			StringBuilder content = new StringBuilder();
+			content.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+			content.append("<package xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"BookID\" version=\"2.0\">\n");
+			content.append("    <metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:opf=\"http://www.idpf.org/2007/opf\">\n");
+			content.append("        <dc:title>" + ReadPdf.getTitle() + "</dc:title>\n");
+			content.append("        <dc:creator>" + ReadPdf.getAuthor() + "</dc:creator>\n");
+			content.append("        <dc:creator opf:role=\"bkp\">ePUBator - Minimal offline PDF to ePUB converter for Android</dc:creator>\n");
+			content.append("        <dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + id + "</dc:identifier>\n");
+			content.append("        <dc:language>en</dc:language>\n");
+			content.append("    </metadata>\n");
+			content.append("    <manifest>\n");
 			for(int i = 1; i <= pages; i += pagesPerFile) {
-				content += "        <item id=\"page" + i + "\" href=\"page" + i + ".html\" media-type=\"application/xhtml+xml\"/>\n";
+				content.append("        <item id=\"page" + i + "\" href=\"page" + i + ".html\" media-type=\"application/xhtml+xml\"/>\n");
 			}
-			content += "        <item id=\"ncx\" href=\"toc.ncx\" media-type=\"application/x-dtbncx+xml\"/>\n";
-			content += "    </manifest>\n";
-			content += "    <spine toc=\"ncx\">\n";
+			content.append("        <item id=\"ncx\" href=\"toc.ncx\" media-type=\"application/x-dtbncx+xml\"/>\n");
+			content.append("    </manifest>\n");
+			content.append("    <spine toc=\"ncx\">\n");
 			for(int i = 1; i <= pages; i += pagesPerFile) {
-				content += "        <itemref idref=\"page" + i + "\"/>\n";
+				content.append("        <itemref idref=\"page" + i + "\"/>\n");
 			}
-			content += "    </spine>\n";
-			content += "</package>\n";
-			return content;
+			content.append("    </spine>\n");
+			content.append("</package>\n");
+			return content.toString();
 		}
 
 		// Create toc.ncx
-		private String createToc(int pages) {
-			String toc = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-			toc += "<!DOCTYPE ncx PUBLIC \"-//NISO//DTD ncx 2005-1//EN\"\n";
-			toc += "   \"http://www.daisy.org/z3986/2005/ncx-2005-1.dtd\">\n";
-			toc += "<ncx xmlns=\"http://www.daisy.org/z3986/2005/ncx/\" version=\"2005-1\">\n";
-			toc += "    <head>\n";
-			toc += "        <meta name=\"dtb:uid\" content=\"" + BookId + "\"/>\n";
-			toc += "        <meta name=\"dtb:depth\" content=\"1\"/>\n";
-			toc += "        <meta name=\"dtb:totalPageCount\" content=\"0\"/>\n";
-			toc += "        <meta name=\"dtb:maxPageNumber\" content=\"0\"/>\n";
-			toc += "    </head>\n";
-			toc += "    <docTitle>\n";
-			toc += "        <text>" + ReadPdf.getTitle() + "</text>\n";
-			toc += "    </docTitle>\n";
-			toc += "    <navMap>\n";
+		private String createToc(int pages, String id) {
+			StringBuilder toc = new StringBuilder();
+			toc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+			toc.append("<!DOCTYPE ncx PUBLIC \"-//NISO//DTD ncx 2005-1//EN\"\n");
+			toc.append("   \"http://www.daisy.org/z3986/2005/ncx-2005-1.dtd\">\n");
+			toc.append("<ncx xmlns=\"http://www.daisy.org/z3986/2005/ncx/\" version=\"2005-1\">\n");
+			toc.append("    <head>\n");
+			toc.append("        <meta name=\"dtb:uid\" content=\"" + id + "\"/>\n");
+			toc.append("        <meta name=\"dtb:depth\" content=\"1\"/>\n");
+			toc.append("        <meta name=\"dtb:totalPageCount\" content=\"0\"/>\n");
+			toc.append("        <meta name=\"dtb:maxPageNumber\" content=\"0\"/>\n");
+			toc.append("    </head>\n");
+			toc.append("    <docTitle>\n");
+			toc.append("        <text>" + ReadPdf.getTitle() + "</text>\n");
+			toc.append("    </docTitle>\n");
+			toc.append("    <navMap>\n");
 			int playOrder = 1;
 			for(int i = 1; i <= pages; i += pagesPerFile) {
-				toc += "        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n";
-				toc += "            <navLabel>\n";
-				toc += "                <text>Page" + i + "</text>\n";
-				toc += "            </navLabel>\n";
-				toc += "            <content src=\"page" + i + ".html\"/>\n";
-				toc += "        </navPoint>\n";
+				toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
+				toc.append("            <navLabel>\n");
+				toc.append("                <text>Page" + i + "</text>\n");
+				toc.append("            </navLabel>\n");
+				toc.append("            <content src=\"page" + i + ".html\"/>\n");
+				toc.append("        </navPoint>\n");
 				playOrder += 1;
 			}
-			toc += "    </navMap>\n";
-			toc += "</ncx>\n";
-			return toc;
+			toc.append("    </navMap>\n");
+			toc.append("</ncx>\n");
+			return toc.toString();
 		}
 
 		// Create pageNN.html
 		private String createPages(int offset, String text) {
-			String html = "  <!DOCTYPE html PUBLIC \"-//WAPFORUM//DTD XHTML Mobile 1.0//EN\" \n";
-			html += "  \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n";
-			html += "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n";
-			html += "<head>\n";
-			html += "  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>\n";
-			html += "  <meta name=\"generator\" content=\"ePUBator - Minimal offline PDF to ePUB converter for Android\"/>\n";
-			html += "  <title>page" + offset + "</title>\n";
-			html += "</head>\n";
-			html += "<body>\n";
-			html += "  <p>\n";
-			html += text.replaceAll("<br/>(?=[a-z])", "&nbsp;");
-			html += "  </p>\n";
-			html += "</body>\n";
-			html += "</html>\n";
-			return html;
+			StringBuilder html = new StringBuilder();
+			html.append("  <!DOCTYPE html PUBLIC \"-//WAPFORUM//DTD XHTML Mobile 1.0//EN\" \n");
+			html.append("  \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n");
+			html.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">\n");
+			html.append("<head>\n");
+			html.append("  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>\n");
+			html.append("  <meta name=\"generator\" content=\"ePUBator - Minimal offline PDF to ePUB converter for Android\"/>\n");
+			html.append("  <title>page" + offset + "</title>\n");
+			html.append("</head>\n");
+			html.append("<body>\n");
+			html.append("  <p>\n");
+			html.append(text.replaceAll("<br/>(?=[a-z])", "&nbsp;"));
+			html.append("  </p>\n");
+			html.append("</body>\n");
+			html.append("</html>\n");
+			return html.toString();
 		}
 
 		//  stringToHTMLString found on the web, no license indicated
