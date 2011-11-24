@@ -8,17 +8,24 @@ PDF extraction based on iText library <http://itextpdf.com/>.
 - ePUBator extract only text (no pictures, no text in pictures).
 - ePUBator works fine with single column PDF (can work bad with multi column or tables).
 - ePUBator can fail extraction (12 of 60 books tested: I'm still working on it but it looks like a iText problem). 
-- ePUBator can crash (4 of 60 books tested: I'm still working on it). 
+- ePUBator can crash (out of memory crash resolved, I hope). 
 
 For comment/feedback/bug/suggestion visit the project page: http://sourceforge.net/projects/epubator/
 
 History:
+v0.3
+- Added preview
+- Added notification
+- Added possibility to stop conversion
+- Enabled 'Move to SD'
+- Differentiate error and page lost marker
+- Code optimization
+v0.2
+- Added 'keep errored file' dialog
+- Added marker on error
+- Fixed a buffer overflow and some minor bugs
 v0.1
 - Initial release
-v0.2
-- Add 'keep errored file' dialog
-- Add marker on error
-- Fixed a buffer overflow and some minor bugs
 
 #########################################################################################################
 
@@ -33,14 +40,21 @@ L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/>.
 - ePUBator estrae solo il testo (nessuna figura, nessun testo dalle figure).
 - ePUBator funziona bene con i PDF a singola colonna (può essere pessimo con quelli multicolonna o le tabelle).
 - ePUBator può fallire l'estrazione (12 libri su 60 provati: ci stò lavorando su ma sembra un problema di iText).
-- ePUBator può piantarsi (4 libri su 60 provati: ci stò lavorando su).
+- ePUBator può piantarsi (risolto il blocco per memoria insufficente, spero).
 
 Per commenti/feedback/bug/suggerimenti visita la pagina web del progetto: http://sourceforge.net/projects/epubator/
 
-Storia:
-v0.1
-- Rilascio iniziale
+Storico:
+v0.3
+- Aggiunta anteprima
+- Aggiunta notifica
+- Aggiunta la possibilità di fermare la conversione
+- Abilitato 'Muovi su SD'
+- Differenziato l'indicatore di errori e pagine perse
+- Ottimizazione del codice
 v0.2
 - Aggiunto dialogo 'conserva file errorato'
 - Aggiunto marcatore in caso di errore
 - Corretto un buffer overflow e alcuni bug meno importanti
+v0.1
+- Rilascio iniziale

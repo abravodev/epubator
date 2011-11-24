@@ -35,6 +35,8 @@ public class ReadPdf {
 			return true;
 		} catch(OutOfMemoryError e) {
 			return true;
+		} catch(NoClassDefFoundError e) {
+			return true;
 		}
 		return false;
 	}
