@@ -41,7 +41,7 @@ public class WriteZip {
 	}
 
 	// Add text entry
-	static boolean addEntry(String filename, String text, boolean store) {
+	static boolean addText(String filename, String text, boolean store) {
 		CRC32 crc32 = new CRC32();
 		byte[] data = text.getBytes();
 
@@ -61,7 +61,22 @@ public class WriteZip {
 			zipOut.closeEntry();
 		}
 		catch (Exception e) {
-			System.err.println("Failed to add file to zip" + e.getMessage());
+			System.err.println("Failed to add textfile to zip" + e.getMessage());
+			return true;
+		}
+		return false;
+	}
+
+	static boolean addImage(String filename, byte[] image) {
+		try {
+			ZipEntry zipEntry = new ZipEntry(filename);
+			zipOut.setMethod(ZipOutputStream.DEFLATED);
+			zipOut.putNextEntry(zipEntry);
+			zipOut.write(image);
+			zipOut.closeEntry();
+		}
+		catch (Exception e) {
+			System.err.println("Failed to add imagefile to zip" + e.getMessage());
 			return true;
 		}
 		return false;

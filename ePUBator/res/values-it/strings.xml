@@ -42,6 +42,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="container">Aggiungo container.xml</string>
 	<string name="content">Aggiungo content.opf</string>
 	<string name="toc">Aggiungo toc.ncx</string>
+	<string name="frontpage">Aggiungo frontpage.html</string>
+	<string name="frontpagepng">Aggiungo frontpage.png</string>
 	<string name="html">Aggiungo page</string>
 	<string name="close">Chiudo il file</string>
 	<string-array name="message">

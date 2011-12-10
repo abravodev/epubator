@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package it.iiizio.epubator;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Date;
 
@@ -28,6 +29,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -334,26 +339,37 @@ public class Convert extends Activity {
 
 				// Add required files
 				publishProgress(getResources().getString(R.string.mimetype));
-				if (WriteZip.addEntry("mimetype", "application/epub+zip", true)) {
+				if (WriteZip.addText("mimetype", "application/epub+zip", true)) {
 					return 3;
 				}
 
 				publishProgress(getResources().getString(R.string.container));
-				if (WriteZip.addEntry("META-INF/container.xml", createContainer(), false)) {
+				if (WriteZip.addText("META-INF/container.xml", createContainer(), false)) {
 					return 3;
 				}
 
 				String bookId = filename.replaceAll("[^\\p{ASCII}]", "")+ " - " + new Date().hashCode();
 				publishProgress(getResources().getString(R.string.content));
-				if (WriteZip.addEntry("OEBPS/content.opf", createContent(pages, bookId), false)) {
+				if (WriteZip.addText("OEBPS/content.opf", createContent(pages, bookId), false)) {
 					return 3;
 				}
 
 				publishProgress(getResources().getString(R.string.toc));
-				if (WriteZip.addEntry("OEBPS/toc.ncx", createToc(pages, bookId), false)) {
+				if (WriteZip.addText("OEBPS/toc.ncx", createToc(pages, bookId), false)) {
 					return 3;
 				}
 
+				publishProgress(getResources().getString(R.string.frontpage));
+				if (WriteZip.addText("OEBPS/frontpage.html", createFrontpage(), false)) {
+					return 3;
+				}
+				
+				publishProgress(getResources().getString(R.string.frontpagepng));
+				if (createFrontpagePng()) {
+					return 3;
+				}
+				
+				
 				// Add extracted text
 				for(int i = 1; i <= pages; i += pagesPerFile) {
 					// Stopped?
@@ -384,7 +400,7 @@ public class Convert extends Activity {
 						}
 					}
 
-					if (WriteZip.addEntry("OEBPS/page" + i + ".html", createPages(i, textSb.toString()) , false)) {
+					if (WriteZip.addText("OEBPS/page" + i + ".html", createPages(i, textSb.toString()) , false)) {
 						return 3;
 					}
 				}
@@ -434,12 +450,18 @@ public class Convert extends Activity {
 				content.append("        <item id=\"page" + i + "\" href=\"page" + i + ".html\" media-type=\"application/xhtml+xml\"/>\n");
 			}
 			content.append("        <item id=\"ncx\" href=\"toc.ncx\" media-type=\"application/x-dtbncx+xml\"/>\n");
+			content.append("        <item id=\"frontpage\" href=\"frontpage.html\" media-type=\"application/xhtml+xml\"/>\n");
+			content.append("        <item id=\"cover\" href=\"frontpage.png\" media-type=\"image/png\"/>\n");
 			content.append("    </manifest>\n");
 			content.append("    <spine toc=\"ncx\">\n");
+			content.append("        <itemref idref=\"frontpage\"/>\n");
 			for(int i = 1; i <= pages; i += pagesPerFile) {
 				content.append("        <itemref idref=\"page" + i + "\"/>\n");
 			}
 			content.append("    </spine>\n");
+			content.append("    <guide>\n");
+			content.append("        <reference type=\"cover\" title=\"Frontpage\" href=\"frontpage.html\"/>\n");
+			content.append("    </guide>\n");
 			content.append("</package>\n");
 			return content.toString();
 		}
@@ -461,7 +483,13 @@ public class Convert extends Activity {
 			toc.append("        <text>" + ReadPdf.getTitle() + "</text>\n");
 			toc.append("    </docTitle>\n");
 			toc.append("    <navMap>\n");
-			int playOrder = 1;
+			toc.append("        <navPoint id=\"navPoint-1\" playOrder=\"1\">\n");
+			toc.append("            <navLabel>\n");
+			toc.append("                <text>Frontpage</text>\n");
+			toc.append("            </navLabel>\n");
+			toc.append("            <content src=\"frontpage.html\"/>\n");
+			toc.append("        </navPoint>\n");
+			int playOrder = 2;
 			for(int i = 1; i <= pages; i += pagesPerFile) {
 				toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
 				toc.append("            <navLabel>\n");
@@ -476,8 +504,8 @@ public class Convert extends Activity {
 			return toc.toString();
 		}
 
-		// Create pageNN.html
-		private String createPages(int offset, String text) {
+		// Create html
+		private String createHtml(String title, String body) {
 			StringBuilder html = new StringBuilder();
 			html.append("  <!DOCTYPE html PUBLIC \"-//WAPFORUM//DTD XHTML Mobile 1.0//EN\" \n");
 			html.append("  \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n");
@@ -485,16 +513,78 @@ public class Convert extends Activity {
 			html.append("<head>\n");
 			html.append("  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>\n");
 			html.append("  <meta name=\"generator\" content=\"ePUBator - Minimal offline PDF to ePUB converter for Android\"/>\n");
-			html.append("  <title>page" + offset + "</title>\n");
+			html.append("  <title>" + title + "</title>\n");
 			html.append("</head>\n");
 			html.append("<body>\n");
-			html.append("  <p>\n");
-			html.append(text.replaceAll("<br/>(?=[a-z])", "&nbsp;"));
-			html.append("  </p>\n");
+			html.append(body);
 			html.append("</body>\n");
 			html.append("</html>\n");
 			return html.toString();
 		}
+
+		// Create pageNN.html
+		private String createPages(int offset, String text) {
+			StringBuilder body = new StringBuilder();
+			body.append("  <p>\n");
+			body.append(text.replaceAll("<br/>(?=[a-z])", "&nbsp;"));
+			body.append("  </p>\n");
+			return createHtml("page" + offset, body.toString());
+		}
+
+		// Create frontpage.html
+		private String createFrontpage() {
+			StringBuilder body = new StringBuilder();
+			body.append("  <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" width=\"100%\" height=\"100%\" viewBox=\"0 0 838 1186\">\n");
+			body.append("    <image width=\"720\" height=\"1080\" xlink:href=\"frontpage.png\"/>\n");
+			body.append("  </svg>\n");
+			return createHtml("Frontpage", body.toString());
+		}
+
+		// Create frontpage.png
+		private boolean createFrontpagePng() {
+	        Paint paint  = new Paint();
+	        int border = 10;
+	        int fontsize = 36;
+	        
+	        Bitmap bmp = Bitmap.createBitmap(240, 360, Bitmap.Config.ARGB_8888);
+	        Canvas canvas = new Canvas(bmp);
+	        paint.setColor(Color.LTGRAY);
+	        canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paint);
+   
+	        paint.setTextSize(fontsize);
+	        paint.setColor(Color.BLACK);
+	        paint.setAntiAlias(true);
+	        paint.setStyle(Paint.Style.FILL);
+	        
+	        String name = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
+			if (ReadPdf.getTitle() != null) {
+	        	name = ReadPdf.getTitle() + " - " + ReadPdf.getAuthor();
+	        }
+			name = name.replaceAll("_", " ").replaceAll("\\[.*?\\]","");
+	        String words[] = name.split("\\s");
+	        
+	        int maxWidth = canvas.getWidth();
+	        float newline = paint.getFontSpacing();
+	        float x = border;
+	        float y = newline;
+
+	        for (String word : words) {
+	        	float len = paint.measureText(word + " ");
+
+	        	if ((x > border) && ((x + len) > maxWidth)) {
+	        		x = border;
+	        		y += newline;
+	        	}
+
+	        	canvas.drawText(word, x, y, paint);
+	        	x += len;
+	        }
+
+	        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	        bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
+	        return WriteZip.addImage("OEBPS/frontpage.png", baos.toByteArray());
+		}
+
 
 		//  stringToHTMLString found on the web, no license indicated
 		//  http://www.rgagnon.com/javadetails/java-0306.html
