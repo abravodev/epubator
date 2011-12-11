@@ -30,6 +30,7 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -548,8 +549,13 @@ public class Convert extends Activity {
 	        
 	        Bitmap bmp = Bitmap.createBitmap(240, 360, Bitmap.Config.ARGB_8888);
 	        Canvas canvas = new Canvas(bmp);
+	        int maxWidth = canvas.getWidth();
+	        int maxHeight = canvas.getHeight();
 	        paint.setColor(Color.LTGRAY);
-	        canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paint);
+	        canvas.drawRect(0, 0, maxWidth, maxHeight, paint);
+	        
+	        Bitmap img = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+	        canvas.drawBitmap(img, maxWidth - img.getWidth(), maxHeight - img.getHeight(), new Paint(Paint.FILTER_BITMAP_FLAG));
    
 	        paint.setTextSize(fontsize);
 	        paint.setColor(Color.BLACK);
@@ -557,13 +563,12 @@ public class Convert extends Activity {
 	        paint.setStyle(Paint.Style.FILL);
 	        
 	        String name = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
-			if (ReadPdf.getTitle() != null) {
+/*			if (ReadPdf.getTitle() != null) {
 	        	name = ReadPdf.getTitle() + " - " + ReadPdf.getAuthor();
-	        }
-			name = name.replaceAll("_", " ").replaceAll("\\[.*?\\]","");
+	        }*/
+			name = name.replaceAll("_", " "); //.replaceAll("\\[.*?\\]","");
 	        String words[] = name.split("\\s");
 	        
-	        int maxWidth = canvas.getWidth();
 	        float newline = paint.getFontSpacing();
 	        float x = border;
 	        float y = newline;
