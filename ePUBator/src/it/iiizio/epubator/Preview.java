@@ -54,14 +54,14 @@ public class Preview extends Activity {
 
 		// Initialize
 		fillPageList();
-		if (pageList.isEmpty()) {
+		if (pageList.size() == 0) {
 			closeEpub();
 			readError();
 		} else if (pageNumber == -1) {
 			pageNumber = 1;
+			showPage(0);
 		}
 
-		showPage(0);
 		prevBt.setOnClickListener(mPrevListener);
 		nextBt.setOnClickListener(mNextListener);
 	}
@@ -69,6 +69,7 @@ public class Preview extends Activity {
 	// Show page
 	private void showPage(int diff) {
 		pageNumber += diff;
+		System.out.println(pageNumber + " " + pageList.size() + pageList.isEmpty());
 
 		// Set buttons
 		if (pageNumber == 1) {
@@ -138,7 +139,7 @@ public class Preview extends Activity {
 		for (fileList = epubFile.entries(); fileList.hasMoreElements();) {
 			ZipEntry entry = (ZipEntry) fileList.nextElement();
 			String name = entry.getName();
-			if (name.contains("page")) {
+			if (name.startsWith("OEBPS/page")) {
 				pageList.add(name);
 			}
 		}
