@@ -50,7 +50,7 @@ public class Convert extends Activity {
 	private static Button stopBt;
 	private static boolean okBtEnabled = true;
 	private static boolean conversionStarted = false;
-	static boolean notificationSent = false;
+	private static boolean notificationSent = false;
 	private static int result;
 	private static String filename = "";
 
@@ -360,6 +360,7 @@ public class Convert extends Activity {
 					return 3;
 				}
 
+				// Add frontpage
 				publishProgress(getResources().getString(R.string.frontpage));
 				if (WriteZip.addText("OEBPS/frontpage.html", createFrontpage(), false)) {
 					return 3;
@@ -534,35 +535,35 @@ public class Convert extends Activity {
 
 		// Create frontpage.html
 		private String createFrontpage() {
-			StringBuilder body = new StringBuilder();
-			body.append("  <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" width=\"100%\" height=\"100%\" viewBox=\"0 0 838 1186\">\n");
-			body.append("    <image width=\"720\" height=\"1080\" xlink:href=\"frontpage.png\"/>\n");
-			body.append("  </svg>\n");
-			return createHtml("Frontpage", body.toString());
+			return createHtml("Frontpage", "<div><img alt=\"cover\" src=\"frontpage.png\" style=\"height: 100%\" /></div>");
 		}
 
 		// Create frontpage.png
 		private boolean createFrontpagePng() {
-	        Paint paint  = new Paint();
-	        int border = 10;
-	        int fontsize = 36;
+	        final int maxWidth = 240;
+	        final int maxHeight = 350;
+	        final int border = 10;
+	        final int fontsize = 36;
 	        
-	        Bitmap bmp = Bitmap.createBitmap(240, 360, Bitmap.Config.ARGB_8888);
-	        Canvas canvas = new Canvas(bmp);
-	        int maxWidth = canvas.getWidth();
-	        int maxHeight = canvas.getHeight();
+	        // Grey background
+	        Bitmap bmp = Bitmap.createBitmap(maxWidth, maxHeight, Bitmap.Config.RGB_565);
+	        Paint paint  = new Paint();
 	        paint.setColor(Color.LTGRAY);
+ 	        Canvas canvas = new Canvas(bmp);
 	        canvas.drawRect(0, 0, maxWidth, maxHeight, paint);
 	        
+	        // Add ePUBator logo
 	        Bitmap img = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
 	        canvas.drawBitmap(img, maxWidth - img.getWidth(), maxHeight - img.getHeight(), new Paint(Paint.FILTER_BITMAP_FLAG));
    
+	        // Add title
 	        paint.setTextSize(fontsize);
 	        paint.setColor(Color.BLACK);
 	        paint.setAntiAlias(true);
 	        paint.setStyle(Paint.Style.FILL);
 	        
 	        String name = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
+	        // TODO ask for title 
 /*			if (ReadPdf.getTitle() != null) {
 	        	name = ReadPdf.getTitle() + " - " + ReadPdf.getAuthor();
 	        }*/
@@ -585,6 +586,7 @@ public class Convert extends Activity {
 	        	x += len;
 	        }
 
+	        // Save bmp as png
 	        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	        bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
 	        return WriteZip.addImage("OEBPS/frontpage.png", baos.toByteArray());
