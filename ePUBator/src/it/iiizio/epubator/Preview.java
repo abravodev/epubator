@@ -54,22 +54,26 @@ public class Preview extends Activity {
 
 		// Initialize
 		fillPageList();
-		if (pageList.size() == 0) {
-			closeEpub();
-			readError();
-		} else if (pageNumber == -1) {
+		if (pageNumber == -1) {
 			pageNumber = 1;
-			showPage(0);
 		}
-
+		
+		showPage(0);
 		prevBt.setOnClickListener(mPrevListener);
 		nextBt.setOnClickListener(mNextListener);
 	}
 
 	// Show page
 	private void showPage(int diff) {
+		// No pages
+		if (pageList.size() == 0) {
+			closeEpub();
+			readError();
+			return;
+		}
+		
+		// Move to prev/next page
 		pageNumber += diff;
-		System.out.println(pageNumber + " " + pageList.size() + pageList.isEmpty());
 
 		// Set buttons
 		if (pageNumber == 1) {
