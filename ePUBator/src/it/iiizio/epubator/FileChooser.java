@@ -49,7 +49,7 @@ public class FileChooser extends ListActivity {
 		if (extras != null) {
 			if (extras.containsKey("path")) {
 				File pathFile = new File(extras.getString("path"));
-				if (pathFile.exists() && pathFile.isDirectory()) {
+				if (pathFile.exists() && pathFile.isDirectory() && pathFile.canRead()) {
 					path = pathFile.getPath();
 					if (!path.endsWith("/")) {
 						path += "/";
