@@ -147,7 +147,7 @@ public class Convert extends Activity {
 		if (id == 0) {
 			// Build dialog
 			return new AlertDialog.Builder(Convert.this)
-			.setTitle(getResources().getString(R.string.extaction_error))
+			.setTitle(getResources().getString(R.string.extraction_error))
 			.setMessage(getResources().getString(R.string.keep))
 			// Ok action
 			.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
@@ -197,9 +197,9 @@ public class Convert extends Activity {
 	private void keepEpub() {
 		progressSb.append("\n" + getResources().getStringArray(R.array.message)[0] + "\n");
 		progressSb.append(getResources().getString(R.string.errors) + "<<! page>>\n");
-		progressSb.append(getResources().getString(R.string.page_lost) + "<<# page>>\n");
+		progressSb.append(getResources().getString(R.string.lost_pages) + "<<# page>>\n");
 		renameFile();
-		progressSb.append(getResources().getString(R.string.file) + " " + filename + EPUB_EXT);
+		progressSb.append(getResources().getString(R.string.file) + filename + EPUB_EXT);
 		progressTv.setText(progressSb);
 		scroll_up();
 	}
@@ -253,7 +253,7 @@ public class Convert extends Activity {
 			}
 
 			// Load PDF
-			publishProgress(getResources().getString(R.string.load) + " " + filename + PDF_EXT);
+			publishProgress(getResources().getString(R.string.load) + filename + PDF_EXT);
 			if (!(new File(filename + PDF_EXT).exists())) {
 				// PDF file not found
 				result = 1;
@@ -325,7 +325,7 @@ public class Convert extends Activity {
 			try {
 				// Set up counter
 				int pages = ReadPdf.getPages();
-				publishProgress(getResources().getString(R.string.pages) + " " + pages);
+				publishProgress(getResources().getString(R.string.pages) + pages);
 				int totalFiles = 1 + pages / pagesPerFile;
 				int writedFiles = 0;
 
@@ -390,6 +390,7 @@ public class Convert extends Activity {
 					for (int j = i; j <= endPage; j++) {
 						String page = stringToHTMLString(ReadPdf.extractText(j));
 						if (page.length() == 0) {
+							publishProgress(String.format(getResources().getString(R.string.extraction_failure), j));
 							textSb.append("&lt;&lt;# " + j + "&gt;&gt;");
 							extractionErrorFlag = true;
 						} else {
