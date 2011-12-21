@@ -119,7 +119,7 @@ public class FileChooser extends ListActivity {
 
 		// Update screen
 		lv.clearTextFilter();
-		((TextView) findViewById(R.id.path)).setText(getResources().getString(R.string.path) + path);
+		((TextView) findViewById(R.id.path)).setText(String.format(getResources().getString(R.string.path), path));
 		setListAdapter(new ArrayAdapter<String>(this, R.layout.filechooserrow,  fileList));
 	}
 }

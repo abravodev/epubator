@@ -196,8 +196,9 @@ public class Convert extends Activity {
 	// Keep file
 	private void keepEpub() {
 		progressSb.append("\n" + getResources().getStringArray(R.array.message)[0] + "\n");
-		progressSb.append(getResources().getString(R.string.errors) + "<<! page>>\n");
-		progressSb.append(getResources().getString(R.string.lost_pages) + "<<# page>>\n");
+		String pageNumber = String.format(getResources().getString(R.string.pagenumber), ">>\n");
+		progressSb.append(String.format(getResources().getString(R.string.errors), "<<@") + pageNumber);
+		progressSb.append(String.format(getResources().getString(R.string.lost_pages), "<<#") + pageNumber);
 		renameFile();
 		progressSb.append(getResources().getString(R.string.file) + filename + EPUB_EXT);
 		progressTv.setText(progressSb);
@@ -253,7 +254,7 @@ public class Convert extends Activity {
 			}
 
 			// Load PDF
-			publishProgress(getResources().getString(R.string.load) + filename + PDF_EXT);
+			publishProgress(String.format(getResources().getString(R.string.load), filename + PDF_EXT));
 			if (!(new File(filename + PDF_EXT).exists())) {
 				// PDF file not found
 				result = 1;
@@ -307,7 +308,7 @@ public class Convert extends Activity {
 				} else {
 					// Keep if ok
 					renameFile();
-					publishProgress("\n" + getResources().getString(R.string.file) + " " + filename + EPUB_EXT);
+					publishProgress(String.format(getResources().getString(R.string.file), filename + EPUB_EXT));
 				}
 			}
 
@@ -325,7 +326,7 @@ public class Convert extends Activity {
 			try {
 				// Set up counter
 				int pages = ReadPdf.getPages();
-				publishProgress(getResources().getString(R.string.pages) + pages);
+				publishProgress(String.format(getResources().getString(R.string.pages), pages));
 				int totalFiles = 1 + pages / pagesPerFile;
 				int writedFiles = 0;
 
@@ -391,11 +392,11 @@ public class Convert extends Activity {
 						String page = stringToHTMLString(ReadPdf.extractText(j));
 						if (page.length() == 0) {
 							publishProgress(String.format(getResources().getString(R.string.extraction_failure), j));
-							textSb.append("&lt;&lt;# " + j + "&gt;&gt;");
+							textSb.append("&lt;&lt;#" + j + "&gt;&gt;");
 							extractionErrorFlag = true;
 						} else {
 							if (page.matches(".*\\p{Cntrl}.*")) {
-								textSb.append(page.replaceAll("\\p{Cntrl}+", "&lt;&lt;! " + j + "&gt;&gt;"));
+								textSb.append(page.replaceAll("\\p{Cntrl}+", "&lt;&lt;@" + j + "&gt;&gt;"));
 								extractionErrorFlag = true;
 							} else {
 								textSb.append(page);
