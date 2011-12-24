@@ -21,8 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	android:orientation="vertical" >
 	<ScrollView android:id="@+id/scroll"
 		android:layout_weight="1"
-		android:layout_width="fill_parent" 
-		android:layout_height="fill_parent">
+		android:layout_width="match_parent" 
+		android:layout_height="match_parent">
 		<TextView
 			android:id="@+id/progress"
 			android:layout_width="match_parent"
@@ -30,8 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</ScrollView>
 	<LinearLayout
 	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:orientation="horizontal" >
+	    android:layout_height="wrap_content" >
 	    <Button
 			android:id="@+id/ok"
 			android:layout_width="match_parent"

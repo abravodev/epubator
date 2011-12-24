@@ -16,34 +16,33 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent" >
-	<LinearLayout
+	<ScrollView android:id="@+id/scroll"
+		android:layout_weight="1"
 		android:layout_width="match_parent" 
-		android:layout_height="wrap_content"
-		android:gravity="center"
-		android:layout_weight="1" >
-		<ImageView
+		android:layout_height="match_parent">
+		<TextView
+			android:id="@+id/progress"
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:gravity="center"
-			android:src="@drawable/epubator" />
-	</LinearLayout>
+			android:layout_height="match_parent" />
+	</ScrollView>
 	<LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content" >
-		<Button
-			android:id="@+id/convert"
+	    android:layout_width="100sp"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical"
+		android:layout_marginTop="6dp" >
+	    <Button
+			android:id="@+id/ok"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:text="@string/convert"
+			android:text="@string/ok"
 			android:layout_weight="1" />
-		 <Button
-			android:id="@+id/preview"
+		<Button
+			android:id="@+id/stop"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:text="@string/preview"
+			android:text="@string/stop"
 			android:layout_weight="1" />
 	</LinearLayout>
 </LinearLayout>
