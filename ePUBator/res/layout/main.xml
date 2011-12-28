@@ -39,7 +39,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			android:layout_height="match_parent"
 			android:text="@string/convert"
 			android:layout_weight="1" />
-		 <Button
+		<Button
+			android:id="@+id/prefs"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:text="@string/prefs"
+			android:layout_weight="1" />
+		<Button
 			android:id="@+id/preview"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"

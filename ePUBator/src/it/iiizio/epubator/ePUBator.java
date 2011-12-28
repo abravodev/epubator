@@ -36,6 +36,7 @@ public class ePUBator extends Activity {
 		setContentView(R.layout.main);
 
 		((Button) findViewById(R.id.convert)).setOnClickListener(mConvertListener);
+		((Button) findViewById(R.id.prefs)).setOnClickListener(mPrefsListener);
 		((Button) findViewById(R.id.preview)).setOnClickListener(mPreviewListener);
 	}
 
@@ -55,6 +56,13 @@ public class ePUBator extends Activity {
 				chooseFile.putExtra("filter", "pdf");
 				startActivityForResult(chooseFile, 0);
 			}
+		}
+	};
+
+	// Settings button pressed
+    View.OnClickListener mPrefsListener = new OnClickListener() {
+		public void onClick(View v) {
+			startActivity(new Intent(ePUBator.this, Prefs.class));
 		}
 	};
 

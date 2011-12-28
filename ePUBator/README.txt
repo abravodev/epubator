@@ -58,7 +58,7 @@ v0.4
 - Aggiunta visualizzazione degli errori di estrazione nel progress dialog
 - Corretto bug del selettore dei file (sdcard non leggibile)
 - Corretto bug dell'anteprima
-- Updated iText lib to 5.1.3
+- Aggiornata iText lib alla 5.1.3
 v0.3
 - Aggiunta anteprima
 - Aggiunta notifica

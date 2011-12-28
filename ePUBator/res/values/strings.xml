@@ -16,14 +16,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
+    <!-- ePUBator -->
     <string name="app_name">ePUBator</string>
 	<string name="convert">Convert</string>
+	<string name="prefs">Settings</string>
 	<string name="preview">Preview</string>
+	<!-- Preview -->
 	<string name="prev">Previous page</string>
 	<string name="next">Next page</string>
+	<!-- Prefs -->
+	<string name="mark_title">Add marker</string>
+	<string name="mark_summary">Mark errors and page lost</string>
+	<string name="page_title">Page per file</string>
+	<string name="page_summary">Number of PDF page per file</string>
+	<string name="experimental">Experimental features</string>
+	<string name="images_title">Include images</string>
+	<string name="images_summary">Extract images from PDF</string>
+	<string name="show_images_title">Show images</string>
+	<string name="show_images_summary">Show images in preview</string>
+	<!-- FileChooser -->
+	<string name="path">Path: %s</string>
+	<!-- Convert -->
 	<string name="read_error">"Can't read ePUB file"</string>
 	<string name="cip">Conversion in progress</string>
-	<string name="path">Path: %s</string>
 	<string name="heading">"ePUBator - &#169;2011 Ezio Querini\nMinimal offline PDF to ePUB converter for Android\n\n"</string>
 	<string name="deleted">ePUB file deleted</string>
 	<string name="kept_old">Kept old ePUB file</string>
