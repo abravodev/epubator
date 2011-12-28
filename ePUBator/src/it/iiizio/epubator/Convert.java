@@ -29,6 +29,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -36,6 +37,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -54,7 +56,9 @@ public class Convert extends Activity {
 	private static int result;
 	private static String filename = "";
 
-	private final int pagesPerFile = 10;
+	private int pagesPerFile;
+	private boolean add_markers;
+	private boolean include_images;
 	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
 	private final String TEMP_EXT = " - ePUBator.tmp";
@@ -94,6 +98,18 @@ public class Convert extends Activity {
 		((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).cancel(R.string.app_name);
 		notificationSent = false;
 	}
+	
+	// Get preferences
+    @Override
+    public void onResume() {
+      super.onResume();
+      
+      SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
+
+      add_markers = prefs.getBoolean("add_markers", true);
+      pagesPerFile = Integer.parseInt(prefs.getString("page_per_file", "10"));
+      include_images = prefs.getBoolean("include_images", false);
+    }
 
 	// Set buttons state
 	private void setButtons(boolean flag) {
@@ -196,9 +212,11 @@ public class Convert extends Activity {
 	// Keep file
 	private void keepEpub() {
 		progressSb.append("\n" + getResources().getStringArray(R.array.message)[0] + "\n");
-		String pageNumber = String.format(getResources().getString(R.string.pagenumber), ">>\n");
-		progressSb.append(String.format(getResources().getString(R.string.errors), "<<@") + pageNumber);
-		progressSb.append(String.format(getResources().getString(R.string.lost_pages), "<<#") + pageNumber);
+		if (add_markers) {
+			String pageNumberString = String.format(getResources().getString(R.string.pagenumber), ">>\n");
+			progressSb.append(String.format(getResources().getString(R.string.errors), "<<@") + pageNumberString);
+			progressSb.append(String.format(getResources().getString(R.string.lost_pages), "<<#") + pageNumberString);
+		}
 		renameFile();
 		progressSb.append(getResources().getString(R.string.file) + filename + EPUB_EXT);
 		progressTv.setText(progressSb);
@@ -392,12 +410,18 @@ public class Convert extends Activity {
 						String page = stringToHTMLString(ReadPdf.extractText(j));
 						if (page.length() == 0) {
 							publishProgress(String.format(getResources().getString(R.string.extraction_failure), j));
-							textSb.append("&lt;&lt;#" + j + "&gt;&gt;");
 							extractionErrorFlag = true;
+							if (add_markers) {
+								textSb.append("&lt;&lt;#" + j + "&gt;&gt;");
+							}
 						} else {
 							if (page.matches(".*\\p{Cntrl}.*")) {
-								textSb.append(page.replaceAll("\\p{Cntrl}+", "&lt;&lt;@" + j + "&gt;&gt;"));
 								extractionErrorFlag = true;
+								if (add_markers) {
+									textSb.append(page.replaceAll("\\p{Cntrl}+", "&lt;&lt;@" + j + "&gt;&gt;"));
+								} else {
+									textSb.append(page.replaceAll("\\p{Cntrl}+", " "));
+								}
 							} else {
 								textSb.append(page);
 							}
