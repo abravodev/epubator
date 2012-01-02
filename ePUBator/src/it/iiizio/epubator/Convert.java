@@ -19,7 +19,10 @@ package it.iiizio.epubator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -345,7 +348,7 @@ public class Convert extends Activity {
 				// Set up counter
 				int pages = ReadPdf.getPages();
 				publishProgress(String.format(getResources().getString(R.string.pages), pages));
-				int totalFiles = 1 + pages / pagesPerFile;
+				int totalFiles = 2 + pages / pagesPerFile;
 				int writedFiles = 0;
 
 				// Set flag
@@ -369,11 +372,6 @@ public class Convert extends Activity {
 				}
 
 				String bookId = filename.replaceAll("[^\\p{ASCII}]", "")+ " - " + new Date().hashCode();
-				publishProgress(getResources().getString(R.string.content));
-				if (WriteZip.addText("OEBPS/content.opf", createContent(pages, bookId), false)) {
-					return 3;
-				}
-
 				publishProgress(getResources().getString(R.string.toc));
 				if (WriteZip.addText("OEBPS/toc.ncx", createToc(pages, bookId), false)) {
 					return 3;
@@ -391,7 +389,8 @@ public class Convert extends Activity {
 				}
 				
 				
-				// Add extracted text
+				// Add extracted text and images
+				List<String> allImageList = new ArrayList<String>();
 				for(int i = 1; i <= pages; i += pagesPerFile) {
 					// Stopped?
 					if (result == 5) {
@@ -407,6 +406,7 @@ public class Convert extends Activity {
 					}
 
 					for (int j = i; j <= endPage; j++) {
+						// extract text
 						String page = stringToHTMLString(ReadPdf.extractText(j));
 						if (page.length() == 0) {
 							publishProgress(String.format(getResources().getString(R.string.extraction_failure), j));
@@ -426,11 +426,29 @@ public class Convert extends Activity {
 								textSb.append(page);
 							}
 						}
+						
+						// extract images
+						List<String> imageList = ReadPdf.getImages(j);
+						Iterator<String> iterator = imageList.iterator();
+						while (iterator.hasNext()) {
+							String imageName = iterator.next();
+							if (!allImageList.contains(imageName)) {
+								allImageList.add(imageName);
+								publishProgress(String.format(getResources().getString(R.string.image), imageName));
+							}
+							textSb.append("<img alt=\"" + imageName + "\" src=\"" + imageName + "\" style=\"height: 100%\" />");
+						}
 					}
 
 					if (WriteZip.addText("OEBPS/page" + i + ".html", createPages(i, textSb.toString()) , false)) {
 						return 3;
 					}
+				}
+
+				// Add content.opf
+				publishProgress(getResources().getString(R.string.content) + "   100%");
+				if (WriteZip.addText("OEBPS/content.opf", createContent(pages, bookId, allImageList), false)) {
+					return 3;
 				}
 
 				// Close ePUB file
@@ -462,7 +480,7 @@ public class Convert extends Activity {
 		}
 
 		// Create content.opf
-		private String createContent(int pages, String id) {
+		private String createContent(int pages, String id, Iterable<String> images) {
 			StringBuilder content = new StringBuilder();
 			content.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 			content.append("<package xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"BookID\" version=\"2.0\">\n");
@@ -480,6 +498,10 @@ public class Convert extends Activity {
 			content.append("        <item id=\"ncx\" href=\"toc.ncx\" media-type=\"application/x-dtbncx+xml\"/>\n");
 			content.append("        <item id=\"frontpage\" href=\"frontpage.html\" media-type=\"application/xhtml+xml\"/>\n");
 			content.append("        <item id=\"cover\" href=\"frontpage.png\" media-type=\"image/png\"/>\n");
+			for(String name : images) {
+				// TODO convert to png
+				content.append("        <item id=\"" + name + "\" href=\"" + name + "\" media-type=\"image/" + name.substring(name.lastIndexOf('.') + 1) + "\"/>\n");
+			}
 			content.append("    </manifest>\n");
 			content.append("    <spine toc=\"ncx\">\n");
 			content.append("        <itemref idref=\"frontpage\"/>\n");
@@ -589,11 +611,7 @@ public class Convert extends Activity {
 	        paint.setStyle(Paint.Style.FILL);
 	        
 	        String name = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
-	        // TODO ask for title 
-/*			if (ReadPdf.getTitle() != null) {
-	        	name = ReadPdf.getTitle() + " - " + ReadPdf.getAuthor();
-	        }*/
-			name = name.replaceAll("_", " "); //.replaceAll("\\[.*?\\]","");
+			name = name.replaceAll("_", " ");
 	        String words[] = name.split("\\s");
 	        
 	        float newline = paint.getFontSpacing();

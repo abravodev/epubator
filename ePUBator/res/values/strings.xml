@@ -62,6 +62,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="frontpage">Add frontpage.html</string>
 	<string name="frontpagepng">Add frontpage.png</string>
 	<string name="html">Add page</string>
+	<string name="image">Add %s</string>
 	<string name="close">Close file</string>
 	<string-array name="message">
 		<item>Conversion completed</item>

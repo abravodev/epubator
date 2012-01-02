@@ -67,6 +67,7 @@ public class WriteZip {
 		return false;
 	}
 
+	// Add image entry
 	static boolean addImage(String filename, byte[] image) {
 		try {
 			ZipEntry zipEntry = new ZipEntry(filename);
@@ -76,8 +77,7 @@ public class WriteZip {
 			zipOut.closeEntry();
 		}
 		catch (Exception e) {
-			System.err.println("Failed to add imagefile to zip" + e.getMessage());
-			return true;
+			return !e.getMessage().startsWith("duplicate");
 		}
 		return false;
 	}

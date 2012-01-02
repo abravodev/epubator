@@ -17,14 +17,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package it.iiizio.epubator;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.parser.ImageRenderInfo;
+import com.itextpdf.text.pdf.parser.PdfImageObject;
+import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
+import com.itextpdf.text.pdf.parser.RenderListener;
+import com.itextpdf.text.pdf.parser.TextRenderInfo;
 
 public class ReadPdf {
 	private static PdfReader reader;
 	private static HashMap<String, String> info;
+	static List<String> imageList;
 
 	// Open pdf file
 	public static boolean open(String filename) {
@@ -41,15 +51,6 @@ public class ReadPdf {
 		return false;
 	}
 
-	// Extract text
-	public static String extractText(int page) {
-		try {
-			return PdfTextExtractor.getTextFromPage(reader, page) + "\n";
-		} catch(Exception e) {
-			return "";
-		}
-	}
-
 	// Number of pages
 	public static int getPages() {
 		return reader.getNumberOfPages();
@@ -64,4 +65,56 @@ public class ReadPdf {
 	public static String getAuthor() {
 		return info.get("Author");
 	}
+
+	// Extract text
+	public static String extractText(int page) {
+		try {
+			return PdfTextExtractor.getTextFromPage(reader, page) + "\n";
+		} catch(Exception e) {
+			return "";
+		}
+	}
+
+	public static List<String> getImages(int page) {
+		imageList = new ArrayList<String>();
+		PdfReaderContentParser parser = new PdfReaderContentParser(reader);
+		renderListener listener = new renderListener();
+		try {
+			parser.processContent(page, listener);
+		} catch (IOException e) {
+			System.err.println("Failed to extract image " + e.getMessage());
+		}
+		return imageList;
+	}
 }
+
+class renderListener implements RenderListener {
+	public void renderImage(ImageRenderInfo renderInfo) {
+		PdfImageObject image;
+		try {
+			image = renderInfo.getImage();
+			if (image != null) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				baos.write(image.getImageAsBytes());
+	            baos.flush();
+	            baos.close();
+	            String imageName = String.format("image%s.%s", renderInfo.getRef().getNumber(), image.getFileType());
+				if (!WriteZip.addImage("OEBPS/" + imageName , baos.toByteArray())) {
+					ReadPdf.imageList.add(imageName);
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Failed to extract image (renderListener) " + e.getMessage());
+		}
+	}
+
+	public void renderText(TextRenderInfo renderInfo) {
+	}
+
+	public void beginTextBlock() {
+	}
+
+	public void endTextBlock() {
+	}
+}
+
