@@ -32,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="experimental">Funzioni sperimentali</string>
 	<string name="images_title">Includi immagini</string>
 	<string name="images_summary">Estrai le immagini dal PDF</string>
+	<string name="images2png_title">Immagini in PNG</string>
+	<string name="images2png_summary">Converti al formato standard</string>
 	<string name="show_images_title">Mostra immagini</string>
 	<string name="show_images_summary">"Mostra le immagini nell'anteprima"</string>
 	<!-- FileChooser -->
@@ -39,10 +41,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<!-- Convert -->
 	<string name="read_error">Non posso leggere il file ePUB</string>
 	<string name="cip">Conversione in corso</string>
-	<string name="heading">"ePUBator - &#169;2011 Ezio Querini\nConvertitore da PDF a ePUB minimale per Android\n\n"</string>
+	<string name="heading">"ePUBator - &#169;2011 Ezio Querini\nConvertitore da PDF a ePUB minimale per Android\nL'estrazione dal PDF è basata sulla libreria iText\n\n"</string>
 	<string name="deleted">File ePUB rimosso</string>
 	<string name="kept_old">Mantenuto il vecchio file ePUB</string>
-	<string name="pages">Numero di pagine: %d</string>
+	<string name="pages">Numero di pagine: %d\n</string>
 	<string name="extraction_failure">Pagina %d: estrazione fallita</string>
 	<string name="extraction_error">Errore di estrazione: il testo può essere incompleto</string>
 	<string name="keep">Devo mantenere il file ePUB?</string>
@@ -71,6 +73,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<item>Scrittura del file ePUB fallita</item>
 		<item>Estrazione del testo fallita</item>
 		<item>Estrazione interrotta dal utente</item>
-		<item>Memoria insufficente</item>
+		<item>Memoria insufficente\nImposta pagine per file a 1, disabilita l\'estrazione delle immagini e riprova</item>
 	</string-array>
 </resources>

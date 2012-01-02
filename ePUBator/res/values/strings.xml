@@ -32,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="experimental">Experimental features</string>
 	<string name="images_title">Include images</string>
 	<string name="images_summary">Extract images from PDF</string>
+	<string name="images2png_title">Images to PNG</string>
+	<string name="images2png_summary">Convert to standard format</string>
 	<string name="show_images_title">Show images</string>
 	<string name="show_images_summary">Show images in preview</string>
 	<!-- FileChooser -->
@@ -39,10 +41,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<!-- Convert -->
 	<string name="read_error">"Can't read ePUB file"</string>
 	<string name="cip">Conversion in progress</string>
-	<string name="heading">"ePUBator - &#169;2011 Ezio Querini\nMinimal offline PDF to ePUB converter for Android\n\n"</string>
+	<string name="heading">"ePUBator - &#169;2011 Ezio Querini\nMinimal offline PDF to ePUB converter for Android\nPDF extraction based on iText library\n\n"</string>
 	<string name="deleted">ePUB file deleted</string>
 	<string name="kept_old">Kept old ePUB file</string>
-	<string name="pages">Number of pages: %d</string>
+	<string name="pages">Number of pages: %d\n</string>
 	<string name="extraction_failure">Page %d: extraction failure</string>
 	<string name="extraction_error">Extraction error: text can be incomplete</string>
 	<string name="keep">Have I to keep the ePUB file?</string>
@@ -71,6 +73,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<item>Failed to write ePUB file</item>
 		<item>Failed to extract text</item>
 		<item>Extraction stopped by user</item>
-		<item>Out of memory error</item>
+		<item>Out of memory error\nSet page per file to 1, disable images extraction and try again</item>
 	</string-array>
 </resources>

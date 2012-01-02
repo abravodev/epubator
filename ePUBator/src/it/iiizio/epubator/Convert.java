@@ -428,15 +428,17 @@ public class Convert extends Activity {
 						}
 						
 						// extract images
-						List<String> imageList = ReadPdf.getImages(j);
-						Iterator<String> iterator = imageList.iterator();
-						while (iterator.hasNext()) {
-							String imageName = iterator.next();
-							if (!allImageList.contains(imageName)) {
-								allImageList.add(imageName);
-								publishProgress(String.format(getResources().getString(R.string.image), imageName));
+						if (include_images) {
+							List<String> imageList = ReadPdf.getImages(j);
+							Iterator<String> iterator = imageList.iterator();
+							while (iterator.hasNext()) {
+								String imageName = iterator.next();
+								if (!allImageList.contains(imageName)) {
+									allImageList.add(imageName);
+									publishProgress(String.format(getResources().getString(R.string.image), imageName));
+								}
+								textSb.append("\n<img alt=\"" + imageName + "\" src=\"" + imageName + "\" style=\"height: 100%\" />");
 							}
-							textSb.append("<img alt=\"" + imageName + "\" src=\"" + imageName + "\" style=\"height: 100%\" />");
 						}
 					}
 
@@ -567,7 +569,7 @@ public class Convert extends Activity {
 			html.append("</head>\n");
 			html.append("<body>\n");
 			html.append(body);
-			html.append("</body>\n");
+			html.append("\n</body>\n");
 			html.append("</html>\n");
 			return html.toString();
 		}
@@ -577,7 +579,7 @@ public class Convert extends Activity {
 			StringBuilder body = new StringBuilder();
 			body.append("  <p>\n");
 			body.append(text.replaceAll("<br/>(?=[a-z])", "&nbsp;"));
-			body.append("  </p>\n");
+			body.append("\n  </p>");
 			return createHtml("page" + offset, body.toString());
 		}
 
@@ -589,9 +591,9 @@ public class Convert extends Activity {
 		// Create frontpage.png
 		private boolean createFrontpagePng() {
 	        final int maxWidth = 240;
-	        final int maxHeight = 350;
+	        final int maxHeight = 340;
 	        final int border = 10;
-	        final int fontsize = 36;
+	        final int fontsize = 40;
 	        
 	        // Grey background
 	        Bitmap bmp = Bitmap.createBitmap(maxWidth, maxHeight, Bitmap.Config.RGB_565);
@@ -678,7 +680,7 @@ public class Convert extends Activity {
 						sb.append("&gt;");
 					else if (c == '\n')
 						// Handle Newline
-						sb.append("<br/>");
+						sb.append("\n<br/>");
 					else {
 						int ci = 0xffff & c;
 						if (ci < 160 )
