@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.ImageRenderInfo;
 import com.itextpdf.text.pdf.parser.PdfImageObject;
@@ -35,6 +37,7 @@ public class ReadPdf {
 	private static PdfReader reader;
 	private static HashMap<String, String> info;
 	static List<String> imageList;
+	static boolean convert2png;
 
 	// Open pdf file
 	public static boolean open(String filename) {
@@ -75,7 +78,9 @@ public class ReadPdf {
 		}
 	}
 
-	public static List<String> getImages(int page) {
+	// Extract images
+	public static List<String> getImages(int page, boolean images2png) {
+		convert2png = images2png;
 		imageList = new ArrayList<String>();
 		PdfReaderContentParser parser = new PdfReaderContentParser(reader);
 		renderListener listener = new renderListener();
@@ -88,20 +93,34 @@ public class ReadPdf {
 	}
 }
 
+// RenderListener helper class
 class renderListener implements RenderListener {
 	public void renderImage(ImageRenderInfo renderInfo) {
-		PdfImageObject image;
 		try {
-			image = renderInfo.getImage();
+			// Get image
+			PdfImageObject image = renderInfo.getImage();
 			if (image != null) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				baos.write(image.getImageAsBytes());
 	            baos.flush();
 	            baos.close();
-	            String imageName = String.format("image%s.%s", renderInfo.getRef().getNumber(), image.getFileType());
-				if (!WriteZip.addImage("OEBPS/" + imageName , baos.toByteArray())) {
-					ReadPdf.imageList.add(imageName);
-				}
+	            
+	            // Convert to PNG
+	            String imageType = image.getFileType();
+	            if (ReadPdf.convert2png && imageType != "png") {
+	            	byte[] imageBA = baos.toByteArray();
+	            	Bitmap bmp = BitmapFactory.decodeByteArray(imageBA, 0, imageBA.length);
+		            baos = new ByteArrayOutputStream();
+		            bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
+		            imageType = "png";
+	            }
+
+	            // Save to ePUB
+	            String imageName = String.format("image%s.%s", renderInfo.getRef().getNumber(), imageType);
+	            if (!WriteZip.addImage("OEBPS/" + imageName, baos.toByteArray())) {
+						ReadPdf.imageList.add(imageName);
+	            }
+
 			}
 		} catch (IOException e) {
 			System.err.println("Failed to extract image (renderListener) " + e.getMessage());

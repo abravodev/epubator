@@ -62,6 +62,8 @@ public class Convert extends Activity {
 	private int pagesPerFile;
 	private boolean add_markers;
 	private boolean include_images;
+	private boolean images2png;
+	
 	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
 	private final String TEMP_EXT = " - ePUBator.tmp";
@@ -112,6 +114,7 @@ public class Convert extends Activity {
       add_markers = prefs.getBoolean("add_markers", true);
       pagesPerFile = Integer.parseInt(prefs.getString("page_per_file", "10"));
       include_images = prefs.getBoolean("include_images", false);
+      images2png = prefs.getBoolean("images2png", true);
     }
 
 	// Set buttons state
@@ -429,7 +432,7 @@ public class Convert extends Activity {
 						
 						// extract images
 						if (include_images) {
-							List<String> imageList = ReadPdf.getImages(j);
+							List<String> imageList = ReadPdf.getImages(j, images2png);
 							Iterator<String> iterator = imageList.iterator();
 							while (iterator.hasNext()) {
 								String imageName = iterator.next();
@@ -501,7 +504,6 @@ public class Convert extends Activity {
 			content.append("        <item id=\"frontpage\" href=\"frontpage.html\" media-type=\"application/xhtml+xml\"/>\n");
 			content.append("        <item id=\"cover\" href=\"frontpage.png\" media-type=\"image/png\"/>\n");
 			for(String name : images) {
-				// TODO convert to png
 				content.append("        <item id=\"" + name + "\" href=\"" + name + "\" media-type=\"image/" + name.substring(name.lastIndexOf('.') + 1) + "\"/>\n");
 			}
 			content.append("    </manifest>\n");
