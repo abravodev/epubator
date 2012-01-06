@@ -34,16 +34,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:title="@string/images_title"
         android:summary="@string/images_summary"
 		android:defaultValue="false" />
-      <CheckBoxPreference
-        android:key="images2png"
-        android:title="@string/images2png_title"
-        android:summary="@string/images2png_summary"
-		android:defaultValue="true"
-		android:dependency="include_images" />
-      <CheckBoxPreference
+<!--       <CheckBoxPreference
         android:key="show_images"
         android:title="@string/show_images_title"
         android:summary="@string/show_images_summary"
-		android:defaultValue="false" />
+		android:defaultValue="false" /> -->
   </PreferenceCategory>
 </PreferenceScreen>

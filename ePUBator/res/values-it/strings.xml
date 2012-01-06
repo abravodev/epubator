@@ -32,8 +32,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="experimental">Funzioni sperimentali</string>
 	<string name="images_title">Includi immagini</string>
 	<string name="images_summary">Estrai le immagini dal PDF</string>
-	<string name="images2png_title">Immagini in PNG</string>
-	<string name="images2png_summary">Converti al formato standard</string>
 	<string name="show_images_title">Mostra immagini</string>
 	<string name="show_images_summary">"Mostra le immagini nell'anteprima"</string>
 	<!-- FileChooser -->
@@ -73,6 +71,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<item>Scrittura del file ePUB fallita</item>
 		<item>Estrazione del testo fallita</item>
 		<item>Estrazione interrotta dal utente</item>
-		<item>Memoria insufficente\nImposta pagine per file a 1, disabilita l\'estrazione delle immagini e riprova</item>
+		<item>Memoria insufficente (imposta pagine per file a 1 e/o disabilita l\'estrazione delle immagini e riprova)</item>
 	</string-array>
 </resources>

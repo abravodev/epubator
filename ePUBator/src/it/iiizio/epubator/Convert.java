@@ -62,7 +62,6 @@ public class Convert extends Activity {
 	private int pagesPerFile;
 	private boolean add_markers;
 	private boolean include_images;
-	private boolean images2png;
 	
 	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
@@ -114,7 +113,6 @@ public class Convert extends Activity {
       add_markers = prefs.getBoolean("add_markers", true);
       pagesPerFile = Integer.parseInt(prefs.getString("page_per_file", "10"));
       include_images = prefs.getBoolean("include_images", false);
-      images2png = prefs.getBoolean("images2png", true);
     }
 
 	// Set buttons state
@@ -432,7 +430,7 @@ public class Convert extends Activity {
 						
 						// extract images
 						if (include_images) {
-							List<String> imageList = ReadPdf.getImages(j, images2png);
+							List<String> imageList = ReadPdf.getImages(j);
 							Iterator<String> iterator = imageList.iterator();
 							while (iterator.hasNext()) {
 								String imageName = iterator.next();
@@ -440,7 +438,7 @@ public class Convert extends Activity {
 									allImageList.add(imageName);
 									publishProgress(String.format(getResources().getString(R.string.image), imageName));
 								}
-								textSb.append("\n<img alt=\"" + imageName + "\" src=\"" + imageName + "\" style=\"height: 100%\" />");
+								textSb.append("\n<img alt=\"" + imageName + "\" src=\"" + imageName + "\" /><br/>");
 							}
 						}
 					}
@@ -587,7 +585,7 @@ public class Convert extends Activity {
 
 		// Create frontpage.html
 		private String createFrontpage() {
-			return createHtml("Frontpage", "<div><img alt=\"cover\" src=\"frontpage.png\" style=\"height: 100%\" /></div>");
+			return createHtml("Frontpage", "<div><img alt=\"cover\" src=\"frontpage.png\" /></div>");
 		}
 
 		// Create frontpage.png
@@ -645,7 +643,7 @@ public class Convert extends Activity {
 		//  http://www.rgagnon.com/javadetails/java-0306.html
 		//	Author: S. Bayer.
 		private  String stringToHTMLString(String string) {
-			StringBuilder sb = new StringBuilder(); // changed StringBuffer to StringBuilder to prevent buffer overflow
+			StringBuilder sb = new StringBuilder(); // changed StringBuffer to StringBuilder to prevent buffer overflow (iiizio)
 			// true if last char was blank
 			boolean lastWasBlankChar = false;
 			int len = string.length();
@@ -680,6 +678,8 @@ public class Convert extends Activity {
 						sb.append("&lt;");
 					else if (c == '>')
 						sb.append("&gt;");
+					else if (c == '%') // Android browser doesn't like % (iiizio)
+						sb.append("&#37;");
 					else if (c == '\n')
 						// Handle Newline
 						sb.append("\n<br/>");
