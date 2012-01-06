@@ -32,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="experimental">Experimental features</string>
 	<string name="images_title">Include images</string>
 	<string name="images_summary">Extract images from PDF</string>
+	<string name="repeated_title">Repeated images</string>
+	<string name="repeated_summary">Add every image repetition</string>
 	<string name="show_images_title">Show images</string>
 	<string name="show_images_summary">Show images in preview</string>
 	<!-- FileChooser -->

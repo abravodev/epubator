@@ -60,8 +60,9 @@ public class Convert extends Activity {
 	private static String filename = "";
 
 	private int pagesPerFile;
-	private boolean add_markers;
-	private boolean include_images;
+	private boolean addMarkers;
+	private boolean includeImages;
+	private boolean repeatedImages;
 	
 	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
@@ -110,9 +111,10 @@ public class Convert extends Activity {
       
       SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
 
-      add_markers = prefs.getBoolean("add_markers", true);
+      addMarkers = prefs.getBoolean("add_markers", true);
       pagesPerFile = Integer.parseInt(prefs.getString("page_per_file", "10"));
-      include_images = prefs.getBoolean("include_images", false);
+      includeImages = prefs.getBoolean("include_images", false);
+      repeatedImages = prefs.getBoolean("repeated_images", false);
     }
 
 	// Set buttons state
@@ -216,7 +218,7 @@ public class Convert extends Activity {
 	// Keep file
 	private void keepEpub() {
 		progressSb.append("\n" + getResources().getStringArray(R.array.message)[0] + "\n");
-		if (add_markers) {
+		if (addMarkers) {
 			String pageNumberString = String.format(getResources().getString(R.string.pagenumber), ">>\n");
 			progressSb.append(String.format(getResources().getString(R.string.errors), "<<@") + pageNumberString);
 			progressSb.append(String.format(getResources().getString(R.string.lost_pages), "<<#") + pageNumberString);
@@ -412,13 +414,13 @@ public class Convert extends Activity {
 						if (page.length() == 0) {
 							publishProgress(String.format(getResources().getString(R.string.extraction_failure), j));
 							extractionErrorFlag = true;
-							if (add_markers) {
+							if (addMarkers) {
 								textSb.append("&lt;&lt;#" + j + "&gt;&gt;");
 							}
 						} else {
 							if (page.matches(".*\\p{Cntrl}.*")) {
 								extractionErrorFlag = true;
-								if (add_markers) {
+								if (addMarkers) {
 									textSb.append(page.replaceAll("\\p{Cntrl}+", "&lt;&lt;@" + j + "&gt;&gt;"));
 								} else {
 									textSb.append(page.replaceAll("\\p{Cntrl}+", " "));
@@ -429,16 +431,20 @@ public class Convert extends Activity {
 						}
 						
 						// extract images
-						if (include_images) {
+						if (includeImages) {
 							List<String> imageList = ReadPdf.getImages(j);
 							Iterator<String> iterator = imageList.iterator();
 							while (iterator.hasNext()) {
 								String imageName = iterator.next();
+								String imageTag = "\n<img alt=\"" + imageName + "\" src=\"" + imageName + "\" /><br/>";
+
 								if (!allImageList.contains(imageName)) {
 									allImageList.add(imageName);
 									publishProgress(String.format(getResources().getString(R.string.image), imageName));
+									textSb.append(imageTag);
+								} else if (repeatedImages) {
+									textSb.append(imageTag);
 								}
-								textSb.append("\n<img alt=\"" + imageName + "\" src=\"" + imageName + "\" /><br/>");
 							}
 						}
 					}

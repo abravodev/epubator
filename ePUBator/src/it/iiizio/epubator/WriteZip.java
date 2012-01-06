@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
 public class WriteZip {
@@ -76,8 +77,11 @@ public class WriteZip {
 			zipOut.write(image);
 			zipOut.closeEntry();
 		}
+		catch (ZipException e) {
+			return !e.getMessage().startsWith("Entry already exists");
+		}
 		catch (Exception e) {
-			return !e.getMessage().startsWith("duplicate");
+			return true;
 		}
 		return false;
 	}

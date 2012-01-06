@@ -32,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="experimental">Funzioni sperimentali</string>
 	<string name="images_title">Includi immagini</string>
 	<string name="images_summary">Estrai le immagini dal PDF</string>
+	<string name="repeated_title">Immagini ripetute</string>
+	<string name="repeated_summary">Aggiungi ogni ripetizione dell\'immagine</string>
 	<string name="show_images_title">Mostra immagini</string>
 	<string name="show_images_summary">"Mostra le immagini nell'anteprima"</string>
 	<!-- FileChooser -->
