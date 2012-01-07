@@ -20,6 +20,9 @@ package it.iiizio.epubator;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -36,8 +39,31 @@ public class ePUBator extends Activity {
 		setContentView(R.layout.main);
 
 		((Button) findViewById(R.id.convert)).setOnClickListener(mConvertListener);
-		((Button) findViewById(R.id.prefs)).setOnClickListener(mPrefsListener);
 		((Button) findViewById(R.id.preview)).setOnClickListener(mPreviewListener);
+	}
+
+	// Inflate menu
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
+	}
+	
+	// Menu item selected
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.prefs:
+			startActivity(new Intent(ePUBator.this, Prefs.class));
+			return true;
+		case R.id.info:
+			startActivity(new Intent(ePUBator.this, Prefs.class));
+			return true;
+		case R.id.license:
+			startActivity(new Intent(ePUBator.this, Prefs.class));
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	// Convert button pressed
@@ -56,13 +82,6 @@ public class ePUBator extends Activity {
 				chooseFile.putExtra("filter", "pdf");
 				startActivityForResult(chooseFile, 0);
 			}
-		}
-	};
-
-	// Settings button pressed
-    View.OnClickListener mPrefsListener = new OnClickListener() {
-		public void onClick(View v) {
-			startActivity(new Intent(ePUBator.this, Prefs.class));
 		}
 	};
 

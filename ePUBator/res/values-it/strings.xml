@@ -19,8 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <!-- ePUBator -->
     <string name="app_name">ePUBator</string>
 	<string name="convert">Converti</string>
-	<string name="prefs">Preferenze</string>
 	<string name="preview">Anteprima</string>
+	<!-- Menu -->
+	<string name="prefs">Preferenze</string>
+	<string name="info">Informazioni</string>
+	<string name="license">Licenza</string>
 	<!-- Preview -->
 	<string name="prev">Pagina precedente</string>
 	<string name="next">Pagina successiva</string>
