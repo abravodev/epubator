@@ -98,22 +98,22 @@ class renderListener implements RenderListener {
 			if (image != null) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				baos.write(image.getImageAsBytes());
-	            baos.flush();
-	            baos.close();
-	            
-	            // Check image type
-	            String imageType = image.getFileType();
-	            if (imageType == "png" || imageType == "gif" || imageType == "jpg") {
-		            if (imageType == "jpg") {
-		            	imageType = "jpeg";
-		            }
-	            	
-		            // Save to ePUB
-		            String imageName = String.format("image%s.%s", renderInfo.getRef().getNumber(), imageType);
-		            if (!WriteZip.addImage("OEBPS/" + imageName, baos.toByteArray())) {
-							ReadPdf.imageList.add(imageName);
-		            }
-	            }
+				baos.flush();
+				baos.close();
+
+				// Check image type
+				String imageType = image.getFileType();
+				if (imageType == "png" || imageType == "gif" || imageType == "jpg") {
+					if (imageType == "jpg") {
+						imageType = "jpeg";
+					}
+
+					// Save to ePUB
+					String imageName = String.format("image%s.%s", renderInfo.getRef().getNumber(), imageType);
+					if (!WriteZip.addImage("OEBPS/" + imageName, baos.toByteArray())) {
+						ReadPdf.imageList.add(imageName);
+					}
+				}
 
 			}
 		} catch (IOException e) {

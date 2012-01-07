@@ -57,7 +57,7 @@ public class Preview extends Activity {
 		if (pageNumber == -1) {
 			pageNumber = 1;
 		}
-		
+
 		showPage(0);
 		prevBt.setOnClickListener(mPrevListener);
 		nextBt.setOnClickListener(mNextListener);
@@ -71,7 +71,7 @@ public class Preview extends Activity {
 			readError();
 			return;
 		}
-		
+
 		// Move to prev/next page
 		pageNumber += diff;
 

@@ -48,7 +48,7 @@ public class ePUBator extends Activity {
 		inflater.inflate(R.menu.menu, menu);
 		return true;
 	}
-	
+
 	// Menu item selected
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -56,10 +56,10 @@ public class ePUBator extends Activity {
 			startActivity(new Intent(ePUBator.this, Prefs.class));
 			return true;
 		case R.id.info:
-			startActivity(new Intent(ePUBator.this, Prefs.class));
+			startActivity(new Intent(ePUBator.this, Info.class));
 			return true;
 		case R.id.license:
-			startActivity(new Intent(ePUBator.this, Prefs.class));
+			startActivity(new Intent(ePUBator.this, License.class));
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

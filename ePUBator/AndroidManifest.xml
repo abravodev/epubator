@@ -23,7 +23,9 @@
 		<activity android:name="Convert"></activity>
 		<activity android:name="Prefs"></activity>
 		<activity android:name="Preview"></activity>
-				</application>
+		<activity android:name="Info"></activity>
+		<activity android:name="License"></activity>
+	</application>
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 </manifest>

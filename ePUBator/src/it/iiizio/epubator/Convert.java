@@ -63,7 +63,7 @@ public class Convert extends Activity {
 	private boolean addMarkers;
 	private boolean includeImages;
 	private boolean repeatedImages;
-	
+
 	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
 	private final String TEMP_EXT = " - ePUBator.tmp";
@@ -103,19 +103,19 @@ public class Convert extends Activity {
 		((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).cancel(R.string.app_name);
 		notificationSent = false;
 	}
-	
-	// Get preferences
-    @Override
-    public void onResume() {
-      super.onResume();
-      
-      SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
 
-      addMarkers = prefs.getBoolean("add_markers", true);
-      pagesPerFile = Integer.parseInt(prefs.getString("page_per_file", "10"));
-      includeImages = prefs.getBoolean("include_images", false);
-      repeatedImages = prefs.getBoolean("repeated_images", false);
-    }
+	// Get preferences
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
+
+		addMarkers = prefs.getBoolean("add_markers", true);
+		pagesPerFile = Integer.parseInt(prefs.getString("page_per_file", "10"));
+		includeImages = prefs.getBoolean("include_images", false);
+		repeatedImages = prefs.getBoolean("repeated_images", false);
+	}
 
 	// Set buttons state
 	private void setButtons(boolean flag) {
@@ -385,13 +385,13 @@ public class Convert extends Activity {
 				if (WriteZip.addText("OEBPS/frontpage.html", createFrontpage(), false)) {
 					return 3;
 				}
-				
+
 				publishProgress(getResources().getString(R.string.frontpagepng));
 				if (createFrontpagePng()) {
 					return 3;
 				}
-				
-				
+
+
 				// Add extracted text and images
 				List<String> allImageList = new ArrayList<String>();
 				for(int i = 1; i <= pages; i += pagesPerFile) {
@@ -429,7 +429,7 @@ public class Convert extends Activity {
 								textSb.append(page);
 							}
 						}
-						
+
 						// extract images
 						if (includeImages) {
 							List<String> imageList = ReadPdf.getImages(j);
@@ -596,52 +596,52 @@ public class Convert extends Activity {
 
 		// Create frontpage.png
 		private boolean createFrontpagePng() {
-	        final int maxWidth = 240;
-	        final int maxHeight = 340;
-	        final int border = 10;
-	        final int fontsize = 40;
-	        
-	        // Grey background
-	        Bitmap bmp = Bitmap.createBitmap(maxWidth, maxHeight, Bitmap.Config.RGB_565);
-	        Paint paint  = new Paint();
-	        paint.setColor(Color.LTGRAY);
- 	        Canvas canvas = new Canvas(bmp);
-	        canvas.drawRect(0, 0, maxWidth, maxHeight, paint);
-	        
-	        // Add ePUBator logo
-	        Bitmap img = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
-	        canvas.drawBitmap(img, maxWidth - img.getWidth(), maxHeight - img.getHeight(), new Paint(Paint.FILTER_BITMAP_FLAG));
-   
-	        // Add title
-	        paint.setTextSize(fontsize);
-	        paint.setColor(Color.BLACK);
-	        paint.setAntiAlias(true);
-	        paint.setStyle(Paint.Style.FILL);
-	        
-	        String name = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
+			final int maxWidth = 240;
+			final int maxHeight = 340;
+			final int border = 10;
+			final int fontsize = 40;
+
+			// Grey background
+			Bitmap bmp = Bitmap.createBitmap(maxWidth, maxHeight, Bitmap.Config.RGB_565);
+			Paint paint  = new Paint();
+			paint.setColor(Color.LTGRAY);
+			Canvas canvas = new Canvas(bmp);
+			canvas.drawRect(0, 0, maxWidth, maxHeight, paint);
+
+			// Add ePUBator logo
+			Bitmap img = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+			canvas.drawBitmap(img, maxWidth - img.getWidth(), maxHeight - img.getHeight(), new Paint(Paint.FILTER_BITMAP_FLAG));
+
+			// Add title
+			paint.setTextSize(fontsize);
+			paint.setColor(Color.BLACK);
+			paint.setAntiAlias(true);
+			paint.setStyle(Paint.Style.FILL);
+
+			String name = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
 			name = name.replaceAll("_", " ");
-	        String words[] = name.split("\\s");
-	        
-	        float newline = paint.getFontSpacing();
-	        float x = border;
-	        float y = newline;
+			String words[] = name.split("\\s");
 
-	        for (String word : words) {
-	        	float len = paint.measureText(word + " ");
+			float newline = paint.getFontSpacing();
+			float x = border;
+			float y = newline;
 
-	        	if ((x > border) && ((x + len) > maxWidth)) {
-	        		x = border;
-	        		y += newline;
-	        	}
+			for (String word : words) {
+				float len = paint.measureText(word + " ");
 
-	        	canvas.drawText(word, x, y, paint);
-	        	x += len;
-	        }
+				if ((x > border) && ((x + len) > maxWidth)) {
+					x = border;
+					y += newline;
+				}
 
-	        // Save bmp as png
-	        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	        bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
-	        return WriteZip.addImage("OEBPS/frontpage.png", baos.toByteArray());
+				canvas.drawText(word, x, y, paint);
+				x += len;
+			}
+
+			// Save bmp as png
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
+			return WriteZip.addImage("OEBPS/frontpage.png", baos.toByteArray());
 		}
 
 

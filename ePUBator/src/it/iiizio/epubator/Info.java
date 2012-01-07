@@ -17,15 +17,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package it.iiizio.epubator;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import android.app.Activity;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
+import android.widget.TextView;
 
-public class Prefs extends PreferenceActivity {
+public class Info extends Activity {
 
+	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.infoview);
 
-		addPreferencesFromResource(R.xml.prefs);
+		TextView infoTv = (TextView)findViewById(R.id.infoview);
+		InputStream is = this.getResources().openRawResource(R.raw.info);
+		try {
+			byte[] buffer = new byte[is.available()];
+			is.read(buffer);
+			is.close();
+			infoTv.setText(new String(buffer, "utf-8"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
