@@ -71,6 +71,10 @@ public class ReadPdf {
 		try {
 			return PdfTextExtractor.getTextFromPage(reader, page) + "\n";
 		} catch(Exception e) {
+			System.err.println("Failed to extract text " + e.getMessage());
+			return "";
+		} catch (OutOfMemoryError e) {
+			System.err.println("Out of memory in text extraction " + e.getMessage());
 			return "";
 		}
 	}
@@ -84,6 +88,8 @@ public class ReadPdf {
 			parser.processContent(page, listener);
 		} catch (IOException e) {
 			System.err.println("Failed to extract image " + e.getMessage());
+		} catch (OutOfMemoryError e) {
+			System.err.println("Out of memory in image extraction " + e.getMessage());
 		}
 		return imageList;
 	}
@@ -118,6 +124,8 @@ class renderListener implements RenderListener {
 			}
 		} catch (IOException e) {
 			System.err.println("Failed to extract image (renderListener) " + e.getMessage());
+		} catch (OutOfMemoryError e) {
+			System.err.println("Out of memory in image extraction (renderListener) " + e.getMessage());
 		}
 	}
 

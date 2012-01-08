@@ -1,0 +1,35 @@
+Convertitore da PDF a ePUB minimale per Android
+
+ePUBator estrae il testo da un file PDF e lo inserisce in un file ePUB correttamente formattato (conforme con epubcheck).
+L'estrazione dal PDF e' basata sulla libreria iText <http://itextpdf.com/>. 
+
+- ePUBator non necessita di una connessione internet.
+- ePUBator non ha pubblicita'.
+- ePUBator estrae solo il testo (nessuna figura, nessun testo dalle figure).
+- ePUBator funziona bene con i PDF a singola colonna (puo' essere pessimo con quelli multicolonna o le tabelle).
+- ePUBator puo' fallire l'estrazione (12 libri su 60 provati: ci sto' lavorando su ma sembra un problema di iText).
+- ePUBator puo' piantarsi (risolto il blocco per memoria insufficente, spero).
+
+Per commenti/feedback/bug/suggerimenti scrivi a: iiizio AT users.sf.net
+
+Storico:
+v0.4
+- Aggiunta frontpage
+- Aggiunto layout orizzontale
+- Aggiunta visualizzazione degli errori di estrazione nel progress dialog
+- Corretto bug del selettore dei file (sdcard non leggibile)
+- Corretto bug dell'anteprima
+- Aggiornata iText lib alla 5.1.3
+v0.3
+- Aggiunta anteprima
+- Aggiunta notifica
+- Aggiunta la possibilita' di fermare la conversione
+- Abilitato 'Muovi su SD'
+- Differenziato l'indicatore di errori e pagine perse
+- Ottimizazione del codice
+v0.2
+- Aggiunto dialogo 'conserva file errorato'
+- Aggiunto marcatore in caso di errore
+- Corretto un buffer overflow e alcuni bug meno importanti
+v0.1
+- Rilascio iniziale
