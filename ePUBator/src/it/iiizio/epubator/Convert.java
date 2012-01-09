@@ -286,7 +286,7 @@ public class Convert extends Activity {
 				// Failed to read PDF file
 				result = 2;
 			} else if (result != 5) {
-				result = fillEpub(filename + TEMP_EXT);
+				result = fillEpub();
 			}
 
 			return null;
@@ -346,7 +346,7 @@ public class Convert extends Activity {
 		}
 
 		// Fill ePUB file
-		private int fillEpub(String filename) {
+		private int fillEpub() {
 			try {
 				// Set up counter
 				int pages = ReadPdf.getPages();
@@ -359,7 +359,7 @@ public class Convert extends Activity {
 
 				// Create ePUB file
 				publishProgress(getResources().getString(R.string.open));
-				if (WriteZip.create(filename)) {
+				if (WriteZip.create(filename + TEMP_EXT)) {
 					return 3;
 				}
 
@@ -374,9 +374,15 @@ public class Convert extends Activity {
 					return 3;
 				}
 
-				String bookId = filename.replaceAll("[^\\p{ASCII}]", "")+ " - " + new Date().hashCode();
+				String name = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
+				String bookId = name.replaceAll("[^\\p{ASCII}]", "") + " - " + new Date().hashCode();
+				String title = ReadPdf.getTitle();
+				if (title == "" || title == null) {
+					title = name;
+				}
+
 				publishProgress(getResources().getString(R.string.toc));
-				if (WriteZip.addText("OEBPS/toc.ncx", createToc(pages, bookId), false)) {
+				if (WriteZip.addText("OEBPS/toc.ncx", createToc(pages, bookId, title), false)) {
 					return 3;
 				}
 
@@ -456,7 +462,7 @@ public class Convert extends Activity {
 
 				// Add content.opf
 				publishProgress(getResources().getString(R.string.content) + "   100%");
-				if (WriteZip.addText("OEBPS/content.opf", createContent(pages, bookId, allImageList), false)) {
+				if (WriteZip.addText("OEBPS/content.opf", createContent(pages, bookId, allImageList, title), false)) {
 					return 3;
 				}
 
@@ -489,12 +495,12 @@ public class Convert extends Activity {
 		}
 
 		// Create content.opf
-		private String createContent(int pages, String id, Iterable<String> images) {
+		private String createContent(int pages, String id, Iterable<String> images, String title) {
 			StringBuilder content = new StringBuilder();
 			content.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 			content.append("<package xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"BookID\" version=\"2.0\">\n");
 			content.append("    <metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:opf=\"http://www.idpf.org/2007/opf\">\n");
-			content.append("        <dc:title>" + ReadPdf.getTitle() + "</dc:title>\n");
+			content.append("        <dc:title>" + title + "</dc:title>\n");
 			content.append("        <dc:creator>" + ReadPdf.getAuthor() + "</dc:creator>\n");
 			content.append("        <dc:creator opf:role=\"bkp\">ePUBator - Minimal offline PDF to ePUB converter for Android</dc:creator>\n");
 			content.append("        <dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + id + "</dc:identifier>\n");
@@ -525,7 +531,7 @@ public class Convert extends Activity {
 		}
 
 		// Create toc.ncx
-		private String createToc(int pages, String id) {
+		private String createToc(int pages, String id, String title) {
 			StringBuilder toc = new StringBuilder();
 			toc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 			toc.append("<!DOCTYPE ncx PUBLIC \"-//NISO//DTD ncx 2005-1//EN\"\n");
@@ -538,7 +544,7 @@ public class Convert extends Activity {
 			toc.append("        <meta name=\"dtb:maxPageNumber\" content=\"0\"/>\n");
 			toc.append("    </head>\n");
 			toc.append("    <docTitle>\n");
-			toc.append("        <text>" + ReadPdf.getTitle() + "</text>\n");
+			toc.append("        <text>" + title + "</text>\n");
 			toc.append("    </docTitle>\n");
 			toc.append("    <navMap>\n");
 			toc.append("        <navPoint id=\"navPoint-1\" playOrder=\"1\">\n");
@@ -596,10 +602,10 @@ public class Convert extends Activity {
 
 		// Create frontpage.png
 		private boolean createFrontpagePng() {
-			final int maxWidth = 240;
-			final int maxHeight = 340;
+			final int maxWidth = 300;
+			final int maxHeight = 410;
 			final int border = 10;
-			final int fontsize = 40;
+			final int fontsize = 48;
 
 			// Grey background
 			Bitmap bmp = Bitmap.createBitmap(maxWidth, maxHeight, Bitmap.Config.RGB_565);
@@ -618,8 +624,7 @@ public class Convert extends Activity {
 			paint.setAntiAlias(true);
 			paint.setStyle(Paint.Style.FILL);
 
-			String name = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
-			name = name.replaceAll("_", " ");
+			String name = filename.substring(filename.lastIndexOf("/") + 1, filename.length()).replaceAll("_", " ");
 			String words[] = name.split("\\s");
 
 			float newline = paint.getFontSpacing();
@@ -629,7 +634,18 @@ public class Convert extends Activity {
 			for (String word : words) {
 				float len = paint.measureText(word + " ");
 
+				// Line wrap
 				if ((x > border) && ((x + len) > maxWidth)) {
+					x = border;
+					y += newline;
+				}
+
+				// Word wrap
+				while ((x + len) > maxWidth) {
+					int maxChar = (int) (word.length() * (maxWidth - border - x) / paint.measureText(word));
+					canvas.drawText(word.substring(0, maxChar), x, y, paint);
+					word = word.substring(maxChar);
+					len = paint.measureText(word + " ");
 					x = border;
 					y += newline;
 				}
