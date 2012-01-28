@@ -13,37 +13,43 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-	<LinearLayout
-		android:layout_width="wrap_content" 
-		android:layout_height="match_parent"
-		android:layout_weight="1"
-		android:orientation="vertical" >
-	    <WebView
-	        android:id="@+id/webview"
-	        android:layout_width="match_parent"
-	        android:layout_height="match_parent" />
-   	</LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <WebView
+            android:id="@+id/webview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="100sp"
         android:layout_height="match_parent"
-		android:orientation="vertical"
-		android:layout_marginTop="6dp" >
+        android:layout_marginTop="6dp"
+        android:orientation="vertical" >
+
         <Button
             android:id="@+id/prev"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="@string/prev"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:text="@string/prev" />
+
         <Button
             android:id="@+id/next"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="@string/next"
-            android:layout_weight="1" />
-        </LinearLayout>
+            android:layout_weight="1"
+            android:text="@string/next" />
+    </LinearLayout>
+
 </LinearLayout>

@@ -16,16 +16,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
-<string-array name="pageArray">
-   <item>1</item>
-   <item>5</item>
-   <item>10</item>
-   <item>20</item>
-</string-array>
-<string-array name="pageValues">
-   <item>1</item>
-   <item>5</item>
-   <item>10</item>
-   <item>20</item>
-</string-array>
+
+    <string-array name="pageArray">
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="pageValues">
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+    </string-array>
+    
+    <string-array name="errorArray">
+        <item>@string/keep_item</item>
+        <item>@string/ask_item</item>
+        <item>@string/discard_item</item>
+    </string-array>
+    <string-array name="errorValues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
 </resources>

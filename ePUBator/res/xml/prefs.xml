@@ -13,37 +13,59 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-  <CheckBoxPreference
-    android:key="add_markers"
-    android:title="@string/mark_title"
-    android:summary="@string/mark_summary"
-	android:defaultValue="true" />
-  <ListPreference
-    android:key="page_per_file"
-    android:title="@string/page_title"
-    android:summary="@string/page_summary"
-    android:entries="@array/pageArray"
-	android:entryValues="@array/pageValues"
-	android:defaultValue="10" />
-    <PreferenceCategory android:title="@string/experimental">
-      <CheckBoxPreference
-        android:key="include_images"
-        android:title="@string/images_title"
-        android:summary="@string/images_summary"
-		android:defaultValue="false" />
-      <CheckBoxPreference
-        android:key="repeated_images"
-        android:dependency="include_images"
-        android:title="@string/repeated_title"
-        android:summary="@string/repeated_summary"
-		android:defaultValue="false" />
-<!--       <CheckBoxPreference
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="add_markers"
+        android:summary="@string/mark_summary"
+        android:title="@string/mark_title" />
+
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/errorArray"
+        android:entryValues="@array/errorValues"
+        android:key="on_error"
+        android:summary="@string/error_summary"
+        android:title="@string/error_title" />
+    
+    <ListPreference
+        android:defaultValue="10"
+        android:entries="@array/pageArray"
+        android:entryValues="@array/pageValues"
+        android:key="page_per_file"
+        android:summary="@string/page_summary"
+        android:title="@string/page_title" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="hide_notifi"
+        android:summary="@string/notifi_summary"
+        android:title="@string/notifi_title" />
+
+    <PreferenceCategory android:title="@string/experimental" >
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="include_images"
+            android:summary="@string/images_summary"
+            android:title="@string/images_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:dependency="include_images"
+            android:key="repeated_images"
+            android:summary="@string/repeated_summary"
+            android:title="@string/repeated_title" />
+        <!--
+           <CheckBoxPreference
         android:key="show_images"
         android:title="@string/show_images_title"
         android:summary="@string/show_images_summary"
-		android:defaultValue="false" /> -->
-  </PreferenceCategory>
+		android:defaultValue="false" />
+        -->
+    </PreferenceCategory>
+
 </PreferenceScreen>

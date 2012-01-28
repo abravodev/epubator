@@ -61,6 +61,8 @@ public class Convert extends Activity {
 
 	private int pagesPerFile;
 	private boolean addMarkers;
+	private int onError;
+	private boolean hideNotifi;
 	private boolean includeImages;
 	private boolean repeatedImages;
 
@@ -112,7 +114,9 @@ public class Convert extends Activity {
 		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
 
 		addMarkers = prefs.getBoolean("add_markers", true);
+		onError = Integer.parseInt(prefs.getString("on_error", "1"));
 		pagesPerFile = Integer.parseInt(prefs.getString("page_per_file", "10"));
+		hideNotifi = prefs.getBoolean("hide_notifi", false);
 		includeImages = prefs.getBoolean("include_images", false);
 		repeatedImages = prefs.getBoolean("repeated_images", false);
 	}
@@ -246,14 +250,16 @@ public class Convert extends Activity {
 
 	// Send notification
 	public void sendNotification() {
-		NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, Convert.class), 0);
-		String message = getResources().getStringArray(R.array.message)[result];
-		String tickerText = getResources().getString(R.string.app_name);
-		Notification notif = new Notification(R.drawable.ic_launcher, message, System.currentTimeMillis());
-		notif.setLatestEventInfo(this, tickerText, message, contentIntent);
-		nm.notify(R.string.app_name, notif);
-		notificationSent = true;
+		if (!hideNotifi) {
+			NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, Convert.class), 0);
+			String message = getResources().getStringArray(R.array.message)[result];
+			String tickerText = getResources().getString(R.string.app_name);
+			Notification notif = new Notification(R.drawable.ic_launcher, message, System.currentTimeMillis());
+			notif.setLatestEventInfo(this, tickerText, message, contentIntent);
+			nm.notify(R.string.app_name, notif);
+			notificationSent = true;
+		}
 	}
 
 	// Start background task
@@ -317,12 +323,21 @@ public class Convert extends Activity {
 		@Override
 		protected void onPostExecute(Void params) {
 			if (result == 4) {
-				// Ask for keeping errored ePUB
-				if (!isFinishing()) {
-					showDialog(0);
-				} else {
+				if (onError == 0) {
+					// Keep ePUB with errors
 					keepEpub();
 					result = 0;
+				} else if (onError == 2){
+					// Drop ePUB with errors
+					deleteTmp();
+				} else {
+					// Ask for keeping ePUB with errors
+					if (!isFinishing()) {
+						showDialog(0);
+					} else {
+						keepEpub();
+						result = 0;
+					}
 				}
 			} else {
 				// Delete on failure

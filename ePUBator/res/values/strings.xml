@@ -13,69 +13,83 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
+
     <!-- ePUBator -->
     <string name="app_name">ePUBator</string>
-	<string name="convert">Convert</string>
-	<string name="preview">Preview</string>
-	<!-- Menu -->
-	<string name="prefs">Settings</string>
-	<string name="info">Information</string>
-	<string name="license">License</string>
-	<!-- Preview -->
-	<string name="prev">Previous page</string>
-	<string name="next">Next page</string>
-	<!-- Prefs -->
-	<string name="mark_title">Add marker</string>
-	<string name="mark_summary">Mark errors and page lost</string>
-	<string name="page_title">Page per file</string>
-	<string name="page_summary">Number of PDF page per file</string>
-	<string name="experimental">Experimental features</string>
-	<string name="images_title">Include images</string>
-	<string name="images_summary">Extract images from PDF</string>
-	<string name="repeated_title">Repeated images</string>
-	<string name="repeated_summary">Add every image repetition</string>
-	<string name="show_images_title">Show images</string>
-	<string name="show_images_summary">Show images in preview</string>
-	<!-- FileChooser -->
-	<string name="path">Path: %s</string>
-	<!-- Convert -->
-	<string name="read_error">"Can't read ePUB file"</string>
-	<string name="cip">Conversion in progress</string>
-	<string name="heading">"ePUBator - &#169;2011 Ezio Querini\nMinimal offline PDF to ePUB converter for Android\nPDF extraction based on iText library\n\n"</string>
-	<string name="deleted">ePUB file deleted</string>
-	<string name="kept_old">Kept old ePUB file</string>
-	<string name="pages">Number of pages: %d\n</string>
-	<string name="extraction_failure">Page %d: extraction failure</string>
-	<string name="extraction_error">Extraction error: text can be incomplete</string>
-	<string name="keep">Have I to keep the ePUB file?</string>
-	<string name="ok">OK</string>
-	<string name="cancel">Cancel</string>
-	<string name="stop">Stop</string>
-	<string name="lost_pages">Lost pages are marked with %s</string>
-	<string name="errors">Errors are marked with %s</string>
-	<string name="pagenumber">PageNumber%s</string>
-	<string name="load">Loading: %s</string>
-	<string name="file">\nePUB file: %s</string>
-	<string name="open">Open ePUB file</string>
-	<string name="mimetype">Add mimetype</string>
-	<string name="container">Add container.xml</string>
-	<string name="content">Add content.opf</string>
-	<string name="toc">Add toc.ncx</string>
-	<string name="frontpage">Add frontpage.html</string>
-	<string name="frontpagepng">Add frontpage.png</string>
-	<string name="html">Add page</string>
-	<string name="image">Add %s</string>
-	<string name="close">Close file</string>
-	<string-array name="message">
-		<item>Conversion completed</item>
-		<item>PDF file not found</item>
-		<item>Failed to read PDF file</item>
-		<item>Failed to write ePUB file</item>
-		<item>Failed to extract text</item>
-		<item>Extraction stopped by user</item>
-		<item>Out of memory error (set page per file to 1 and/or disable images extraction and try again)</item>
-	</string-array>
+    <string name="convert">Convert</string>
+    <string name="preview">Preview</string>
+    
+    <!-- Menu -->
+    <string name="prefs">Settings</string>
+    <string name="info">Information</string>
+    <string name="license">License</string>
+    
+    <!-- Preview -->
+    <string name="prev">Previous page</string>
+    <string name="next">Next page</string>
+    
+    <!-- Prefs -->
+    <string name="mark_title">Add marker</string>
+    <string name="mark_summary">Mark errors and page lost</string>
+    <string name="error_title">ePUB with error</string>
+    <string name="error_summary">On conversion error</string>
+    <string name="keep_item">Keep</string>
+    <string name="ask_item">Ask</string>
+    <string name="discard_item">Discard</string>
+    <string name="page_title">Page per file</string>
+    <string name="page_summary">Number of PDF page per file</string>
+    <string name="notifi_title">Hide notification</string>
+    <string name="notifi_summary">Does Not send notification</string>
+    <string name="experimental">Experimental features</string>
+    <string name="images_title">Include images</string>
+    <string name="images_summary">Extract images from PDF</string>
+    <string name="repeated_title">Repeated images</string>
+    <string name="repeated_summary">Add every image repetition</string>
+    <string name="show_images_title">Show images</string>
+    <string name="show_images_summary">Show images in preview</string>
+    
+    <!-- FileChooser -->
+    <string name="path">Path: %s</string>
+    
+    <!-- Convert -->
+    <string name="read_error">"Can't read ePUB file"</string>
+    <string name="cip">Conversion in progress</string>
+    <string name="heading">"ePUBator - ©2011 Ezio Querini\nMinimal offline PDF to ePUB converter for Android\nPDF extraction based on iText library\n\n"</string>
+    <string name="deleted">ePUB file deleted</string>
+    <string name="kept_old">Kept old ePUB file</string>
+    <string name="pages">Number of pages: %d\n</string>
+    <string name="extraction_failure">Page %d: extraction failure</string>
+    <string name="extraction_error">Extraction error: text can be incomplete</string>
+    <string name="keep">Have I to keep the ePUB file?</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="stop">Stop</string>
+    <string name="lost_pages">Lost pages are marked with %s</string>
+    <string name="errors">Errors are marked with %s</string>
+    <string name="pagenumber">PageNumber%s</string>
+    <string name="load">Loading: %s</string>
+    <string name="file">\nePUB file: %s</string>
+    <string name="open">Open ePUB file</string>
+    <string name="mimetype">Add mimetype</string>
+    <string name="container">Add container.xml</string>
+    <string name="content">Add content.opf</string>
+    <string name="toc">Add toc.ncx</string>
+    <string name="frontpage">Add frontpage.html</string>
+    <string name="frontpagepng">Add frontpage.png</string>
+    <string name="html">Add page</string>
+    <string name="image">Add %s</string>
+    <string name="close">Close file</string>
+    <string-array name="message">
+        <item>Conversion completed</item>
+        <item>PDF file not found</item>
+        <item>Failed to read PDF file</item>
+        <item>Failed to write ePUB file</item>
+        <item>Failed to extract text</item>
+        <item>Extraction stopped by user</item>
+        <item>Out of memory error (set page per file to 1 and/or disable images extraction and try again)</item>
+    </string-array>
+
 </resources>

@@ -13,69 +13,83 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
+
     <!-- ePUBator -->
     <string name="app_name">ePUBator</string>
-	<string name="convert">Converti</string>
-	<string name="preview">Anteprima</string>
-	<!-- Menu -->
-	<string name="prefs">Preferenze</string>
-	<string name="info">Informazioni</string>
-	<string name="license">Licenza</string>
-	<!-- Preview -->
-	<string name="prev">Pagina precedente</string>
-	<string name="next">Pagina successiva</string>
-	<!-- Prefs -->
-	<string name="mark_title">Aggiungi marker</string>
-	<string name="mark_summary">Segnala errori e pagine mancanti</string>
-	<string name="page_title">Pagine per file</string>
-	<string name="page_summary">Numero di pagine PDF per file</string>
-	<string name="experimental">Funzioni sperimentali</string>
-	<string name="images_title">Includi immagini</string>
-	<string name="images_summary">Estrai le immagini dal PDF</string>
-	<string name="repeated_title">Immagini ripetute</string>
-	<string name="repeated_summary">Aggiungi ogni ripetizione dell\'immagine</string>
-	<string name="show_images_title">Mostra immagini</string>
-	<string name="show_images_summary">"Mostra le immagini nell'anteprima"</string>
-	<!-- FileChooser -->
-	<string name="path">Percorso: %s</string>
-	<!-- Convert -->
-	<string name="read_error">Non posso leggere il file ePUB</string>
-	<string name="cip">Conversione in corso</string>
-	<string name="heading">"ePUBator - &#169;2011 Ezio Querini\nConvertitore da PDF a ePUB minimale per Android\nL'estrazione dal PDF è basata sulla libreria iText\n\n"</string>
-	<string name="deleted">File ePUB rimosso</string>
-	<string name="kept_old">Mantenuto il vecchio file ePUB</string>
-	<string name="pages">Numero di pagine: %d\n</string>
-	<string name="extraction_failure">Pagina %d: estrazione fallita</string>
-	<string name="extraction_error">Errore di estrazione: il testo può essere incompleto</string>
-	<string name="keep">Devo mantenere il file ePUB?</string>
-	<string name="ok">OK</string>
-	<string name="cancel">Annulla</string>
-	<string name="stop">Interrompi</string>
-	<string name="lost_pages">Le pagine mancanti sono indicate con %s</string>
-	<string name="errors">Gli errori sono indicati con %s</string>
-	<string name="pagenumber">NumeroPagina%s</string>
-	<string name="load">Carico: %s</string>
-	<string name="file">\nFile ePUB: %s</string>
-	<string name="open">Apro il file ePUB</string>
-	<string name="mimetype">Aggiungo mimetype</string>
-	<string name="container">Aggiungo container.xml</string>
-	<string name="content">Aggiungo content.opf</string>
-	<string name="toc">Aggiungo toc.ncx</string>
-	<string name="frontpage">Aggiungo frontpage.html</string>
-	<string name="frontpagepng">Aggiungo frontpage.png</string>
-	<string name="html">Aggiungo page</string>
-	<string name="image">Aggiungo %s</string>
-	<string name="close">Chiudo il file</string>
-	<string-array name="message">
-		<item>Conversione completata</item>
-		<item>File PDF non trovato</item>
-		<item>Lettura del file PDF fallita</item>
-		<item>Scrittura del file ePUB fallita</item>
-		<item>Estrazione del testo fallita</item>
-		<item>Estrazione interrotta dal utente</item>
-		<item>Memoria insufficente (imposta pagine per file a 1 e/o disabilita l\'estrazione delle immagini e riprova)</item>
-	</string-array>
+    <string name="convert">Converti</string>
+    <string name="preview">Anteprima</string>
+    
+    <!-- Menu -->
+    <string name="prefs">Preferenze</string>
+    <string name="info">Informazioni</string>
+    <string name="license">Licenza</string>
+    
+    <!-- Preview -->
+    <string name="prev">Pagina precedente</string>
+    <string name="next">Pagina successiva</string>
+    
+    <!-- Prefs -->
+    <string name="mark_title">Aggiungi marker</string>
+    <string name="mark_summary">Segnala errori e pagine mancanti</string>
+    <string name="error_title">ePUB con errori</string>
+    <string name="error_summary">In caso di errore di conversione</string>
+    <string name="keep_item">Mantieni</string>
+    <string name="ask_item">Chiedi</string>
+    <string name="discard_item">Elimina</string>
+    <string name="page_title">Pagine per file</string>
+    <string name="page_summary">Numero di pagine PDF per file</string>
+    <string name="notifi_title">Sopprimi notifiche</string>
+    <string name="notifi_summary">Non inviare le notifiche</string>
+    <string name="experimental">Funzioni sperimentali</string>
+    <string name="images_title">Includi immagini</string>
+    <string name="images_summary">Estrai le immagini dal PDF</string>
+    <string name="repeated_title">Immagini ripetute</string>
+    <string name="repeated_summary">Aggiungi ogni ripetizione dell\'immagine</string>
+    <string name="show_images_title">Mostra immagini</string>
+    <string name="show_images_summary">"Mostra le immagini nell'anteprima"</string>
+    
+    <!-- FileChooser -->
+    <string name="path">Percorso: %s</string>
+    
+    <!-- Convert -->
+    <string name="read_error">Non posso leggere il file ePUB</string>
+    <string name="cip">Conversione in corso</string>
+    <string name="heading">"ePUBator - ©2011 Ezio Querini\nConvertitore da PDF a ePUB minimale per Android\nL'estrazione dal PDF è basata sulla libreria iText\n\n"</string>
+    <string name="deleted">File ePUB rimosso</string>
+    <string name="kept_old">Mantenuto il vecchio file ePUB</string>
+    <string name="pages">Numero di pagine: %d\n</string>
+    <string name="extraction_failure">Pagina %d: estrazione fallita</string>
+    <string name="extraction_error">Errore di estrazione: il testo può essere incompleto</string>
+    <string name="keep">Devo mantenere il file ePUB?</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Annulla</string>
+    <string name="stop">Interrompi</string>
+    <string name="lost_pages">Le pagine mancanti sono indicate con %s</string>
+    <string name="errors">Gli errori sono indicati con %s</string>
+    <string name="pagenumber">NumeroPagina%s</string>
+    <string name="load">Carico: %s</string>
+    <string name="file">\nFile ePUB: %s</string>
+    <string name="open">Apro il file ePUB</string>
+    <string name="mimetype">Aggiungo mimetype</string>
+    <string name="container">Aggiungo container.xml</string>
+    <string name="content">Aggiungo content.opf</string>
+    <string name="toc">Aggiungo toc.ncx</string>
+    <string name="frontpage">Aggiungo frontpage.html</string>
+    <string name="frontpagepng">Aggiungo frontpage.png</string>
+    <string name="html">Aggiungo page</string>
+    <string name="image">Aggiungo %s</string>
+    <string name="close">Chiudo il file</string>
+    <string-array name="message">
+        <item>Conversione completata</item>
+        <item>File PDF non trovato</item>
+        <item>Lettura del file PDF fallita</item>
+        <item>Scrittura del file ePUB fallita</item>
+        <item>Estrazione del testo fallita</item>
+        <item>Estrazione interrotta dal utente</item>
+        <item>Memoria insufficente (imposta pagine per file a 1 e/o disabilita l\'estrazione delle immagini e riprova)</item>
+    </string-array>
+
 </resources>
