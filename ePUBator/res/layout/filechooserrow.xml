@@ -14,29 +14,38 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
--->
 
+-->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="6dp" >
+    android:padding="7dp" >
 	<TextView
 		android:id="@+id/name"
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentTop="true"
 	    android:layout_alignWithParentIfMissing="true"
-	    android:background="#110000"
 	    android:textSize="16sp" />
-
+
 	<TextView
-	    android:id="@+id/datesize"
-	    android:layout_width="fill_parent"
+	    android:id="@+id/size"
+	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentBottom="true"
+	    android:layout_alignParentLeft="true"
 	    android:layout_below="@id/name"
-	    android:background="#001100"
+	    android:textSize="10sp" />
+
+	<TextView
+	    android:id="@+id/date"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentBottom="true"
+	    android:layout_alignParentRight="true"
+	    android:layout_toRightOf="@id/size"
+	    android:gravity="right"
 	    android:textSize="10sp" />
 
 </RelativeLayout>

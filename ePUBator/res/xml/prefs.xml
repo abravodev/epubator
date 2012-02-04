@@ -45,6 +45,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:summary="@string/notifi_summary"
         android:title="@string/notifi_title" />
 
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="hide_detail"
+        android:summary="@string/detail_summary"
+        android:title="@string/detail_title" />
+    
     <PreferenceCategory android:title="@string/experimental" >
 
         <CheckBoxPreference

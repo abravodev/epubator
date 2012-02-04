@@ -43,6 +43,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="page_summary">Numero di pagine PDF per file</string>
     <string name="notifi_title">Sopprimi notifiche</string>
     <string name="notifi_summary">Non inviare le notifiche</string>
+    <string name="detail_title">Nascondi dettagli</string>
+    <string name="detail_summary">Mostra solo i nomi dei file</string>
     <string name="experimental">Funzioni sperimentali</string>
     <string name="images_title">Includi immagini</string>
     <string name="images_summary">Estrai le immagini dal PDF</string>
