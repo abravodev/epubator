@@ -53,7 +53,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <!-- FileChooser -->
     <string name="path">Path: %s</string>
-    
+    <string name="root">Root folder</string>
+    <string name="up">Upper folder</string>
+	<string name="folder">Folder</string>
+
     <!-- Convert -->
     <string name="read_error">"Can't read ePUB file"</string>
     <string name="cip">Conversion in progress</string>

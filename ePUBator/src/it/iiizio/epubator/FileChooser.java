@@ -20,20 +20,21 @@ package it.iiizio.epubator;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
 
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 public class FileChooser extends ListActivity {
-	private List<String> fileList;
+//	private ArrayList<HashMap<String,String>> fileList;
 	private	String path = "/";
 	private	String filter = "";
 	private ListView lv;
@@ -43,7 +44,7 @@ public class FileChooser extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.filechoosermain);
-
+		
 		// Get extras
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -67,7 +68,8 @@ public class FileChooser extends ListActivity {
 		lv.setOnItemClickListener(new OnItemClickListener() {
 			// New OnItemClickListener
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				String chosen = ((TextView) view).getText().toString();
+				String chosen = ((TextView) view.findViewById(R.id.name)).getText().toString();
+				
 				if(chosen.endsWith("/")) {
 					// Change path
 					if (chosen == "/") {
@@ -92,13 +94,20 @@ public class FileChooser extends ListActivity {
 
 	// Fill FileChooser
 	private void setFileList(String dirPath, String ext) {
-		fileList = new ArrayList<String>();
+		ArrayList<HashMap<String,String>> fileList = new ArrayList<HashMap<String,String>>();
+		HashMap<String,String> item;
 		File f = new File(dirPath + "/");
 
 		// Add Root & Up
 		if (dirPath.length() > 1) {
-			fileList.add("/");
-			fileList.add("../");
+			item = new HashMap<String,String>();
+			item.put("filename", "/");
+			item.put("detail", getResources().getString(R.string.root));
+			fileList.add(item);
+			item = new HashMap<String,String>();
+			item.put("filename", "../");
+			item.put("detail", getResources().getString(R.string.up));
+			fileList.add(item);
 		}
 
 		// Add filenames
@@ -108,10 +117,18 @@ public class FileChooser extends ListActivity {
 			for(File file : files) {
 				if((!file.isHidden()) && (file.canRead())) {
 					String fileName = file.getName();
+					String date = DateUtils.formatDateTime(this, file.lastModified(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE);
+					String time = DateUtils.formatDateTime(this, file.lastModified(), DateUtils.FORMAT_SHOW_TIME);
 					if (file.isDirectory()) {
-						fileList.add(fileName + "/");
+						item = new HashMap<String,String>();
+						item.put("filename", fileName + "/");
+						item.put("detail", String.format("%s %s      %s", date, time, getResources().getString(R.string.folder)));
+						fileList.add(item);
 					} else if (fileName.endsWith(ext)) {
-						fileList.add(fileName);
+						item = new HashMap<String,String>();
+						item.put("filename", fileName);
+						item.put("detail", String.format("%s %s      %d Byte", date, time, file.length()));
+						fileList.add(item);
 					}
 				}
 			}
@@ -120,6 +137,6 @@ public class FileChooser extends ListActivity {
 		// Update screen
 		lv.clearTextFilter();
 		((TextView) findViewById(R.id.path)).setText(String.format(getResources().getString(R.string.path), path));
-		setListAdapter(new ArrayAdapter<String>(this, R.layout.filechooserrow,  fileList));
+		setListAdapter(new SimpleAdapter(this, fileList, R.layout.filechooserrow, new String[] {"filename", "detail"}, new int[] {R.id.name, R.id.datesize}));
 	}
 }

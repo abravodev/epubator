@@ -53,7 +53,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <!-- FileChooser -->
     <string name="path">Percorso: %s</string>
-    
+    <string name="root">Cartella principale</string>
+    <string name="up">Cartella superiore</string>
+	<string name="folder">Cartella</string>
+
     <!-- Convert -->
     <string name="read_error">Non posso leggere il file ePUB</string>
     <string name="cip">Conversione in corso</string>
