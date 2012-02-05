@@ -43,6 +43,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="page_summary">Number of PDF page per file</string>
     <string name="notifi_title">Hide notification</string>
     <string name="notifi_summary">Does Not send notification</string>
+    <string name="filechooser">File chooser</string>
+    <string name="all_files_title">Show all</string>
+    <string name="all_files_summary">Show all files</string>
     <string name="detail_title">Hide detail</string>
     <string name="detail_summary">Show only filenames</string>
     <string name="experimental">Experimental features</string>

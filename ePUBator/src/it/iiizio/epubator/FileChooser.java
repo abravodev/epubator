@@ -34,14 +34,15 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class FileChooser extends ListActivity {
 	private	String path = "/";
 	private	String filter = "";
 	private ListView lv;
+	private boolean showAllFiles;
 	private boolean hideDetail;
-
 
 	/** Called when the activity is first created. */
 	@Override
@@ -96,22 +97,16 @@ public class FileChooser extends ListActivity {
 		setFileList(path, filter);
 	}
 	
-	// Get preferences
-	@Override
-	public void onResume() {
-		super.onResume();
-
-		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
-
-		hideDetail = prefs.getBoolean("hide_detail", false);
-	}
-
-
 	// Fill FileChooser
 	private void setFileList(String dirPath, String ext) {
 		ArrayList<FileChooserList> fileChooserList = new ArrayList<FileChooserList>();
 		FileChooserList item;
 		File f = new File(dirPath + "/");
+
+		// Get preferences
+		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
+		showAllFiles = prefs.getBoolean("show_all_files", false);
+		hideDetail = prefs.getBoolean("hide_detail", false);
 
 		// Add Root & Up
 		if (dirPath.length() > 1) {
@@ -119,11 +114,13 @@ public class FileChooser extends ListActivity {
 			item.setName("/");
 			item.setSize(getResources().getString(R.string.root));
 			item.setDate(getDateTime(new File("/")));
+			item.setEnabled(true);
 			fileChooserList.add(item);
 			item = new FileChooserList();
 			item.setName("../");
 			item.setSize(getResources().getString(R.string.up));
 			item.setDate(getDateTime(f.getParentFile()));
+			item.setEnabled(true);
 			fileChooserList.add(item);
 		}
 
@@ -135,17 +132,28 @@ public class FileChooser extends ListActivity {
 				if((!file.isHidden()) && (file.canRead())) {
 					String fileName = file.getName();
 					if (file.isDirectory()) {
+						// Folder
 						item = new FileChooserList();
 						item.setName(fileName + "/");
 						item.setSize(getResources().getString(R.string.folder));
 						item.setDate(getDateTime(file));
+						item.setEnabled(true);
 						fileChooserList.add(item);
-
 					} else if (fileName.endsWith(ext)) {
+						// Target file
 						item = new FileChooserList();
 						item.setName(fileName);
 						item.setSize(String.format("%d Byte", file.length()));
 						item.setDate(getDateTime(file));
+						item.setEnabled(true);
+						fileChooserList.add(item);
+					} else if (showAllFiles) {
+						// Other file
+						item = new FileChooserList();
+						item.setName(fileName);
+						item.setSize(String.format("%d Byte", file.length()));
+						item.setDate(getDateTime(file));
+						item.setEnabled(false);
 						fileChooserList.add(item);
 					}
 				}
@@ -158,16 +166,19 @@ public class FileChooser extends ListActivity {
         lv.setAdapter(new FileChooserAdapter(this, fileChooserList));
 	}
 	
+	// Get last modification date & time
 	String getDateTime(File file) {
 		String date = DateUtils.formatDateTime(this, file.lastModified(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE);
 		String time = DateUtils.formatDateTime(this, file.lastModified(), DateUtils.FORMAT_SHOW_TIME);
 		return String.format("%s %s", date, time);
 	}
 
+	// Custom list class
 	public class FileChooserList {
 		private String name = "";
 		private String size = "";
 		private String date = "";
+		private boolean enabled;
 
 		public void setName(String name) {
 			this.name = name;
@@ -192,8 +203,17 @@ public class FileChooser extends ListActivity {
 		public String getDate() {
 			return date;
 		}
+
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
+		}
+
+		public boolean getEnabled() {
+			return enabled;
+		}
 	}
 
+	// Custom adapter
 	public class FileChooserAdapter extends BaseAdapter {
 		private  ArrayList<FileChooserList> fileChooserList;
 
@@ -224,6 +244,7 @@ public class FileChooser extends ListActivity {
 				holder.txtName = (TextView) convertView.findViewById(R.id.name);
 				holder.txtSize = (TextView) convertView.findViewById(R.id.size);
 				holder.txtDate = (TextView) convertView.findViewById(R.id.date);
+				holder.row = (RelativeLayout) convertView.findViewById(R.id.row);
 
 				convertView.setTag(holder);
 			} else {
@@ -234,6 +255,12 @@ public class FileChooser extends ListActivity {
 			holder.txtSize.setText(fileChooserList.get(position).getSize());
 			holder.txtDate.setText(fileChooserList.get(position).getDate());
 			
+			boolean enabled = fileChooserList.get(position).getEnabled();
+			holder.row.setClickable(!enabled);
+			holder.row.setFocusable(!enabled);
+			holder.row.setEnabled(enabled);
+			holder.txtName.setEnabled(enabled);
+			
 			if (hideDetail) {
 				holder.txtSize.setVisibility(View.GONE);
 				holder.txtDate.setVisibility(View.GONE);
@@ -241,11 +268,12 @@ public class FileChooser extends ListActivity {
 
 			return convertView;
 		}
-
+		
 		class ViewHolder {
 			TextView txtName;
 			TextView txtSize;
 			TextView txtDate;
+			RelativeLayout row;
 		}
 	}
 }

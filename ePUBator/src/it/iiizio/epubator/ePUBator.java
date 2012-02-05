@@ -31,6 +31,8 @@ import android.widget.Toast;
 public class ePUBator extends Activity {
 	String filename = "";
 	static String path = "/sdcard/";
+	private final String PDF_EXT = ".pdf";
+	private final String EPUB_EXT = " - ePUBator.epub";
 
 	/** Called when the activity is first created. */
 	@Override
@@ -79,7 +81,7 @@ public class ePUBator extends Activity {
 				// Select a file
 				Intent chooseFile = new Intent(ePUBator.this, FileChooser.class);
 				chooseFile.putExtra("path", path);
-				chooseFile.putExtra("filter", "pdf");
+				chooseFile.putExtra("filter", PDF_EXT);
 				startActivityForResult(chooseFile, 0);
 			}
 		}
@@ -91,7 +93,7 @@ public class ePUBator extends Activity {
 			// Select a file
 			Intent chooseFile = new Intent(ePUBator.this, FileChooser.class);
 			chooseFile.putExtra("path", path);
-			chooseFile.putExtra("filter", "ePUBator.epub");
+			chooseFile.putExtra("filter", EPUB_EXT);
 			startActivityForResult(chooseFile, 0);
 		}
 	};
@@ -102,11 +104,11 @@ public class ePUBator extends Activity {
 			filename = data.getAction();
 			path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
 
-			if (filename.endsWith("pdf")) {
+			if (filename.endsWith(PDF_EXT)) {
 				Intent convert = new Intent(ePUBator.this, Convert.class);
 				convert.putExtra("filename", filename);
 				startActivity(convert);
-			} else {
+			} else if (filename.endsWith(EPUB_EXT)) {
 				Intent preview = new Intent(ePUBator.this, Preview.class);
 				preview.putExtra("filename", filename);
 				startActivity(preview);

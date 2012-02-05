@@ -43,6 +43,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="page_summary">Numero di pagine PDF per file</string>
     <string name="notifi_title">Sopprimi notifiche</string>
     <string name="notifi_summary">Non inviare le notifiche</string>
+    <string name="filechooser">Selettore dei file</string>
+    <string name="all_files_title">Mostra tutti</string>
+    <string name="all_files_summary">Mostra tutti i files</string>
     <string name="detail_title">Nascondi dettagli</string>
     <string name="detail_summary">Mostra solo i nomi dei file</string>
     <string name="experimental">Funzioni sperimentali</string>
