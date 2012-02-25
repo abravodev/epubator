@@ -91,7 +91,7 @@ public class Preview extends Activity {
 		String pageName = pageList.get(pageNumber - 1);
 		StringBuilder htmlPageSb = new StringBuilder();
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry(pageName))));
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry(pageName))), 8 * 1024);
 			String line;
 			while ((line = bufferedReader.readLine()) != null) {
 				htmlPageSb.append(line);
