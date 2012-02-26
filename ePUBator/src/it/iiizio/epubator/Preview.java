@@ -17,13 +17,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package it.iiizio.epubator;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -40,6 +49,7 @@ public class Preview extends Activity {
 	private WebView previewWv;
 	private Button prevBt;
 	private Button nextBt;
+	final int BUFFERSIZE = 2048;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -91,7 +101,7 @@ public class Preview extends Activity {
 		String pageName = pageList.get(pageNumber - 1);
 		StringBuilder htmlPageSb = new StringBuilder();
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry(pageName))), 8 * 1024);
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry(pageName))), BUFFERSIZE);
 			String line;
 			while ((line = bufferedReader.readLine()) != null) {
 				htmlPageSb.append(line);
@@ -102,7 +112,79 @@ public class Preview extends Activity {
 
 		// Show page in white on black
 		String htmlPage = htmlPageSb.toString().replace("<body>", "<body bgcolor=\"Black\"><font color=\"White\">").replace("</body>", "</font></body>");
-		previewWv.loadData(htmlPage, "text/html", "utf-8");
+
+		// TODO show/hide images
+
+		// Remove old files
+		removeFiles();
+
+		// Save html page
+		File file = new File(getFilesDir(), "page.html");
+		String url = file.getAbsolutePath();
+		FileWriter writer;
+		try {
+			writer = new FileWriter(file);
+			writer.append(htmlPage);
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			// Show page without images
+			previewWv.loadData(htmlPage, "text/html", "utf-8");
+			return;
+		}
+
+		// Get images
+		XmlPullParserFactory factory;
+		try {
+			factory = XmlPullParserFactory.newInstance();
+			XmlPullParser xpp = factory.newPullParser();
+
+			xpp.setInput(new StringReader (htmlPage.replaceAll("&nbsp;", "")));
+			int eventType = xpp.getEventType();
+
+			// Search images in html file
+			while (eventType != XmlPullParser.END_DOCUMENT) {
+				if(eventType == XmlPullParser.START_TAG && "img".equals(xpp.getName())) {
+					String imageName = xpp.getAttributeValue(null, "src");
+
+					// Save image
+					ZipEntry entry = epubFile.getEntry("OEBPS/" + imageName);
+					BufferedInputStream in = new BufferedInputStream(epubFile.getInputStream(entry), BUFFERSIZE);
+					FileOutputStream out = new FileOutputStream(new File(getFilesDir() + "/" + imageName));
+					byte[] buffer = new byte[BUFFERSIZE];
+					int len;
+					BufferedOutputStream dest = new BufferedOutputStream(out, BUFFERSIZE);
+					while ((len = in.read(buffer, 0, BUFFERSIZE)) != -1) {
+						dest.write(buffer, 0, len);
+					}
+					dest.flush();
+					dest.close();
+					in.close();
+				}
+				eventType = xpp.next();
+			}
+		} catch (XmlPullParserException e) {
+			System.err.println("XmlPullParserException in image preview");
+		} catch (IOException e) {
+			System.err.println("IOException in image preview");
+		}
+
+		// Show page with images
+		previewWv.clearCache(true);
+		previewWv.loadUrl("file://" + url);
+	}
+
+	// Remove temp files
+	private void removeFiles() {
+		File file = new File(getFilesDir(), "");
+		if (file != null && file.isDirectory()) {
+			File[] files = file.listFiles();
+			if(files != null) {
+				for(File f : files) {   
+					f.delete();
+				}
+			}
+		}
 	}
 
 	// Prev button pressed
@@ -158,6 +240,7 @@ public class Preview extends Activity {
 	// Activity end
 	private void exit() {
 		pageNumber = -1;
+		removeFiles();
 		finish();
 	}
 
