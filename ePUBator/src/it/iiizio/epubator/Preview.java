@@ -36,6 +36,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebView;
@@ -113,7 +114,13 @@ public class Preview extends Activity {
 		// Show page in white on black
 		String htmlPage = htmlPageSb.toString().replace("<body>", "<body bgcolor=\"Black\"><font color=\"White\">").replace("</body>", "</font></body>");
 
-		// TODO show/hide images
+		// Check prefs
+		if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("show_images", true)) {
+			// Don't show images
+			previewWv.loadData(htmlPage, "text/html", "utf-8");
+			return;
+		}
+
 
 		// Remove old files
 		removeFiles();

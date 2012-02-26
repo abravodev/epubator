@@ -32,27 +32,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="next">Pagina successiva</string>
     
     <!-- Prefs -->
-    <string name="mark_title">Aggiungi marker</string>
-    <string name="mark_summary">Segnala errori e pagine mancanti</string>
+    <string name="images_title">Includi immagini</string>
+    <string name="images_summary">Estrai le immagini dal PDF</string>
+    <string name="repeated_title">Immagini ripetute</string>
+    <string name="repeated_summary">Aggiungi ogni ripetizione dell\'immagine</string>
+    <string name="page_title">Pagine per file</string>
+    <string name="page_summary">Numero di pagine PDF per file</string>
     <string name="error_title">ePUB con errori</string>
     <string name="error_summary">In caso di errore di conversione</string>
     <string name="keep_item">Mantieni</string>
     <string name="ask_item">Chiedi</string>
     <string name="discard_item">Elimina</string>
-    <string name="page_title">Pagine per file</string>
-    <string name="page_summary">Numero di pagine PDF per file</string>
+    <string name="mark_title">Aggiungi marker</string>
+    <string name="mark_summary">Segnala errori e pagine mancanti</string>
     <string name="notifi_title">Sopprimi notifiche</string>
     <string name="notifi_summary">Non inviare le notifiche</string>
-    <string name="filechooser">Selettore dei file</string>
+    <string name="filechooser_group">Selettore dei file</string>
     <string name="all_files_title">Mostra tutti</string>
     <string name="all_files_summary">Mostra tutti i files</string>
     <string name="detail_title">Nascondi dettagli</string>
     <string name="detail_summary">Mostra solo i nomi dei file</string>
-    <string name="experimental">Funzioni sperimentali</string>
-    <string name="images_title">Includi immagini</string>
-    <string name="images_summary">Estrai le immagini dal PDF</string>
-    <string name="repeated_title">Immagini ripetute</string>
-    <string name="repeated_summary">Aggiungi ogni ripetizione dell\'immagine</string>
+    <string name="preview_group">Anteprima</string>
     <string name="show_images_title">Mostra immagini</string>
     <string name="show_images_summary">"Mostra le immagini nell'anteprima"</string>
     

@@ -32,27 +32,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="next">Next page</string>
     
     <!-- Prefs -->
-    <string name="mark_title">Add marker</string>
-    <string name="mark_summary">Mark errors and page lost</string>
+    <string name="images_title">Include images</string>
+    <string name="images_summary">Extract images from PDF</string>
+    <string name="repeated_title">Repeated images</string>
+    <string name="repeated_summary">Add every image repetition</string>
+    <string name="page_title">Page per file</string>
+    <string name="page_summary">Number of PDF page per file</string>
     <string name="error_title">ePUB with error</string>
     <string name="error_summary">On conversion error</string>
     <string name="keep_item">Keep</string>
     <string name="ask_item">Ask</string>
     <string name="discard_item">Discard</string>
-    <string name="page_title">Page per file</string>
-    <string name="page_summary">Number of PDF page per file</string>
+    <string name="mark_title">Add marker</string>
+    <string name="mark_summary">Mark errors and page lost</string>
     <string name="notifi_title">Hide notification</string>
     <string name="notifi_summary">Does Not send notification</string>
-    <string name="filechooser">File chooser</string>
+    <string name="filechooser_group">File chooser</string>
     <string name="all_files_title">Show all</string>
     <string name="all_files_summary">Show all files</string>
     <string name="detail_title">Hide detail</string>
     <string name="detail_summary">Show only filenames</string>
-    <string name="experimental">Experimental features</string>
-    <string name="images_title">Include images</string>
-    <string name="images_summary">Extract images from PDF</string>
-    <string name="repeated_title">Repeated images</string>
-    <string name="repeated_summary">Add every image repetition</string>
+    <string name="preview_group">Preview</string>
     <string name="show_images_title">Show images</string>
     <string name="show_images_summary">Show images in preview</string>
     
