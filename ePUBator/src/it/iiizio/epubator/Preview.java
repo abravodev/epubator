@@ -60,6 +60,7 @@ public class Preview extends Activity {
 
 		previewWv = (WebView)findViewById(R.id.webview);
 		previewWv.setBackgroundColor(0);
+		previewWv.getSettings().setUseWideViewPort(true);
 		prevBt = (Button)findViewById(R.id.prev);
 		nextBt = (Button)findViewById(R.id.next);
 
@@ -111,16 +112,15 @@ public class Preview extends Activity {
 			readError();
 		}
 
-		// Show page in white on black
+		// Set page colors
 		String htmlPage = htmlPageSb.toString().replace("<body>", "<body bgcolor=\"Black\"><font color=\"White\">").replace("</body>", "</font></body>");
 
 		// Check prefs
 		if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("show_images", true)) {
-			// Don't show images
+			// Show page without images
 			previewWv.loadData(htmlPage, "text/html", "utf-8");
 			return;
 		}
-
 
 		// Remove old files
 		removeFiles();
@@ -135,7 +135,7 @@ public class Preview extends Activity {
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			// Show page without images
+			// Fallback to page without images
 			previewWv.loadData(htmlPage, "text/html", "utf-8");
 			return;
 		}
@@ -232,7 +232,7 @@ public class Preview extends Activity {
 		for (fileList = epubFile.entries(); fileList.hasMoreElements();) {
 			ZipEntry entry = (ZipEntry) fileList.nextElement();
 			String name = entry.getName();
-			if (name.startsWith("OEBPS/page")) {
+			if (name.endsWith(".html")) {
 				pageList.add(name);
 			}
 		}
