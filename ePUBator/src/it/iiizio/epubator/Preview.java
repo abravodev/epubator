@@ -39,6 +39,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.Toast;
@@ -56,6 +57,8 @@ public class Preview extends Activity {
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_PROGRESS);
+		setProgressBarVisibility(true);
 		setContentView(R.layout.preview);
 
 		previewWv = (WebView)findViewById(R.id.webview);
@@ -78,7 +81,8 @@ public class Preview extends Activity {
 	// Show page
 	private void showPage(int diff) {
 		// No pages
-		if (pageList.size() == 0) {
+		int pages = pageList.size();
+		if (pages == 0) {
 			closeEpub();
 			readError();
 			return;
@@ -93,11 +97,12 @@ public class Preview extends Activity {
 		} else {
 			prevBt.setEnabled(true);
 		}
-		if  (pageNumber == pageList.size()) {
+		if  (pageNumber == pages) {
 			nextBt.setEnabled(false);
 		} else {
 			nextBt.setEnabled(true);
 		}
+		setProgress(pageNumber*9999/pages);
 
 		// get html page
 		String pageName = pageList.get(pageNumber - 1);

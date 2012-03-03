@@ -42,6 +42,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ScrollView;
@@ -75,8 +76,11 @@ public class Convert extends Activity {
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_PROGRESS);
+		setProgressBarVisibility(true);
 		setContentView(R.layout.progressview);
-
+		setProgress(0);
+		
 		// Set variables
 		progressSv = (ScrollView)findViewById(R.id.scroll);
 		progressTv = (TextView)findViewById(R.id.progress);
@@ -261,6 +265,11 @@ public class Convert extends Activity {
 			notificationSent = true;
 		}
 	}
+	
+	// Update progress bar
+/*	void updateBar(int writed, int total) {
+		setProgress(writed*9999/total);
+	}*/
 
 	// Start background task
 	private class convertTask extends AsyncTask<Void, String, Void> {
@@ -366,7 +375,7 @@ public class Convert extends Activity {
 				// Set up counter
 				int pages = ReadPdf.getPages();
 				publishProgress(String.format(getResources().getString(R.string.pages), pages));
-				int totalFiles = 2 + pages / pagesPerFile;
+				int totalFiles = 2 + pages;
 				int writedFiles = 0;
 
 				// Set flag
@@ -403,6 +412,7 @@ public class Convert extends Activity {
 
 				// Add frontpage
 				publishProgress(getResources().getString(R.string.frontpage));
+				setProgress(++writedFiles*9999/totalFiles);
 				if (WriteZip.addText("OEBPS/frontpage.html", createFrontpage(), false)) {
 					return 3;
 				}
@@ -411,7 +421,6 @@ public class Convert extends Activity {
 				if (createFrontpagePng()) {
 					return 3;
 				}
-
 
 				// Add extracted text and images
 				List<String> allImageList = new ArrayList<String>();
@@ -423,13 +432,16 @@ public class Convert extends Activity {
 
 					StringBuilder textSb = new StringBuilder();
 
-					publishProgress(getResources().getString(R.string.html) + i + ".html   " + (int)(100 * (++writedFiles) / totalFiles) + "%");
+					publishProgress(String.format(getResources().getString(R.string.html), i));
 					int endPage = i + pagesPerFile - 1;
 					if (endPage > pages) {
 						endPage = pages;
 					}
 
 					for (int j = i; j <= endPage; j++) {
+						// Update progress bar
+						setProgress(++writedFiles*9999/totalFiles);
+
 						// extract text
 						String page = stringToHTMLString(ReadPdf.extractText(j));
 						if (page.length() == 0) {
@@ -476,7 +488,8 @@ public class Convert extends Activity {
 				}
 
 				// Add content.opf
-				publishProgress(getResources().getString(R.string.content) + "   100%");
+				publishProgress(getResources().getString(R.string.content));
+				setProgress(++writedFiles*9999/totalFiles);
 				if (WriteZip.addText("OEBPS/content.opf", createContent(pages, bookId, allImageList, title), false)) {
 					return 3;
 				}
