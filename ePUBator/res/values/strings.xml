@@ -36,8 +36,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="images_summary">Extract images from PDF</string>
     <string name="repeated_title">Repeated images</string>
     <string name="repeated_summary">Add every image repetition</string>
-    <string name="page_title">Page per file</string>
-    <string name="page_summary">Number of PDF page per file</string>
+    <string name="page_title">Pages per file</string>
+    <string name="page_summary">Number of PDF pages per file</string>
     <string name="error_title">ePUB with error</string>
     <string name="error_summary">On conversion error</string>
     <string name="keep_item">Keep</string>
@@ -97,7 +97,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>Failed to write ePUB file</item>
         <item>Failed to extract text</item>
         <item>Extraction stopped by user</item>
-        <item>Out of memory error (set page per file to 1 and/or disable images extraction and try again)</item>
+        <item>Out of memory error</item>
     </string-array>
 
 </resources>

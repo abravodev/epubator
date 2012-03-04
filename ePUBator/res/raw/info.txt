@@ -5,16 +5,26 @@ ePUBator extract text from a PDF file and put it in a well formed (epubcheck com
 PDF extraction based on iText library <http://itextpdf.com/>. 
 
 - ePUBator doesn't need internet connection.
+- ePUBator doesn't send your docs somewhere on the net.
 - ePUBator doesn't have ads.
 - ePUBator extract text (no text in pictures).
-- ePUBator doesn't show images in preview (for now).
-- ePUBator extract images (experimental, only png, jpg and gif).
+- ePUBator try to extract images (only png, jpg and gif) but puts them at the page's end.
+- ePUBator doesn't extract the table of contents but creates a dummy index.
 - ePUBator works fine with single column PDF (can work bad with multi column or tables).
-- ePUBator can fail extraction (12 of 60 books tested: it looks like a iText problem). 
+- ePUBator can fail extraction (17 of 100 books tested: it looks like a iText problem). 
+
+WARNING!!!
+In the event of crash, unexpected stoppages or insufficient memory try setting Page per file to 1 and/or disable the extraction of images and try again (sometimes helps).
 
 For comment/feedback/bug/suggestion/localization write to: iiizio AT users.sf.net
 
 History:
+v0.6
+- Added images in preview
+- Added progress bar
+- Added some prefs
+- Improved file chooser
+- Some bug fix
 v0.5
 - Added images extraction
 - Added preferences

@@ -80,7 +80,7 @@ public class Convert extends Activity {
 		setProgressBarVisibility(true);
 		setContentView(R.layout.progressview);
 		setProgress(0);
-		
+
 		// Set variables
 		progressSv = (ScrollView)findViewById(R.id.scroll);
 		progressTv = (TextView)findViewById(R.id.progress);
@@ -265,11 +265,6 @@ public class Convert extends Activity {
 			notificationSent = true;
 		}
 	}
-	
-	// Update progress bar
-/*	void updateBar(int writed, int total) {
-		setProgress(writed*9999/total);
-	}*/
 
 	// Start background task
 	private class convertTask extends AsyncTask<Void, String, Void> {
@@ -372,6 +367,11 @@ public class Convert extends Activity {
 		// Fill ePUB file
 		private int fillEpub() {
 			try {
+				// Stopped?
+				if (result == 5) {
+					return 5;
+				}
+
 				// Set up counter
 				int pages = ReadPdf.getPages();
 				publishProgress(String.format(getResources().getString(R.string.pages), pages));
@@ -389,6 +389,7 @@ public class Convert extends Activity {
 
 				// Add required files
 				publishProgress(getResources().getString(R.string.mimetype));
+				setProgress(++writedFiles*9999/totalFiles);
 				if (WriteZip.addText("mimetype", "application/epub+zip", true)) {
 					return 3;
 				}
@@ -412,7 +413,6 @@ public class Convert extends Activity {
 
 				// Add frontpage
 				publishProgress(getResources().getString(R.string.frontpage));
-				setProgress(++writedFiles*9999/totalFiles);
 				if (WriteZip.addText("OEBPS/frontpage.html", createFrontpage(), false)) {
 					return 3;
 				}
@@ -425,11 +425,6 @@ public class Convert extends Activity {
 				// Add extracted text and images
 				List<String> allImageList = new ArrayList<String>();
 				for(int i = 1; i <= pages; i += pagesPerFile) {
-					// Stopped?
-					if (result == 5) {
-						return 5;
-					}
-
 					StringBuilder textSb = new StringBuilder();
 
 					publishProgress(String.format(getResources().getString(R.string.html), i));
@@ -439,6 +434,11 @@ public class Convert extends Activity {
 					}
 
 					for (int j = i; j <= endPage; j++) {
+						// Stopped?
+						if (result == 5) {
+							return 5;
+						}
+
 						// Update progress bar
 						setProgress(++writedFiles*9999/totalFiles);
 
@@ -468,6 +468,11 @@ public class Convert extends Activity {
 							List<String> imageList = ReadPdf.getImages(j);
 							Iterator<String> iterator = imageList.iterator();
 							while (iterator.hasNext()) {
+								// Stopped?
+								if (result == 5) {
+									return 5;
+								}
+
 								String imageName = iterator.next();
 								String imageTag = "\n<img alt=\"" + imageName + "\" src=\"" + imageName + "\" /><br/>";
 

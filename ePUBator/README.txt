@@ -5,16 +5,26 @@ ePUBator extract text from a PDF file and put it in a well formed (epubcheck com
 PDF extraction based on iText library <http://itextpdf.com/>. 
 
 - ePUBator doesn't need internet connection.
+- ePUBator doesn't send your docs somewhere on the net.
 - ePUBator doesn't have ads.
 - ePUBator extract text (no text in pictures).
-- ePUBator extract images (experimental, only png, jpg and gif).
-- ePUBator doesn't show images in preview (for now).
+- ePUBator try to extract images (only png, jpg and gif) but puts them at the page's end.
+- ePUBator doesn't extract the table of contents but creates a dummy index.
 - ePUBator works fine with single column PDF (can work bad with multi column or tables).
-- ePUBator can fail extraction (12 of 60 books tested: it looks like a iText problem). 
+- ePUBator can fail extraction (17 of 100 books tested: it looks like a iText problem).
+
+WARNING!!!
+In the event of crash, unexpected stoppages or insufficient memory try setting Page per file to 1 and/or disable the extraction of images and try again (sometimes helps).
 
 For comment/feedback/bug/suggestion/localization write to: iiizio AT users.sf.net
 
 History:
+v0.6
+- Added images in preview
+- Added progress bar
+- Added some prefs
+- Improved file chooser
+- Some bug fix
 v0.5
 - Added images extraction
 - Added preferences
@@ -51,16 +61,26 @@ ePUBator estrae il testo da un file PDF e lo inserisce in un file ePUB correttam
 L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/>. 
 
 - ePUBator non necessita di una connessione internet.
+- ePUBator non invia i tuoi documenti da qualche parte sulla rete.
 - ePUBator non ha pubblicità.
 - ePUBator estrae il testo (nessun testo dalle figure).
-- ePUBator estrae le immagini (sperimentale, solo png, jpg e gif).
-- ePUBator non mostra le immagini nell'anteprima (per adesso).
+- ePUBator cerca di estrarre le immagini (solo png, jpg e gif) ma le mette alla fine della pagina.
+- ePUBator non estrae l'indice del PDF ma ne crea uno fittizio.
 - ePUBator funziona bene con i PDF a singola colonna (può essere pessimo con quelli multicolonna o le tabelle).
-- ePUBator può fallire l'estrazione (12 libri su 60 provati: sembra sia un problema di iText).
+- ePUBator può fallire l'estrazione (17 libri su 100 provati: sembra sia un problema di iText).
+
+ATTENZIONE!!!
+Nel caso di crash, interruzioni inaspettate o memoria insufficente prova ad impostare Pagine per file a 1 e/o disabilitare l'estrazione delle immagini e riprova (a volte aiuta).
 
 Per commenti/feedback/bug/suggerimenti/localizzazioni scrivi a: iiizio AT users.sf.net
 
 Storico:
+v0.6
+- Aggiunte immagini nell'anteprima
+- Aggiunta la barra di avanzamento
+- Aggiunte alcune preferenze
+- Migliorato il selettore dei file
+- Risolto qualche bug
 v0.5
 - Aggiunta l'estrazione delle immagini
 - Aggiunte impostazioni

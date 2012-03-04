@@ -5,16 +5,26 @@ ePUBator estrae il testo da un file PDF e lo inserisce in un file ePUB correttam
 L'estrazione dal PDF e' basata sulla libreria iText <http://itextpdf.com/>. 
 
 - ePUBator non necessita di una connessione internet.
+- ePUBator non invia i tuoi documenti da qualche parte sulla rete.
 - ePUBator non ha pubblicita'.
 - ePUBator estrae il testo (nessun testo dalle figure).
-- ePUBator estrae le immagini (sperimentale, solo png, jpg e gif).
-- ePUBator non mostra le immagini nell'anteprima (per adesso).
+- ePUBator cerca di estrarre le immagini (solo png, jpg e gif) ma le mette alla fine della pagina.
+- ePUBator non estrae l'indice del PDF ma ne crea uno fittizio.
 - ePUBator funziona bene con i PDF a singola colonna (puo' essere pessimo con quelli multicolonna o le tabelle).
-- ePUBator puo' fallire l'estrazione (12 libri su 60 provati: sembra sia un problema di iText).
+- ePUBator puo' fallire l'estrazione (17 libri su 100 provati: sembra sia un problema di iText).
+
+ATTENZIONE!!!
+Nel caso di crash, interruzioni inaspettate o memoria insufficente prova ad impostare Pagine per file a 1 e/o disabilitare l'estrazione delle immagini e riprova (a volte aiuta).
 
 Per commenti/feedback/bug/suggerimenti/localizzazioni scrivi a: iiizio AT users.sf.net
 
 Storico:
+v0.6
+- Aggiunte immagini nell'anteprima
+- Aggiunta la barra di avanzamento
+- Aggiunte alcune preferenze
+- Migliorato il selettore dei file
+- Risolto qualche bug
 v0.5
 - Aggiunta l'estrazione delle immagini
 - Aggiunte impostazioni
