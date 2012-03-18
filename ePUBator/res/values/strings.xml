@@ -65,7 +65,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <!-- Convert -->
     <string name="read_error">"Can't read ePUB file"</string>
     <string name="cip">Conversion in progress</string>
-    <string name="heading">"ePUBator - ©2011 Ezio Querini\nMinimal offline PDF to ePUB converter for Android\nPDF extraction based on iText library\n\n"</string>
+    <string name="heading">"ePUBator - ©2011 Ezio Querini\nMinimal offline PDF to ePUB converter for Android\n"</string>
+    <string name="library">"PDF extraction based on iText software library\niText is released under the AGPL license\n\n"</string>
     <string name="deleted">ePUB file deleted</string>
     <string name="kept_old">Kept old ePUB file</string>
     <string name="pages">Number of pages: %d\n</string>

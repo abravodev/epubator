@@ -2,7 +2,7 @@ Minimal offline PDF to ePUB converter for Android
 
 ePUBator extract text from a PDF file and put it in a well formed (epubcheck compliant) ePUB file.
 
-PDF extraction based on iText library <http://itextpdf.com/>. 
+PDF extraction based on iText library <http://itextpdf.com/> released under the AGPL license. 
 
 - ePUBator doesn't need internet connection.
 - ePUBator doesn't send your docs somewhere on the net.
@@ -58,7 +58,7 @@ Convertitore da PDF a ePUB minimale per Android
 
 ePUBator estrae il testo da un file PDF e lo inserisce in un file ePUB correttamente formattato (conforme con epubcheck).
 
-L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/>. 
+L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/> rilasciata sotto licenza AGPL. 
 
 - ePUBator non necessita di una connessione internet.
 - ePUBator non invia i tuoi documenti da qualche parte sulla rete.

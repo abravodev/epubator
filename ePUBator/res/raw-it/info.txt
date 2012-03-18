@@ -2,7 +2,7 @@ Convertitore da PDF a ePUB minimale per Android
 
 ePUBator estrae il testo da un file PDF e lo inserisce in un file ePUB correttamente formattato (conforme con epubcheck).
 
-L'estrazione dal PDF e' basata sulla libreria iText <http://itextpdf.com/>. 
+L'estrazione dal PDF e' basata sulla libreria iText <http://itextpdf.com/> rilasciata sotto licenza AGPL. 
 
 - ePUBator non necessita di una connessione internet.
 - ePUBator non invia i tuoi documenti da qualche parte sulla rete.

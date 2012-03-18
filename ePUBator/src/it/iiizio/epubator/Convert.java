@@ -318,6 +318,7 @@ public class Convert extends Activity {
 		protected void onPreExecute() {
 			progressSb = new StringBuilder();
 			progressSb.append(getResources().getString(R.string.heading));
+			progressSb.append(getResources().getString(R.string.library));
 			setButtons(false);
 			result = 0;
 			conversionStarted = true;
