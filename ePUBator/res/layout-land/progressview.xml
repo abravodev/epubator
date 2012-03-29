@@ -17,18 +17,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent" xmlns:tools="http://schemas.android.com/tools" tools:ignore="NestedWeights">
 
     <ScrollView
         android:id="@+id/scroll"
-        android:layout_width="match_parent"
+        android:layout_width="0dip"
         android:layout_height="match_parent"
         android:layout_weight="1" >
 
         <TextView
             android:id="@+id/progress"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
     </ScrollView>
 
     <LinearLayout
@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:layout_height="match_parent"
         android:layout_marginTop="6dp"
         android:orientation="vertical" >
-
+
         <Button
             android:id="@+id/ok"
             android:layout_width="match_parent"

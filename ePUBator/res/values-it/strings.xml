@@ -66,7 +66,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="read_error">Non posso leggere il file ePUB</string>
     <string name="cip">Conversione in corso</string>
     <string name="heading">"ePUBator - ©2011 Ezio Querini\nConvertitore da PDF a ePUB minimale per Android\n"</string>
-    <string name="library">"L'estrazione dal PDF è basata sulla libreria iText\niText è rilasciata sotto licenza AGPL\n\n"</string>
+    <string name="library">"L'estrazione dal PDF è basata sulla libreria iText rilasciata sotto licenza AGPL\n\n"</string>
     <string name="deleted">File ePUB rimosso</string>
     <string name="kept_old">Mantenuto il vecchio file ePUB</string>
     <string name="pages">Numero di pagine: %d\n</string>

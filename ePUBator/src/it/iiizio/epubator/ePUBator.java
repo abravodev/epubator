@@ -20,6 +20,7 @@ package it.iiizio.epubator;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,7 +31,7 @@ import android.widget.Toast;
 
 public class ePUBator extends Activity {
 	String filename = "";
-	static String path = "/sdcard/";
+	static String path = Environment.getExternalStorageDirectory().getPath();
 	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
 
