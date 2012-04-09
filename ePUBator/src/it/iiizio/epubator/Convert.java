@@ -401,12 +401,9 @@ public class Convert extends Activity {
 				}
 
 				String name = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
-				String bookId = name.replaceAll("[^\\p{ASCII}]", "") + " - " + new Date().hashCode();
-				String title = ReadPdf.getTitle();
-				if (title == "" || title == null) {
-					title = name;
-				}
-
+				String title = name.replaceAll("[^\\p{Alnum}]", " ");
+				String bookId = title + " - " + new Date().hashCode();
+				
 				publishProgress(getResources().getString(R.string.toc));
 				if (WriteZip.addText("OEBPS/toc.ncx", createToc(pages, bookId, title), false)) {
 					return 3;
