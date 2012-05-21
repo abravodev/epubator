@@ -9,49 +9,69 @@ PDF extraction based on iText library <http://itextpdf.com/> released under the 
 - ePUBator doesn't have ads.
 - ePUBator extract text (no text in pictures).
 - ePUBator try to extract images (only png, jpg and gif) but puts them at the page's end.
-- ePUBator doesn't extract the table of contents but creates a dummy index.
+- ePUBator doesn't extract the table of contents (it creates a dummy index).
+- ePUBator doesn't extract the font size and style.
 - ePUBator works fine with single column PDF (can work bad with multi column or tables).
 - ePUBator can fail extraction (17 of 100 books tested: it looks like a iText problem).
 
 WARNING!!!
 In the event of crash, unexpected stoppages or insufficient memory try setting Page per file to 1 and/or disable the extraction of images and try again (sometimes helps).
 
-For comment/feedback/bug/suggestion/localization write to: iiizio AT users.sf.net
+Permissions required:
+- WRITE_EXTERNAL_STORAGE for save the ePUB file
+
+Legal stuff:
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+For comment / feedback / bug / suggestion / localization / donations write to: iiizio AT users.sf.net
 
 History:
-v0.6
+v0.7  (2012-05-21)
+- Fixed title bug (bad ePUB)
+- Updated iText lib to 5.2.1
+- Some Lint optimizations
+
+v0.6  (2012-03-04)
 - Added images in preview
 - Added progress bar
 - Added some prefs
 - Improved file chooser
 - Some bug fix
-v0.5
+
+v0.5  (2012-01-09)
 - Added images extraction
 - Added preferences
 - Improved memory management
 - Some little fix
-v0.4
+
+v0.4  (2011-12-24)
 - Added frontpage
 - Added landscape layout
 - Added shows extraction failure in progress dialog
 - Fixed filechooser bug (sdcard not readable)
 - Fixed preview bug
 - Updated iText lib to 5.1.3
-v0.3
+
+v0.3  (2011-11-24)
 - Added preview
 - Added notification
 - Added possibility to stop conversion
 - Enabled 'Move to SD'
 - Differentiate error and page lost marker
 - Code optimization
-v0.2
+
+v0.2  (2011-11-08)
 - Added 'keep errored file' dialog
 - Added marker on error
 - Fixed a buffer overflow and some minor bugs
-v0.1
+
+v0.1  (2011-11-01)
 - Initial release
 
-#########################################################################################################
+
+----------------------------------------------------------------------------------
 
 
 Convertitore da PDF a ePUB minimale per Android
@@ -65,44 +85,63 @@ L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/> rilasc
 - ePUBator non ha pubblicità.
 - ePUBator estrae il testo (nessun testo dalle figure).
 - ePUBator cerca di estrarre le immagini (solo png, jpg e gif) ma le mette alla fine della pagina.
-- ePUBator non estrae l'indice del PDF ma ne crea uno fittizio.
+- ePUBator non estrae l'indice del PDF (ne crea uno fittizio).
+- ePUBator non estrae lo stile e dimensioni dei caratteri.
 - ePUBator funziona bene con i PDF a singola colonna (può essere pessimo con quelli multicolonna o le tabelle).
 - ePUBator può fallire l'estrazione (17 libri su 100 provati: sembra sia un problema di iText).
 
 ATTENZIONE!!!
 Nel caso di crash, interruzioni inaspettate o memoria insufficente prova ad impostare Pagine per file a 1 e/o disabilitare l'estrazione delle immagini e riprova (a volte aiuta).
 
-Per commenti/feedback/bug/suggerimenti/localizzazioni scrivi a: iiizio AT users.sf.net
+Autorizzazioni richieste:
+- WRITE_EXTERNAL_STORAGE per salvare il file ePUB
+
+Note legali:
+Questo programma è software libero: è possibile ridistribuirlo e/o modificarlo secondo i termini della GNU General Public License come pubblicata dalla Free Software Foundation, sia la versione 3 della licenza, o (a propria scelta) una versione successiva. 
+
+Questo programma è distribuito nella speranza che possa essere utile, ma SENZA ALCUNA GARANZIA, nemmeno la garanzia implicita di COMMERCIABILITÀ o IDONEITÀ PER UN PARTICOLARE SCOPO. Vedere la GNU General Public License per ulteriori dettagli. 
+
+Per commenti / feedback / bug / suggerimenti / localizzazioni / donazioni scrivi a: iiizio AT users.sf.net
 
 Storico:
-v0.6
+v0.7  (21-05-2012)
+- Risolto bug del titolo (ePUB difettoso) 
+- Aggiornata iText lib alla 5.2.1
+- Alcune ottimizazioni suggerite da Lint
+
+v0.6  (04-03-2012)
 - Aggiunte immagini nell'anteprima
 - Aggiunta la barra di avanzamento
 - Aggiunte alcune preferenze
 - Migliorato il selettore dei file
 - Risolto qualche bug
-v0.5
+
+v0.5  (09-01-2012)
 - Aggiunta l'estrazione delle immagini
 - Aggiunte impostazioni
 - Migliorata la gestione della memoria
 - Alcune piccole correzioni
-v0.4
+
+v0.4  (24-12-2011)
 - Aggiunta frontpage
 - Aggiunto layout orizzontale
 - Aggiunta visualizzazione degli errori di estrazione nel progress dialog
 - Corretto bug del selettore dei file (sdcard non leggibile)
 - Corretto bug dell'anteprima
 - Aggiornata iText lib alla 5.1.3
-v0.3
+
+v0.3  (24-11-2011)
 - Aggiunta anteprima
 - Aggiunta notifica
 - Aggiunta la possibilità di fermare la conversione
 - Abilitato 'Muovi su SD'
 - Differenziato l'indicatore di errori e pagine perse
 - Ottimizazione del codice
-v0.2
+
+v0.2  (08-11-2011)
 - Aggiunto dialogo 'conserva file errorato'
 - Aggiunto marcatore in caso di errore
 - Corretto un buffer overflow e alcuni bug meno importanti
-v0.1
+
+v0.1  (01-11-2011)
 - Rilascio iniziale

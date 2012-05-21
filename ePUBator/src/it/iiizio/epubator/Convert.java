@@ -121,7 +121,7 @@ public class Convert extends Activity {
 		onError = Integer.parseInt(prefs.getString("on_error", "1"));
 		pagesPerFile = Integer.parseInt(prefs.getString("page_per_file", "10"));
 		hideNotifi = prefs.getBoolean("hide_notifi", false);
-		includeImages = prefs.getBoolean("include_images", true);
+		includeImages = prefs.getBoolean("include_images", false);
 		repeatedImages = prefs.getBoolean("repeated_images", false);
 	}
 

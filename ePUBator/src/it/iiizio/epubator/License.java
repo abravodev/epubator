@@ -33,6 +33,7 @@ public class License extends Activity {
 		setContentView(R.layout.infoview);
 
 		TextView infoTv = (TextView)findViewById(R.id.infoview);
+		infoTv.setTextSize(18);
 		InputStream is = this.getResources().openRawResource(R.raw.license);
 		try {
 			byte[] buffer = new byte[is.available()];
