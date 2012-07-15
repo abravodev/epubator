@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.SimpleBookmark;
 import com.itextpdf.text.pdf.parser.ImageRenderInfo;
 import com.itextpdf.text.pdf.parser.PdfImageObject;
 import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
@@ -93,6 +94,22 @@ public class ReadPdf {
 		}
 		return imageList;
 	}
+
+	// Extract bookmarks
+	public static String getBookmarks() {
+		List<HashMap<String, Object>> list = SimpleBookmark.getBookmark(reader);
+		if (list == null) {
+			return "";
+		}
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
+        try {
+			SimpleBookmark.exportToXML(list, baos, "ISO8859-1", true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return baos.toString();
+	}
 }
 
 // RenderListener helper class
@@ -129,6 +146,7 @@ class renderListener implements RenderListener {
 		}
 	}
 
+	// Nothing to do, just required methods
 	public void renderText(TextRenderInfo renderInfo) {
 	}
 

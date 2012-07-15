@@ -24,6 +24,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -440,6 +444,10 @@ public class Convert extends Activity {
 						// Update progress bar
 						setProgress(++writedFiles*9999/totalFiles);
 
+						// Add anchor
+						textSb.append("  <p>\n");
+						textSb.append("  <a id=\"page" + j + "\"/>\n");
+						
 						// extract text
 						String page = stringToHTMLString(ReadPdf.extractText(j));
 						if (page.length() == 0) {
@@ -483,9 +491,12 @@ public class Convert extends Activity {
 								}
 							}
 						}
+						// Close page
+						textSb.append("\n  </p>\n");
 					}
-
-					if (WriteZip.addText("OEBPS/page" + i + ".html", createPages(i, textSb.toString()) , false)) {
+					
+					String text = textSb.toString();
+					if (WriteZip.addText("OEBPS/page" + i + ".html", createHtml("page" + i, text.replaceAll("<br/>(?=[a-z])", "&nbsp;")) , false)) {
 						return 3;
 					}
 				}
@@ -584,16 +595,68 @@ public class Convert extends Activity {
 			toc.append("            </navLabel>\n");
 			toc.append("            <content src=\"frontpage.html\"/>\n");
 			toc.append("        </navPoint>\n");
+
+			// Try to extract toc from pdf
 			int playOrder = 2;
-			for(int i = 1; i <= pages; i += pagesPerFile) {
-				toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
-				toc.append("            <navLabel>\n");
-				toc.append("                <text>Page" + i + "</text>\n");
-				toc.append("            </navLabel>\n");
-				toc.append("            <content src=\"page" + i + ".html\"/>\n");
-				toc.append("        </navPoint>\n");
-				playOrder += 1;
+			boolean extractedToc = false;
+			XMLParser parser = new XMLParser();
+			Document doc = parser.getDomElement(ReadPdf.getBookmarks());
+			if (doc != null) {
+				NodeList nl = doc.getElementsByTagName("Title");
+				if (nl != null) {
+					int lastPage = Integer.MAX_VALUE;
+					StringBuilder sb = new StringBuilder();
+					// looping through all item nodes <item>
+					for (int i = 0; i < nl.getLength(); i++) {
+						Element e = (Element) nl.item(i);
+						String action = parser.getValue(e, "Action");
+						if (action.equals("GoTo")) {
+							String chapter = parser.getElementValue(e).trim();
+							int page = Integer.valueOf(parser.getValue(e, "Page").split(" ")[0]);
+							if (page > lastPage) {
+								int pageFile = ((int) ((lastPage - 1) / pagesPerFile)) * pagesPerFile + 1;
+								toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
+								toc.append("            <navLabel>\n");
+								toc.append("                <text>" + sb.toString() + "</text>\n");
+								toc.append("            </navLabel>\n");
+								toc.append("            <content src=\"page" + pageFile + ".html#page" + lastPage + "\"/>\n");
+								toc.append("        </navPoint>\n");
+								playOrder += 1;
+
+								sb = new StringBuilder();
+							}
+							sb.append(chapter);
+							sb.append("\n");
+							lastPage = page;
+						}
+						extractedToc = true;
+					}
+					if (sb.length() > 0) {
+						int pageFile = ((int) ((lastPage - 1) / pagesPerFile)) * pagesPerFile + 1;
+						toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
+						toc.append("            <navLabel>\n");
+						toc.append("                <text>" + sb.toString() + "</text>\n");
+						toc.append("            </navLabel>\n");
+						toc.append("            <content src=\"page" + pageFile + ".html#page" + lastPage + "\"/>\n");
+						toc.append("        </navPoint>\n");
+					}
+
+				}
 			}
+
+			// Create dummy toc
+			if (!extractedToc) {
+				for(int i = 1; i <= pages; i += pagesPerFile) {
+					toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
+					toc.append("            <navLabel>\n");
+					toc.append("                <text>Page" + i + "</text>\n");
+					toc.append("            </navLabel>\n");
+					toc.append("            <content src=\"page" + i + ".html\"/>\n");
+					toc.append("        </navPoint>\n");
+					playOrder += 1;
+				}
+			}
+			
 			toc.append("    </navMap>\n");
 			toc.append("</ncx>\n");
 			return toc.toString();
@@ -615,15 +678,6 @@ public class Convert extends Activity {
 			html.append("\n</body>\n");
 			html.append("</html>\n");
 			return html.toString();
-		}
-
-		// Create pageNN.html
-		private String createPages(int offset, String text) {
-			StringBuilder body = new StringBuilder();
-			body.append("  <p>\n");
-			body.append(text.replaceAll("<br/>(?=[a-z])", "&nbsp;"));
-			body.append("\n  </p>");
-			return createHtml("page" + offset, body.toString());
 		}
 
 		// Create frontpage.html
