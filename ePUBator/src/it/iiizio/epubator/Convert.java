@@ -64,12 +64,13 @@ public class Convert extends Activity {
 	private static int result;
 	private static String filename = "";
 
-	private int pagesPerFile;
-	private boolean addMarkers;
-	private int onError;
-	private boolean hideNotifi;
 	private boolean includeImages;
 	private boolean repeatedImages;
+	private int pagesPerFile;
+	private int onError;
+	private boolean addMarkers;
+	private boolean hideNotifi;
+	private boolean tocFromPdf;
 
 	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
@@ -121,12 +122,13 @@ public class Convert extends Activity {
 
 		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
 
-		addMarkers = prefs.getBoolean("add_markers", true);
-		onError = Integer.parseInt(prefs.getString("on_error", "1"));
-		pagesPerFile = Integer.parseInt(prefs.getString("page_per_file", "10"));
-		hideNotifi = prefs.getBoolean("hide_notifi", false);
 		includeImages = prefs.getBoolean("include_images", false);
 		repeatedImages = prefs.getBoolean("repeated_images", false);
+		pagesPerFile = Integer.parseInt(prefs.getString("page_per_file", "10"));
+		onError = Integer.parseInt(prefs.getString("on_error", "1"));
+		addMarkers = prefs.getBoolean("add_markers", true);
+		hideNotifi = prefs.getBoolean("hide_notifi", false);
+		tocFromPdf = prefs.getBoolean("toc_from_pdf", true);
 	}
 
 	// Set buttons state
@@ -596,51 +598,53 @@ public class Convert extends Activity {
 			toc.append("            <content src=\"frontpage.html\"/>\n");
 			toc.append("        </navPoint>\n");
 
-			// Try to extract toc from pdf
 			int playOrder = 2;
 			boolean extractedToc = false;
-			XMLParser parser = new XMLParser();
-			Document doc = parser.getDomElement(ReadPdf.getBookmarks());
-			if (doc != null) {
-				NodeList nl = doc.getElementsByTagName("Title");
-				if (nl != null) {
-					int lastPage = Integer.MAX_VALUE;
-					StringBuilder sb = new StringBuilder();
-					// looping through all item nodes <item>
-					for (int i = 0; i < nl.getLength(); i++) {
-						Element e = (Element) nl.item(i);
-						String action = parser.getValue(e, "Action");
-						if (action.equals("GoTo")) {
-							String chapter = parser.getElementValue(e).trim();
-							int page = Integer.valueOf(parser.getValue(e, "Page").split(" ")[0]);
-							if (page > lastPage) {
-								int pageFile = ((int) ((lastPage - 1) / pagesPerFile)) * pagesPerFile + 1;
-								toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
-								toc.append("            <navLabel>\n");
-								toc.append("                <text>" + sb.toString() + "</text>\n");
-								toc.append("            </navLabel>\n");
-								toc.append("            <content src=\"page" + pageFile + ".html#page" + lastPage + "\"/>\n");
-								toc.append("        </navPoint>\n");
-								playOrder += 1;
+			if (tocFromPdf) {
+				// Try to extract toc from pdf
+				XMLParser parser = new XMLParser();
+				Document doc = parser.getDomElement(ReadPdf.getBookmarks());
+				if (doc != null) {
+					NodeList nl = doc.getElementsByTagName("Title");
+					if (nl != null) {
+						int lastPage = Integer.MAX_VALUE;
+						StringBuilder sb = new StringBuilder();
+						// looping through all item nodes <item>
+						for (int i = 0; i < nl.getLength(); i++) {
+							Element e = (Element) nl.item(i);
+							String action = parser.getValue(e, "Action");
+							if (action.equals("GoTo")) {
+								String chapter = parser.getElementValue(e).trim();
+								int page = Integer.valueOf(parser.getValue(e, "Page").split(" ")[0]);
+								if (page > lastPage) {
+									int pageFile = ((int) ((lastPage - 1) / pagesPerFile)) * pagesPerFile + 1;
+									toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
+									toc.append("            <navLabel>\n");
+									toc.append("                <text>" + sb.toString() + "</text>\n");
+									toc.append("            </navLabel>\n");
+									toc.append("            <content src=\"page" + pageFile + ".html#page" + lastPage + "\"/>\n");
+									toc.append("        </navPoint>\n");
+									playOrder += 1;
 
-								sb = new StringBuilder();
+									sb = new StringBuilder();
+								}
+								sb.append(chapter);
+								sb.append("\n");
+								lastPage = page;
 							}
-							sb.append(chapter);
-							sb.append("\n");
-							lastPage = page;
+							extractedToc = true;
 						}
-						extractedToc = true;
-					}
-					if (sb.length() > 0) {
-						int pageFile = ((int) ((lastPage - 1) / pagesPerFile)) * pagesPerFile + 1;
-						toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
-						toc.append("            <navLabel>\n");
-						toc.append("                <text>" + sb.toString() + "</text>\n");
-						toc.append("            </navLabel>\n");
-						toc.append("            <content src=\"page" + pageFile + ".html#page" + lastPage + "\"/>\n");
-						toc.append("        </navPoint>\n");
-					}
+						if (sb.length() > 0) {
+							int pageFile = ((int) ((lastPage - 1) / pagesPerFile)) * pagesPerFile + 1;
+							toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
+							toc.append("            <navLabel>\n");
+							toc.append("                <text>" + sb.toString() + "</text>\n");
+							toc.append("            </navLabel>\n");
+							toc.append("            <content src=\"page" + pageFile + ".html#page" + lastPage + "\"/>\n");
+							toc.append("        </navPoint>\n");
+						}
 
+					}
 				}
 			}
 

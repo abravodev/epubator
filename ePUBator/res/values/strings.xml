@@ -47,6 +47,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="mark_summary">Mark errors and page lost</string>
     <string name="notifi_title">Hide notification</string>
     <string name="notifi_summary">Does Not send notification</string>
+    <string name="pdftoc_title">TOC from PDF</string>
+    <string name="pdftoc_summary">Try to extract the table of contents from PDF</string>
     <string name="filechooser_group">File chooser</string>
     <string name="all_files_title">Show all</string>
     <string name="all_files_summary">Show all files</string>

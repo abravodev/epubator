@@ -58,6 +58,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:summary="@string/notifi_summary"
         android:title="@string/notifi_title" />
 
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="toc_from_pdf"
+        android:summary="@string/pdftoc_summary"
+        android:title="@string/pdftoc_title" />
+
     <PreferenceCategory android:title="@string/filechooser_group" >
 
 	    <CheckBoxPreference

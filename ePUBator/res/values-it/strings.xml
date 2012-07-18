@@ -47,6 +47,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="mark_summary">Segnala errori e pagine mancanti</string>
     <string name="notifi_title">Sopprimi notifiche</string>
     <string name="notifi_summary">Non inviare le notifiche</string>
+    <string name="pdftoc_title">Indice del PDF</string>
+    <string name="pdftoc_summary">Prova ad estrarre l\'indice dal PDF</string>
     <string name="filechooser_group">Selettore dei file</string>
     <string name="all_files_title">Mostra tutti</string>
     <string name="all_files_summary">Mostra tutti i files</string>
