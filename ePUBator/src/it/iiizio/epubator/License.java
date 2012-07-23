@@ -32,6 +32,7 @@ public class License extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.infoview);
 
+		// Get license from raw
 		TextView infoTv = (TextView)findViewById(R.id.infoview);
 		infoTv.setTextSize(18);
 		InputStream is = this.getResources().openRawResource(R.raw.license);
@@ -39,9 +40,15 @@ public class License extends Activity {
 			byte[] buffer = new byte[is.available()];
 			is.read(buffer);
 			is.close();
+			// Remove unwanted newlines
 			infoTv.setText(new String(buffer, "utf-8").replaceAll("(?<!\n)\n(?!\n)", " "));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void onDestroy() {
+		super.onDestroy();
+		finish();
 	}
 }

@@ -9,10 +9,11 @@ PDF extraction based on iText library <http://itextpdf.com/> released under the 
 - ePUBator doesn't have ads.
 - ePUBator extract text (no text in pictures).
 - ePUBator try to extract images (only png, jpg and gif) but puts them at the page's end.
-- ePUBator doesn't extract the table of contents (it creates a dummy index).
+- ePUBator try to extract the table of contents if present (or creates a dummy TOC).
 - ePUBator doesn't extract the font size and style.
 - ePUBator works fine with single column PDF (can work bad with multi column or tables).
-- ePUBator can fail extraction (17 of 100 books tested: it looks like a iText problem).
+- ePUBator can fail extraction (5 of 358 books with v0.8 on my Atrix).
+- ePUBator IS MADE FOR BOOKS, NOT FOR EVERY TYPE OF PDF (DON'T ASK IT TOO MUCH).
 
 WARNING!!!
 In the event of crash, unexpected stoppages or insufficient memory try setting Page per file to 1 and/or disable the extraction of images and try again (sometimes helps).
@@ -28,6 +29,12 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 For comment / feedback / bug / suggestion / localization / donations write to: iiizio AT users.sf.net
 
 History:
+v0.8  (2012-07-23)
+- Added TOC extraction
+- Fixed creator bug
+- Code optimization
+- Updated iText lib to 5.3.0
+
 v0.7  (2012-05-21)
 - Fixed title bug (bad ePUB)
 - Updated iText lib to 5.2.1
@@ -85,10 +92,11 @@ L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/> rilasc
 - ePUBator non ha pubblicità.
 - ePUBator estrae il testo (nessun testo dalle figure).
 - ePUBator cerca di estrarre le immagini (solo png, jpg e gif) ma le mette alla fine della pagina.
-- ePUBator non estrae l'indice del PDF (ne crea uno fittizio).
+- ePUBator cerca di estrarre l'indice dal PDF se presente (o ne crea uno fittizio).
 - ePUBator non estrae lo stile e dimensioni dei caratteri.
 - ePUBator funziona bene con i PDF a singola colonna (può essere pessimo con quelli multicolonna o le tabelle).
 - ePUBator può fallire l'estrazione (17 libri su 100 provati: sembra sia un problema di iText).
+- ePUBator E' FATTO PER I LIBRI, NON PER OGNI TIPO DI PDF (NON CHIEDETEGLI TROPPO).
 
 ATTENZIONE!!!
 Nel caso di crash, interruzioni inaspettate o memoria insufficente prova ad impostare Pagine per file a 1 e/o disabilitare l'estrazione delle immagini e riprova (a volte aiuta).
@@ -104,8 +112,14 @@ Questo programma è distribuito nella speranza che possa essere utile, ma SENZA A
 Per commenti / feedback / bug / suggerimenti / localizzazioni / donazioni scrivi a: iiizio AT users.sf.net
 
 Storico:
+v0.8  (23-07-2012)
+- Aggiunta l'estrazione del indice
+- Risolto bug del creatore
+- Ottimizazione del codice
+- Aggiornata iText lib alla 5.3.0
+
 v0.7  (21-05-2012)
-- Risolto bug del titolo (ePUB difettoso) 
+- Risolto bug del titolo
 - Aggiornata iText lib alla 5.2.1
 - Alcune ottimizazioni suggerite da Lint
 

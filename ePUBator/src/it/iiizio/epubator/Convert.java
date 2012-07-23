@@ -131,6 +131,11 @@ public class Convert extends Activity {
 		tocFromPdf = prefs.getBoolean("toc_from_pdf", true);
 	}
 
+	public void onDestroy() {
+		super.onDestroy();
+		finish();
+	}
+
 	// Set buttons state
 	private void setButtons(boolean flag) {
 		okBtEnabled = flag;
@@ -545,7 +550,7 @@ public class Convert extends Activity {
 			content.append("<package xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"BookID\" version=\"2.0\">\n");
 			content.append("    <metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:opf=\"http://www.idpf.org/2007/opf\">\n");
 			content.append("        <dc:title>" + title + "</dc:title>\n");
-			content.append("        <dc:creator>" + ReadPdf.getAuthor() + "</dc:creator>\n");
+			content.append("        <dc:creator>" + (ReadPdf.getAuthor()).replaceAll("[<>]", "_") + "</dc:creator>\n");
 			content.append("        <dc:creator opf:role=\"bkp\">ePUBator - Minimal offline PDF to ePUB converter for Android</dc:creator>\n");
 			content.append("        <dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + id + "</dc:identifier>\n");
 			content.append("        <dc:language>en</dc:language>\n");

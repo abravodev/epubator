@@ -2,17 +2,18 @@ Convertitore da PDF a ePUB minimale per Android
 
 ePUBator estrae il testo da un file PDF e lo inserisce in un file ePUB correttamente formattato (conforme con epubcheck).
 
-L'estrazione dal PDF e' basata sulla libreria iText <http://itextpdf.com/> rilasciata sotto licenza AGPL. 
+L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/> rilasciata sotto licenza AGPL. 
 
 - ePUBator non necessita di una connessione internet.
 - ePUBator non invia i tuoi documenti da qualche parte sulla rete.
-- ePUBator non ha pubblicita'.
+- ePUBator non ha pubblicità.
 - ePUBator estrae il testo (nessun testo dalle figure).
 - ePUBator cerca di estrarre le immagini (solo png, jpg e gif) ma le mette alla fine della pagina.
-- ePUBator non estrae l'indice del PDF (ne crea uno fittizio).
+- ePUBator cerca di estrarre l'indice dal PDF se presente (o ne crea uno fittizio).
 - ePUBator non estrae lo stile e dimensioni dei caratteri.
-- ePUBator funziona bene con i PDF a singola colonna (puo' essere pessimo con quelli multicolonna o le tabelle).
-- ePUBator puo' fallire l'estrazione (17 libri su 100 provati: sembra sia un problema di iText).
+- ePUBator funziona bene con i PDF a singola colonna (può essere pessimo con quelli multicolonna o le tabelle).
+- ePUBator può fallire l'estrazione (17 libri su 100 provati: sembra sia un problema di iText).
+- ePUBator E' FATTO PER I LIBRI, NON PER OGNI TIPO DI PDF (NON CHIEDETEGLI TROPPO).
 
 ATTENZIONE!!!
 Nel caso di crash, interruzioni inaspettate o memoria insufficente prova ad impostare Pagine per file a 1 e/o disabilitare l'estrazione delle immagini e riprova (a volte aiuta).
@@ -21,15 +22,21 @@ Autorizzazioni richieste:
 - WRITE_EXTERNAL_STORAGE per salvare il file ePUB
 
 Note legali:
-Questo programma e' software libero: e' possibile ridistribuirlo e/o modificarlo secondo i termini della GNU General Public License come pubblicata dalla Free Software Foundation, sia la versione 3 della licenza, o (a propria scelta) una versione successiva. 
+Questo programma è software libero: è possibile ridistribuirlo e/o modificarlo secondo i termini della GNU General Public License come pubblicata dalla Free Software Foundation, sia la versione 3 della licenza, o (a propria scelta) una versione successiva. 
 
-Questo programma e' distribuito nella speranza che possa essere utile, ma SENZA ALCUNA GARANZIA, nemmeno la garanzia implicita di COMMERCIABILITA' o IDONEITA' PER UN PARTICOLARE SCOPO. Vedere la GNU General Public License per ulteriori dettagli. 
+Questo programma è distribuito nella speranza che possa essere utile, ma SENZA ALCUNA GARANZIA, nemmeno la garanzia implicita di COMMERCIABILITÀ o IDONEITÀ PER UN PARTICOLARE SCOPO. Vedere la GNU General Public License per ulteriori dettagli. 
 
 Per commenti / feedback / bug / suggerimenti / localizzazioni / donazioni scrivi a: iiizio AT users.sf.net
 
 Storico:
+v0.8  (23-07-2012)
+- Aggiunta l'estrazione del indice
+- Risolto bug del creatore
+- Ottimizazione del codice
+- Aggiornata iText lib alla 5.3.0
+
 v0.7  (21-05-2012)
-- Risolto bug del titolo (ePUB difettoso) 
+- Risolto bug del titolo
 - Aggiornata iText lib alla 5.2.1
 - Alcune ottimizazioni suggerite da Lint
 
@@ -57,7 +64,7 @@ v0.4  (24-12-2011)
 v0.3  (24-11-2011)
 - Aggiunta anteprima
 - Aggiunta notifica
-- Aggiunta la possibilita' di fermare la conversione
+- Aggiunta la possibilità di fermare la conversione
 - Abilitato 'Muovi su SD'
 - Differenziato l'indicatore di errori e pagine perse
 - Ottimizazione del codice

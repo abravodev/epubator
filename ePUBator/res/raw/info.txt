@@ -9,10 +9,11 @@ PDF extraction based on iText library <http://itextpdf.com/> released under the 
 - ePUBator doesn't have ads.
 - ePUBator extract text (no text in pictures).
 - ePUBator try to extract images (only png, jpg and gif) but puts them at the page's end.
-- ePUBator doesn't extract the table of contents (it creates a dummy index).
+- ePUBator try to extract the table of contents if present (or creates a dummy TOC).
 - ePUBator doesn't extract the font size and style.
 - ePUBator works fine with single column PDF (can work bad with multi column or tables).
-- ePUBator can fail extraction (17 of 100 books tested: it looks like a iText problem). 
+- ePUBator can fail extraction (5 of 358 books with v0.8 on my Atrix).
+- ePUBator IS MADE FOR BOOKS, NOT FOR EVERY TYPE OF PDF (DON'T ASK IT TOO MUCH).
 
 WARNING!!!
 In the event of crash, unexpected stoppages or insufficient memory try setting Page per file to 1 and/or disable the extraction of images and try again (sometimes helps).
@@ -28,7 +29,13 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 For comment / feedback / bug / suggestion / localization / donations write to: iiizio AT users.sf.net
 
 History:
-v0.7 (2012-05-21)
+v0.8  (2012-07-23)
+- Added TOC extraction
+- Fixed creator bug
+- Code optimization
+- Updated iText lib to 5.3.0
+
+v0.7  (2012-05-21)
 - Fixed title bug (bad ePUB)
 - Updated iText lib to 5.2.1
 - Some Lint optimizations

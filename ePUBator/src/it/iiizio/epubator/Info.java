@@ -32,16 +32,28 @@ public class Info extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.infoview);
 
+		// Get about text from raw
 		TextView infoTv = (TextView)findViewById(R.id.infoview);
 		infoTv.setTextSize(18);
 		InputStream is = this.getResources().openRawResource(R.raw.info);
+		
+		StringBuilder sb = new StringBuilder();
+		int i;
 		try {
-			byte[] buffer = new byte[is.available()];
-			is.read(buffer);
-			is.close();
-			infoTv.setText(new String(buffer, "utf-8"));
+			i = is.read();
+			while (i != -1) {
+				sb.append((char) i);
+				i = is.read();
+			}
 		} catch (IOException e) {
+			// Auto-generated catch block
 			e.printStackTrace();
 		}
+		infoTv.setText(sb.toString());
+	}
+
+	public void onDestroy() {
+		super.onDestroy();
+		finish();
 	}
 }
