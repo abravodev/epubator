@@ -29,6 +29,9 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 For comment / feedback / bug / suggestion / localization / donations write to: iiizio AT users.sf.net
 
 History:
+v0.8.1  (2012-07-24)
+- Fixed null string bug
+
 v0.8  (2012-07-23)
 - Added TOC extraction
 - Fixed creator bug
@@ -112,6 +115,9 @@ Questo programma è distribuito nella speranza che possa essere utile, ma SENZA A
 Per commenti / feedback / bug / suggerimenti / localizzazioni / donazioni scrivi a: iiizio AT users.sf.net
 
 Storico:
+v0.8.1  (24-07-2012)
+- Risolto bug stringa inesistente
+
 v0.8  (23-07-2012)
 - Aggiunta l'estrazione del indice
 - Risolto bug del creatore

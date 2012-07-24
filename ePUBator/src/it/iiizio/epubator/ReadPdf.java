@@ -59,12 +59,20 @@ public class ReadPdf {
 
 	// Title
 	public static String getTitle() {
-		return info.get("Title");
+		String title = info.get("Title");
+		if (title != null) {
+			return title;
+		}
+		return "";
 	}
 
 	// Author
 	public static String getAuthor() {
-		return info.get("Author");
+		String author = info.get("Author");
+		if (author != null) {
+			return author;
+		}
+		return "";
 	}
 
 	// Extract text
