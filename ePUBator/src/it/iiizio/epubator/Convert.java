@@ -620,22 +620,26 @@ public class Convert extends Activity {
 							String action = parser.getValue(e, "Action");
 							if (action.equals("GoTo")) {
 								String chapter = parser.getElementValue(e).trim();
-								int page = Integer.valueOf(parser.getValue(e, "Page").split(" ")[0]);
-								if (page > lastPage) {
-									int pageFile = ((int) ((lastPage - 1) / pagesPerFile)) * pagesPerFile + 1;
-									toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
-									toc.append("            <navLabel>\n");
-									toc.append("                <text>" + sb.toString() + "</text>\n");
-									toc.append("            </navLabel>\n");
-									toc.append("            <content src=\"page" + pageFile + ".html#page" + lastPage + "\"/>\n");
-									toc.append("        </navPoint>\n");
-									playOrder += 1;
+								try {
+									int page = Integer.valueOf(parser.getValue(e, "Page").split(" ")[0]);
+									if (page > lastPage) {
+										int pageFile = ((int) ((lastPage - 1) / pagesPerFile)) * pagesPerFile + 1;
+										toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
+										toc.append("            <navLabel>\n");
+										toc.append("                <text>" + sb.toString() + "</text>\n");
+										toc.append("            </navLabel>\n");
+										toc.append("            <content src=\"page" + pageFile + ".html#page" + lastPage + "\"/>\n");
+										toc.append("        </navPoint>\n");
+										playOrder += 1;
 
-									sb = new StringBuilder();
+										sb = new StringBuilder();
+									}
+									sb.append(chapter);
+									sb.append("\n");
+									lastPage = page;
+								} catch (RuntimeException ex) {
+									System.err.println("RuntimeException in xml extraction " + ex.getMessage());
 								}
-								sb.append(chapter);
-								sb.append("\n");
-								lastPage = page;
 							}
 							extractedToc = true;
 						}
