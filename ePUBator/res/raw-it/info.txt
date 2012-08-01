@@ -7,12 +7,12 @@ L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/> rilasc
 - ePUBator non necessita di una connessione internet.
 - ePUBator non invia i tuoi documenti da qualche parte sulla rete.
 - ePUBator non ha pubblicità.
-- ePUBator estrae il testo (nessun testo dalle figure).
+- ePUBator estrae il testo (nessun testo dalle figure o da PDF raster).
 - ePUBator cerca di estrarre le immagini (solo png, jpg e gif) ma le mette alla fine della pagina.
 - ePUBator cerca di estrarre l'indice dal PDF se presente (o ne crea uno fittizio).
 - ePUBator non estrae lo stile e dimensioni dei caratteri.
 - ePUBator funziona bene con i PDF a singola colonna (può essere pessimo con quelli multicolonna o le tabelle).
-- ePUBator può fallire l'estrazione (17 libri su 100 provati: sembra sia un problema di iText).
+- ePUBator può fallire l'estrazione (5 of 358 libri con la v0.8.1 sul mio Atrix).
 - ePUBator E' FATTO PER I LIBRI, NON PER OGNI TIPO DI PDF (NON CHIEDETEGLI TROPPO).
 
 ATTENZIONE!!!

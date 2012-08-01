@@ -7,12 +7,12 @@ PDF extraction based on iText library <http://itextpdf.com/> released under the 
 - ePUBator doesn't need internet connection.
 - ePUBator doesn't send your docs somewhere on the net.
 - ePUBator doesn't have ads.
-- ePUBator extract text (no text in pictures).
+- ePUBator extract text (no text in pictures or in raster PDF).
 - ePUBator try to extract images (only png, jpg and gif) but puts them at the page's end.
 - ePUBator try to extract the table of contents if present (or creates a dummy TOC).
 - ePUBator doesn't extract the font size and style.
 - ePUBator works fine with single column PDF (can work bad with multi column or tables).
-- ePUBator can fail extraction (5 of 358 books with v0.8 on my Atrix).
+- ePUBator can fail extraction (5 of 358 books with v0.8.1 on my Atrix).
 - ePUBator IS MADE FOR BOOKS, NOT FOR EVERY TYPE OF PDF (DON'T ASK IT TOO MUCH).
 
 WARNING!!!
@@ -93,12 +93,12 @@ L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/> rilasc
 - ePUBator non necessita di una connessione internet.
 - ePUBator non invia i tuoi documenti da qualche parte sulla rete.
 - ePUBator non ha pubblicità.
-- ePUBator estrae il testo (nessun testo dalle figure).
+- ePUBator estrae il testo (nessun testo dalle figure o da PDF raster).
 - ePUBator cerca di estrarre le immagini (solo png, jpg e gif) ma le mette alla fine della pagina.
 - ePUBator cerca di estrarre l'indice dal PDF se presente (o ne crea uno fittizio).
 - ePUBator non estrae lo stile e dimensioni dei caratteri.
 - ePUBator funziona bene con i PDF a singola colonna (può essere pessimo con quelli multicolonna o le tabelle).
-- ePUBator può fallire l'estrazione (17 libri su 100 provati: sembra sia un problema di iText).
+- ePUBator può fallire l'estrazione (5 of 358 libri con la v0.8.1 sul mio Atrix).
 - ePUBator E' FATTO PER I LIBRI, NON PER OGNI TIPO DI PDF (NON CHIEDETEGLI TROPPO).
 
 ATTENZIONE!!!

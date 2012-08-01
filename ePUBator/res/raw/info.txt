@@ -7,12 +7,12 @@ PDF extraction based on iText library <http://itextpdf.com/> released under the 
 - ePUBator doesn't need internet connection.
 - ePUBator doesn't send your docs somewhere on the net.
 - ePUBator doesn't have ads.
-- ePUBator extract text (no text in pictures).
+- ePUBator extract text (no text in pictures or in raster PDF).
 - ePUBator try to extract images (only png, jpg and gif) but puts them at the page's end.
 - ePUBator try to extract the table of contents if present (or creates a dummy TOC).
 - ePUBator doesn't extract the font size and style.
 - ePUBator works fine with single column PDF (can work bad with multi column or tables).
-- ePUBator can fail extraction (5 of 358 books with v0.8 on my Atrix).
+- ePUBator can fail extraction (5 of 358 books with v0.8.1 on my Atrix).
 - ePUBator IS MADE FOR BOOKS, NOT FOR EVERY TYPE OF PDF (DON'T ASK IT TOO MUCH).
 
 WARNING!!!
