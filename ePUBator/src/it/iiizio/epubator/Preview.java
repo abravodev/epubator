@@ -97,12 +97,14 @@ public class Preview extends Activity {
 		pageNumber += diff;
 
 		// Set buttons
-		if (pageNumber == 1) {
+		if (pageNumber <= 1) {
+			pageNumber = 1;
 			prevBt.setEnabled(false);
 		} else {
 			prevBt.setEnabled(true);
 		}
-		if  (pageNumber == pages) {
+		if  (pageNumber >= pages) {
+			pageNumber = pages;
 			nextBt.setEnabled(false);
 		} else {
 			nextBt.setEnabled(true);
