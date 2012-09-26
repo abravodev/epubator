@@ -805,10 +805,10 @@ public class Convert extends Activity {
 						sb.append("\n<br/>");
 					else {
 						int ci = 0xffff & c;
-						if (ci < 160 )
+						if (ci < 160 ) {
 							// nothing special only 7 Bit
 							sb.append(c);
-						else {
+						} else {
 							// Not 7 Bit use the unicode system
 							sb.append("&#");
 							sb.append(Integer.valueOf(ci).toString());

@@ -11,12 +11,18 @@ L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/> rilasc
 - ePUBator cerca di estrarre le immagini (solo png, jpg e gif) ma le mette alla fine della pagina.
 - ePUBator cerca di estrarre l'indice dal PDF se presente (o ne crea uno fittizio).
 - ePUBator non estrae lo stile e dimensioni dei caratteri.
+- ePUBator mette il file ePUB nella stessa cartella del file PDF.
+- ePUBator usa il nome del file PDF per generare il nome del file ePUB e il titolo di copertina.
 - ePUBator funziona bene con i PDF a singola colonna (può essere pessimo con quelli multicolonna o le tabelle).
 - ePUBator può fallire l'estrazione (5 of 358 libri con la v0.8.1 sul mio Atrix).
 - ePUBator E' FATTO PER I LIBRI, NON PER OGNI TIPO DI PDF (NON CHIEDETEGLI TROPPO).
 
 ATTENZIONE!!!
 Nel caso di crash, interruzioni inaspettate o memoria insufficente prova ad impostare Pagine per file a 1 e/o disabilitare l'estrazione delle immagini e riprova (a volte aiuta).
+
+Ho convertito parecchi libri italiani (e alcuni in inglese) con ePUBator, ma con qualcuno la conversione fallisce (PDF scannerizzati, colonne, caratteri in ordine errato).
+
+Non ho mai provato pdf con caratteri arabi o asiatici, scrittura da destra a sinistra o verticale e non so se (e come) la libreria iText li gestisce. Mi dispiace.
 
 Autorizzazioni richieste:
 - WRITE_EXTERNAL_STORAGE per salvare il file ePUB
@@ -28,7 +34,13 @@ Questo programma è distribuito nella speranza che possa essere utile, ma SENZA A
 
 Per commenti / feedback / bug / suggerimenti / localizzazioni / donazioni scrivi a: iiizio AT users.sf.net
 
+Puoi trovare i sorgenti e tutti i file apk su sourceforge: https://sourceforge.net/p/epubator/home/Home/
+
 Storico:
+v0.9  (26-09-2012)
+- Corretti alcuni bug
+- Aggiornata iText lib alla 5.3.3
+
 v0.8.1  (24-07-2012)
 - Risolto bug stringa inesistente
 
