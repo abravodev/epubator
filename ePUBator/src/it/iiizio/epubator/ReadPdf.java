@@ -105,7 +105,12 @@ public class ReadPdf {
 
 	// Extract bookmarks
 	public static String getBookmarks() {
-		List<HashMap<String, Object>> list = SimpleBookmark.getBookmark(reader);
+		List<HashMap<String, Object>> list;
+		try {
+			list = SimpleBookmark.getBookmark(reader);
+		} catch (ClassCastException e) {
+			return "";
+		}
 		if (list == null) {
 			return "";
 		}
