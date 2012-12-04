@@ -117,7 +117,7 @@ public class ReadPdf {
 		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
         try {
-			SimpleBookmark.exportToXML(list, baos, "ISO8859-1", true);
+			SimpleBookmark.exportToXML(list, baos, "UTF-8", false);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

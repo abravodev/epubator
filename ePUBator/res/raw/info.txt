@@ -11,7 +11,7 @@ PDF extraction based on iText library <http://itextpdf.com/> released under the 
 - ePUBator try to extract images (only png, jpg and gif) but puts them at the page's end.
 - ePUBator try to extract the table of contents if present (or creates a dummy TOC).
 - ePUBator doesn't extract the font size and style.
-- ePUBator put the ePUB file in the same folder of PDF file.
+- ePUBator save the ePUB file in the same folder of PDF file.
 - ePUBator uses the PDF filename to generate ePUB filename and the title in the frontpage.
 - ePUBator works fine with single column PDF (can work bad with multi column or tables).
 - ePUBator can fail extraction (5 of 358 books with v0.8.1 on my Atrix).

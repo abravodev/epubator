@@ -11,7 +11,7 @@ L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/> rilasc
 - ePUBator cerca di estrarre le immagini (solo png, jpg e gif) ma le mette alla fine della pagina.
 - ePUBator cerca di estrarre l'indice dal PDF se presente (o ne crea uno fittizio).
 - ePUBator non estrae lo stile e dimensioni dei caratteri.
-- ePUBator mette il file ePUB nella stessa cartella del file PDF.
+- ePUBator salva il file ePUB nella stessa cartella del file PDF.
 - ePUBator usa il nome del file PDF per generare il nome del file ePUB e il titolo di copertina.
 - ePUBator funziona bene con i PDF a singola colonna (può essere pessimo con quelli multicolonna o le tabelle).
 - ePUBator può fallire l'estrazione (5 of 358 libri con la v0.8.1 sul mio Atrix).

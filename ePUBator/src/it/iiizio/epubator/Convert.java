@@ -626,7 +626,7 @@ public class Convert extends Activity {
 										int pageFile = ((int) ((lastPage - 1) / pagesPerFile)) * pagesPerFile + 1;
 										toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
 										toc.append("            <navLabel>\n");
-										toc.append("                <text>" + sb.toString() + "</text>\n");
+										toc.append("                <text>" + sb.toString() + "                </text>\n");
 										toc.append("            </navLabel>\n");
 										toc.append("            <content src=\"page" + pageFile + ".html#page" + lastPage + "\"/>\n");
 										toc.append("        </navPoint>\n");
