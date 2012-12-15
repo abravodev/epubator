@@ -131,11 +131,6 @@ public class Convert extends Activity {
 		tocFromPdf = prefs.getBoolean("toc_from_pdf", true);
 	}
 
-	public void onDestroy() {
-		super.onDestroy();
-		finish();
-	}
-
 	// Set buttons state
 	private void setButtons(boolean flag) {
 		okBtEnabled = flag;

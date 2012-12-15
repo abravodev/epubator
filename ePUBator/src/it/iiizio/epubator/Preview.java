@@ -78,11 +78,6 @@ public class Preview extends Activity {
 		nextBt.setOnClickListener(mNextListener);
 	}
 
-	public void onDestroy() {
-		super.onDestroy();
-		finish();
-	}
-
 	// Show page
 	private void showPage(int diff) {
 		// No pages

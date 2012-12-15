@@ -51,9 +51,4 @@ public class Info extends Activity {
 		}
 		infoTv.setText(sb.toString());
 	}
-
-	public void onDestroy() {
-		super.onDestroy();
-		finish();
-	}
 }

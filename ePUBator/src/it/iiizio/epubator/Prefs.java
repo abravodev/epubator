@@ -28,9 +28,4 @@ public class Prefs extends PreferenceActivity {
 
 		addPreferencesFromResource(R.xml.prefs);
 	}
-
-	public void onDestroy() {
-		super.onDestroy();
-		finish();
-	}
 }

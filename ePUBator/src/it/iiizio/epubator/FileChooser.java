@@ -276,9 +276,4 @@ public class FileChooser extends ListActivity {
 			RelativeLayout row;
 		}
 	}
-
-	public void onDestroy() {
-		super.onDestroy();
-		finish();
-	}
 }

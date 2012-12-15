@@ -46,9 +46,4 @@ public class License extends Activity {
 			e.printStackTrace();
 		}
 	}
-
-	public void onDestroy() {
-		super.onDestroy();
-		finish();
-	}
 }
