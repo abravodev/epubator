@@ -605,6 +605,7 @@ public class Convert extends Activity {
 				XMLParser parser = new XMLParser();
 				Document doc = parser.getDomElement(ReadPdf.getBookmarks());
 				if (doc != null) {
+					doc.normalize();
 					NodeList nl = doc.getElementsByTagName("Title");
 					if (nl != null) {
 						int lastPage = Integer.MAX_VALUE;
