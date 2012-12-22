@@ -24,6 +24,8 @@ Ho convertito parecchi libri italiani (e alcuni in inglese) con ePUBator, ma con
 
 Non ho mai provato pdf con caratteri arabi o asiatici, scrittura da destra a sinistra o verticale e non so se (e come) la libreria iText li gestisce. Mi dispiace.
 
+In alcuni libri si possono trovare caratteri errati (ad esempio Øø invece di éù), sembra sia un problema di iText (un'altra libreria PDF estrae lo stesso testo correttamente). Ne sto cercando una migliore, gratuita e compatibile con Android.
+
 Autorizzazioni richieste:
 - WRITE_EXTERNAL_STORAGE per salvare il file ePUB
 
@@ -32,11 +34,16 @@ Questo programma è software libero: è possibile ridistribuirlo e/o modificarlo s
 
 Questo programma è distribuito nella speranza che possa essere utile, ma SENZA ALCUNA GARANZIA, nemmeno la garanzia implicita di COMMERCIABILITÀ o IDONEITÀ PER UN PARTICOLARE SCOPO. Vedere la GNU General Public License per ulteriori dettagli. 
 
-Per commenti / feedback / bug / suggerimenti / localizzazioni / donazioni scrivi a: iiizio AT users.sf.net
+Per commenti / feedback / bug / suggerimenti / localizzazioni scrivi a: iiizio AT users.sf.net
 
-Puoi trovare i sorgenti e tutti i file apk su sourceforge: https://sourceforge.net/p/epubator/home/Home/
+Per sorgenti / tutti i file apk / donazioni vai su sourceforge: https://sourceforge.net/p/epubator/home/Home/
 
 Storico:
+v0.10  (22-12-2012)
+- Migliorata l'estrazione del indice
+- Corretta chiusura alla rotazione
+- Aggiornata iText lib alla 5.3.5
+
 v0.9  (26-09-2012)
 - Corretti alcuni bug
 - Aggiornata iText lib alla 5.3.3

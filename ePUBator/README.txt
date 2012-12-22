@@ -24,6 +24,8 @@ I converted a lot of books (italians and some english) with ePUBator, but with s
 
 I never try with arabic or asian characters, right to left or vertical writing and I don't know if (and how) the iText library can manage those pdf. I'm sorry.
 
+On some books we can find wrong chars (e.g. Øø instead of éù), it seems a iText's problem (another PDF library extract the same text correctly). I'm looking for a better one, free and Android compatible.
+
 Permissions required:
 - WRITE_EXTERNAL_STORAGE for save the ePUB file
 
@@ -32,11 +34,16 @@ This program is free software: you can redistribute it and/or modify it under th
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-For comment / feedback / bug / suggestion / localization / donations write to: iiizio AT users.sf.net
+For comment / feedback / bug / suggestion / localization write to: iiizio AT users.sf.net
 
-You can find sources and all apk files on sourceforge: https://sourceforge.net/p/epubator/home/Home/
+For sources / all apk files / donations go to sourceforge: https://sourceforge.net/p/epubator/home/Home/
 
 History:
+v0.10  (2012-12-22)
+- Improved TOC extraction 
+- Fixed close on rotate
+- Updated iText lib to 5.3.5
+
 v0.9  (2012-09-26)
 - Fixed some bugs
 - Updated iText lib to 5.3.3
@@ -122,6 +129,8 @@ Ho convertito parecchi libri italiani (e alcuni in inglese) con ePUBator, ma con
 
 Non ho mai provato pdf con caratteri arabi o asiatici, scrittura da destra a sinistra o verticale e non so se (e come) la libreria iText li gestisce. Mi dispiace.
 
+In alcuni libri si possono trovare caratteri errati (ad esempio Øø invece di éù), sembra sia un problema di iText (un'altra libreria PDF estrae lo stesso testo correttamente). Ne sto cercando una migliore, gratuita e compatibile con Android.
+
 Autorizzazioni richieste:
 - WRITE_EXTERNAL_STORAGE per salvare il file ePUB
 
@@ -130,11 +139,16 @@ Questo programma è software libero: è possibile ridistribuirlo e/o modificarlo s
 
 Questo programma è distribuito nella speranza che possa essere utile, ma SENZA ALCUNA GARANZIA, nemmeno la garanzia implicita di COMMERCIABILITÀ o IDONEITÀ PER UN PARTICOLARE SCOPO. Vedere la GNU General Public License per ulteriori dettagli. 
 
-Per commenti / feedback / bug / suggerimenti / localizzazioni / donazioni scrivi a: iiizio AT users.sf.net
+Per commenti / feedback / bug / suggerimenti / localizzazioni scrivi a: iiizio AT users.sf.net
 
-Puoi trovare i sorgenti e tutti i file apk su sourceforge: https://sourceforge.net/p/epubator/home/Home/
+Per sorgenti / tutti i file apk / donazioni vai su sourceforge: https://sourceforge.net/p/epubator/home/Home/
 
 Storico:
+v0.10  (22-12-2012)
+- Migliorata l'estrazione del indice
+- Corretta chiusura alla rotazione
+- Aggiornata iText lib alla 5.3.5
+
 v0.9  (26-09-2012)
 - Corretti alcuni bug
 - Aggiornata iText lib alla 5.3.3
