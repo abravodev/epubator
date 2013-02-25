@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="app_name">ePUBator</string>
     <string name="convert">Convert</string>
     <string name="preview">Preview</string>
+    <string name="cip">Conversion in progress</string>
+    <string name="wrongfile">Sorry, ePUBator can\'t handle this file</string>
     
     <!-- Menu -->
     <string name="prefs">Settings</string>
@@ -66,7 +68,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
     <!-- Convert -->
     <string name="read_error">"Can't read ePUB file"</string>
-    <string name="cip">Conversion in progress</string>
     <string name="heading">"ePUBator - ©2011 Ezio Querini\nMinimal offline PDF to ePUB converter for Android\n"</string>
     <string name="library">"PDF extraction based on iText software library released under the AGPL license\n\n"</string>
     <string name="deleted">ePUB file deleted</string>
