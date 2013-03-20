@@ -48,7 +48,6 @@ public class ePUBator extends Activity {
 	    // To get the action of the intent use
 	    String action = intent.getAction();
 	    if (action.equals(Intent.ACTION_VIEW)) {
-	    	System.out.println(intent.getDataString());
 			filename = intent.getDataString().replaceAll("%20", " ");
 			if (filename.startsWith("file://")) {
 				filename = filename.replace("file://", "");
@@ -121,7 +120,6 @@ public class ePUBator extends Activity {
 	// Start conversion or preview
 	protected void pickActivity() {
 			path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
-	    	System.out.println(filename);
 
 			if (filename.endsWith(PDF_EXT)) {
 				Intent convert = new Intent(ePUBator.this, Convert.class);
