@@ -618,6 +618,16 @@ public class Convert extends Activity {
 								String chapter = parser.getElementValue(e).trim();
 								try {
 									int page = Integer.valueOf(parser.getValue(e, "Page").split(" ")[0]);
+									
+									// First entry not in page one, create a dummy one
+									if ((lastPage == Integer.MAX_VALUE) && (page > 1))
+									{
+										sb.append(title);
+										sb.append("\n");
+										lastPage = 1;
+									}
+									
+									// Add entry in toc
 									if (page > lastPage) {
 										int pageFile = ((int) ((lastPage - 1) / pagesPerFile)) * pagesPerFile + 1;
 										toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
@@ -630,6 +640,8 @@ public class Convert extends Activity {
 
 										sb = new StringBuilder();
 									}
+									
+									// Set next entry
 									sb.append(chapter);
 									sb.append("\n");
 									lastPage = page;
@@ -639,11 +651,13 @@ public class Convert extends Activity {
 							}
 							extractedToc = true;
 						}
+						
+						// Add last entry
 						if (sb.length() > 0) {
 							int pageFile = ((int) ((lastPage - 1) / pagesPerFile)) * pagesPerFile + 1;
 							toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
 							toc.append("            <navLabel>\n");
-							toc.append("                <text>" + sb.toString() + "</text>\n");
+							toc.append("                <text>" + sb.toString() + "                </text>\n");
 							toc.append("            </navLabel>\n");
 							toc.append("            <content src=\"page" + pageFile + ".html#page" + lastPage + "\"/>\n");
 							toc.append("        </navPoint>\n");
