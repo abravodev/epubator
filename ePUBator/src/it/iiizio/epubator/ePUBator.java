@@ -18,7 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package it.iiizio.epubator;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.Menu;
@@ -31,7 +33,8 @@ import android.widget.Toast;
 
 public class ePUBator extends Activity {
 	String filename = "";
-	static String path = Environment.getExternalStorageDirectory().getPath();
+	static String path;
+	SharedPreferences sharedPref;
 	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
 
@@ -43,6 +46,10 @@ public class ePUBator extends Activity {
 
 		((Button) findViewById(R.id.convert)).setOnClickListener(mConvertListener);
 		((Button) findViewById(R.id.preview)).setOnClickListener(mPreviewListener);
+		
+		sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+		path = sharedPref.getString("path", Environment.getExternalStorageDirectory().getPath());
+		System.out.println("@"+path+"@");
 		
 	    Intent intent = getIntent();
 	    // To get the action of the intent use
@@ -120,7 +127,10 @@ public class ePUBator extends Activity {
 	// Start conversion or preview
 	protected void pickActivity() {
 			path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
-
+			SharedPreferences.Editor editor = sharedPref.edit();
+			editor.putString("path", path);
+			editor.commit();
+			
 			if (filename.endsWith(PDF_EXT)) {
 				Intent convert = new Intent(ePUBator.this, Convert.class);
 				convert.putExtra("filename", filename);
