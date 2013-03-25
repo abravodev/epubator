@@ -34,7 +34,7 @@ import android.widget.Toast;
 public class ePUBator extends Activity {
 	String filename = "";
 	static String path;
-	SharedPreferences sharedPref;
+	private SharedPreferences sharedPref;
 	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
 
@@ -47,11 +47,12 @@ public class ePUBator extends Activity {
 		((Button) findViewById(R.id.convert)).setOnClickListener(mConvertListener);
 		((Button) findViewById(R.id.preview)).setOnClickListener(mPreviewListener);
 		
+	    Intent intent = getIntent();
+		
+		// Get last path
 		sharedPref = this.getPreferences(Context.MODE_PRIVATE);
 		path = sharedPref.getString("path", Environment.getExternalStorageDirectory().getPath());
-		System.out.println("@"+path+"@");
-		
-	    Intent intent = getIntent();
+
 	    // To get the action of the intent use
 	    String action = intent.getAction();
 	    if (action.equals(Intent.ACTION_VIEW)) {
@@ -126,21 +127,21 @@ public class ePUBator extends Activity {
 
 	// Start conversion or preview
 	protected void pickActivity() {
-			path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
-			SharedPreferences.Editor editor = sharedPref.edit();
-			editor.putString("path", path);
-			editor.commit();
-			
-			if (filename.endsWith(PDF_EXT)) {
-				Intent convert = new Intent(ePUBator.this, Convert.class);
-				convert.putExtra("filename", filename);
-				startActivity(convert);
-			} else if (filename.endsWith(EPUB_EXT)) {
-				Intent preview = new Intent(ePUBator.this, Preview.class);
-				preview.putExtra("filename", filename);
-				startActivity(preview);
-			} else {
-				Toast.makeText(getApplicationContext(), getResources().getString(R.string.wrongfile), Toast.LENGTH_SHORT).show();
-			}
+		path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
+		SharedPreferences.Editor editor = sharedPref.edit();
+		editor.putString("path", path);
+		editor.commit();
+
+		if (filename.endsWith(PDF_EXT)) {
+			Intent convert = new Intent(ePUBator.this, Convert.class);
+			convert.putExtra("filename", filename);
+			startActivity(convert);
+		} else if (filename.endsWith(EPUB_EXT)) {
+			Intent preview = new Intent(ePUBator.this, Preview.class);
+			preview.putExtra("filename", filename);
+			startActivity(preview);
+		} else {
+			Toast.makeText(getApplicationContext(), getResources().getString(R.string.wrongfile), Toast.LENGTH_SHORT).show();
+		}
 	}
 }

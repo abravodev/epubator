@@ -20,6 +20,7 @@ package it.iiizio.epubator;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -43,6 +44,7 @@ public class FileChooser extends ListActivity {
 	private ListView lv;
 	private boolean showAllFiles;
 	private boolean hideDetail;
+	private String history;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -67,6 +69,23 @@ public class FileChooser extends ListActivity {
 			}
 		}
 
+		// Update path history
+		SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+		history = sharedPref.getString("history", "");
+		SharedPreferences.Editor editor = sharedPref.edit();
+		history = path + "|" + history.replace(path + "|", "");
+		String[] items = history.split("\\|");
+		if (items.length > 8) {
+			StringBuilder sb = new StringBuilder();
+			for (int k = 0;  k < 8; k++) {
+				sb.append(items[k]);
+				sb.append("|");
+			}
+			history = sb.toString();
+		}
+		editor.putString("history", history);
+		editor.commit();
+
 		// Set up ListView
 		lv = getListView();
 		lv.setTextFilterEnabled(true);
@@ -81,9 +100,16 @@ public class FileChooser extends ListActivity {
 						path = chosen;
 					} else if (chosen == "../") {
 						path = path.substring(0, path.lastIndexOf('/', path.length() - 2) + 1);
+					} else if (chosen.startsWith("/")) {
+						path = chosen;
 					} else {
 						path += chosen;
 					}
+					setFileList(path, filter);
+
+				} else if (chosen == getResources().getString(R.string.recent_title)) {
+					setRecentFolders();
+				} else if (chosen == getResources().getString(R.string.back_title)) {
 					setFileList(path, filter);
 				} else {
 					// File chosen
@@ -107,6 +133,14 @@ public class FileChooser extends ListActivity {
 		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
 		showAllFiles = prefs.getBoolean("show_all_files", false);
 		hideDetail = prefs.getBoolean("hide_detail", false);
+
+		// Add Recent folders
+		item = new FileChooserList();
+		item.setName(getResources().getString(R.string.recent_title));
+		item.setSize(getResources().getString(R.string.recent_summary));
+		item.setDate("");
+		item.setEnabled(true);
+		fileChooserList.add(item);
 
 		// Add Root & Up
 		if (dirPath.length() > 1) {
@@ -154,6 +188,48 @@ public class FileChooser extends ListActivity {
 						item.setSize(String.format("%d Byte", file.length()));
 						item.setDate(getDateTime(file));
 						item.setEnabled(false);
+						fileChooserList.add(item);
+					}
+				}
+			}
+		}
+
+		// Update screen
+		lv.clearTextFilter();
+		((TextView) findViewById(R.id.path)).setText(String.format(getResources().getString(R.string.path), path));
+        lv.setAdapter(new FileChooserAdapter(this, fileChooserList));
+	}
+	
+	// Fill Recent folders
+	private void setRecentFolders() {
+		ArrayList<FileChooserList> fileChooserList = new ArrayList<FileChooserList>();
+		FileChooserList item;
+		
+		// Get preferences
+		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
+		showAllFiles = prefs.getBoolean("show_all_files", false);
+
+		// Add Back
+		item = new FileChooserList();
+		item.setName(getResources().getString(R.string.back_title));
+		item.setSize(getResources().getString(R.string.back_summary));
+		item.setDate("");
+		item.setEnabled(true);
+		fileChooserList.add(item);
+
+		// Add filenames
+		String[] folders = history.split("\\|");
+		if (folders.length > 0) {
+			for(String folder : folders) {
+				File file = new File (folder);
+				if((!file.isHidden()) && (file.canRead())) {
+					if (file.isDirectory()) {
+						// Folder
+						item = new FileChooserList();
+						item.setName(folder);
+						item.setSize(getResources().getString(R.string.folder));
+						item.setDate(getDateTime(file));
+						item.setEnabled(true);
 						fileChooserList.add(item);
 					}
 				}

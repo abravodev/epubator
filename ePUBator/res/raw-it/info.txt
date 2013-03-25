@@ -1,4 +1,4 @@
-Convertitore da PDF a ePUB minimale per Android
+Convertitore da PDF a ePUB minimale per Android - ©2011 Ezio Querini
 
 ePUBator estrae il testo da un file PDF e lo inserisce in un file ePUB correttamente formattato (conforme con epubcheck).
 

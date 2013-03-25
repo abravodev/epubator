@@ -65,7 +65,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="root">Cartella principale</string>
     <string name="up">Cartella superiore</string>
 	<string name="folder">Cartella</string>
-
+    <string name="recent_title">Cartelle recenti</string>
+    <string name="recent_summary">Seleziona una delle cartelle usate in precedenza</string>
+    <string name="back_title">Indietro</string>
+	<string name="back_summary">Ritorna al selettore dei files</string>
+	
     <!-- Convert -->
     <string name="read_error">Non posso leggere il file ePUB</string>
     <string name="heading">"ePUBator - ©2011 Ezio Querini\nConvertitore da PDF a ePUB minimale per Android\n"</string>

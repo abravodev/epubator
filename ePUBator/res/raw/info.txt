@@ -1,4 +1,4 @@
-Minimal offline PDF to ePUB converter for Android
+Minimal offline PDF to ePUB converter for Android - ©2011 Ezio Querini
 
 ePUBator extract text from a PDF file and put it in a well formed (epubcheck compliant) ePUB file.
 
