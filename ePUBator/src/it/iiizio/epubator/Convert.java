@@ -688,7 +688,7 @@ public class Convert extends Activity {
 		// Create html
 		private String createHtml(String title, String body) {
 			StringBuilder html = new StringBuilder();
-			html.append("  <!DOCTYPE html PUBLIC \"-//WAPFORUM//DTD XHTML Mobile 1.0//EN\" \n");
+			html.append("  <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n");
 			html.append("  \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n");
 			html.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">\n");
 			html.append("<head>\n");
