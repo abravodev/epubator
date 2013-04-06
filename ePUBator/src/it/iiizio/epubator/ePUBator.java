@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.view.MenuCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -65,9 +66,11 @@ public class ePUBator extends Activity {
 	}
 
 	// Inflate menu
+	@SuppressWarnings("deprecation")
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
+		MenuCompat.setShowAsAction(menu.findItem(R.id.prefs), 1);
 		return true;
 	}
 
