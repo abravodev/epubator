@@ -4,18 +4,15 @@ ePUBator estrae il testo da un file PDF e lo inserisce in un file ePUB correttam
 
 L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/> rilasciata sotto licenza AGPL. 
 
-- ePUBator non necessita di una connessione internet.
-- ePUBator non invia i tuoi documenti da qualche parte sulla rete.
-- ePUBator non ha pubblicità.
+- ePUBator E' FATTO PER I LIBRI, NON PER OGNI TIPO DI PDF (NON CHIEDETEGLI TROPPO).
+- ePUBator non necessita di una connessione internet (non invia i tuoi documenti da qualche parte sulla rete, non ha pubblicità).
 - ePUBator estrae il testo (nessun testo dalle figure o da PDF raster).
 - ePUBator cerca di estrarre le immagini (solo png, jpg e gif) ma le mette alla fine della pagina.
 - ePUBator cerca di estrarre l'indice dal PDF se presente (o ne crea uno fittizio).
-- ePUBator non estrae lo stile e dimensioni dei caratteri.
-- ePUBator salva il file ePUB nella stessa cartella del file PDF.
-- ePUBator usa il nome del file PDF per generare il nome del file ePUB e il titolo di copertina.
-- ePUBator funziona bene con i PDF a singola colonna (può essere pessimo con quelli multicolonna o le tabelle).
+- ePUBator non estrae lo stile e le dimensioni dei caratteri.
+- ePUBator salva il file ePUB nella stessa cartella del file PDF (usa il nome del file PDF per generare il nome del file ePUB e il titolo di copertina, quindi rinomina il PDF prima della conversione).
+- ePUBator funziona bene solo con i PDF a singola colonna (peggio con quelli multicolonna o le tabelle).
 - ePUBator può fallire l'estrazione (5 of 358 libri con la v0.8.1 sul mio Atrix).
-- ePUBator E' FATTO PER I LIBRI, NON PER OGNI TIPO DI PDF (NON CHIEDETEGLI TROPPO).
 
 ATTENZIONE!!!
 Nel caso di crash, interruzioni inaspettate o memoria insufficente prova ad impostare Pagine per file a 1 e/o disabilitare l'estrazione delle immagini e riprova (a volte aiuta).
@@ -39,6 +36,14 @@ Per commenti / feedback / bug / suggerimenti / localizzazioni scrivi a: iiizio A
 Per sorgenti / tutti i file apk / donazioni vai su sourceforge: https://sourceforge.net/p/epubator/home/Home/
 
 Storico:
+v0.11  (07-04-2013)
+- Aggiunto apri con ePUBator
+- Aggiunto selettore delle cartelle recenti
+- Aggiunto capitolo fittizio per la prima pagina
+- Aggiunta libreria di supporto
+- Aggiornata iText lib alla 5.4.0
+- Alcune correzioni e miglioramenti minori
+
 v0.10  (22-12-2012)
 - Migliorata l'estrazione del indice
 - Corretta chiusura alla rotazione

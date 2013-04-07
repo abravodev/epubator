@@ -4,18 +4,15 @@ ePUBator extract text from a PDF file and put it in a well formed (epubcheck com
 
 PDF extraction based on iText library <http://itextpdf.com/> released under the AGPL license. 
 
-- ePUBator doesn't need internet connection.
-- ePUBator doesn't send your docs somewhere on the net.
-- ePUBator doesn't have ads.
-- ePUBator extract text (no text in pictures or in raster PDF).
+- ePUBator IS MADE FOR BOOKS, NOT FOR EVERY TYPE OF PDF (DON'T ASK IT TOO MUCH).
+- ePUBator doesn't need internet connection (doesn't send your docs somewhere on the net, doesn't have ads).
+- ePUBator extract text (no text from pictures or from raster PDF).
 - ePUBator try to extract images (only png, jpg and gif) but puts them at the page's end.
 - ePUBator try to extract the table of contents if present (or creates a dummy TOC).
 - ePUBator doesn't extract the font size and style.
-- ePUBator save the ePUB file in the same folder of PDF file.
-- ePUBator uses the PDF filename to generate ePUB filename and the title in the frontpage.
-- ePUBator works fine with single column PDF (can work bad with multi column or tables).
+- ePUBator save the ePUB file in the same folder of PDF file (it uses the PDF filename to generate ePUB filename and the title in the frontpage, so rename the PDF before conversion).
+- ePUBator works fine only with single column PDF (worse with multi column or tables).
 - ePUBator can fail extraction (5 of 358 books with v0.8.1 on my Atrix).
-- ePUBator IS MADE FOR BOOKS, NOT FOR EVERY TYPE OF PDF (DON'T ASK IT TOO MUCH).
 
 WARNING!!!
 In the event of crash, unexpected stoppages or insufficient memory try setting Page per file to 1 and/or disable the extraction of images and try again (sometimes helps).
@@ -39,6 +36,14 @@ For comment / feedback / bug / suggestion / localization write to: iiizio AT use
 For sources / all apk files / donations go to sourceforge: https://sourceforge.net/p/epubator/home/Home/
 
 History:
+v0.11  (2013-04-07)
+- Added open with ePUBator
+- Added recent folder selector
+- Added dummy entry for first page
+- Added support library
+- Updated iText lib to 5.4.0
+- Some minor fix and improvements
+
 v0.10  (2012-12-22)
 - Improved TOC extraction 
 - Fixed close on rotate

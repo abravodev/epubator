@@ -1,21 +1,18 @@
-Minimal offline PDF to ePUB converter for Android
+Minimal offline PDF to ePUB converter for Android - ©2011 Ezio Querini
 
 ePUBator extract text from a PDF file and put it in a well formed (epubcheck compliant) ePUB file.
 
 PDF extraction based on iText library <http://itextpdf.com/> released under the AGPL license. 
 
-- ePUBator doesn't need internet connection.
-- ePUBator doesn't send your docs somewhere on the net.
-- ePUBator doesn't have ads.
-- ePUBator extract text (no text in pictures or in raster PDF).
+- ePUBator IS MADE FOR BOOKS, NOT FOR EVERY TYPE OF PDF (DON'T ASK IT TOO MUCH).
+- ePUBator doesn't need internet connection (doesn't send your docs somewhere on the net, doesn't have ads).
+- ePUBator extract text (no text from pictures or from raster PDF).
 - ePUBator try to extract images (only png, jpg and gif) but puts them at the page's end.
 - ePUBator try to extract the table of contents if present (or creates a dummy TOC).
 - ePUBator doesn't extract the font size and style.
-- ePUBator save the ePUB file in the same folder of PDF file.
-- ePUBator uses the PDF filename to generate ePUB filename and the title in the frontpage.
-- ePUBator works fine with single column PDF (can work bad with multi column or tables).
+- ePUBator save the ePUB file in the same folder of PDF file (it uses the PDF filename to generate ePUB filename and the title in the frontpage, so rename the PDF before conversion).
+- ePUBator works fine only with single column PDF (worse with multi column or tables).
 - ePUBator can fail extraction (5 of 358 books with v0.8.1 on my Atrix).
-- ePUBator IS MADE FOR BOOKS, NOT FOR EVERY TYPE OF PDF (DON'T ASK IT TOO MUCH).
 
 WARNING!!!
 In the event of crash, unexpected stoppages or insufficient memory try setting Page per file to 1 and/or disable the extraction of images and try again (sometimes helps).
@@ -39,6 +36,14 @@ For comment / feedback / bug / suggestion / localization write to: iiizio AT use
 For sources / all apk files / donations go to sourceforge: https://sourceforge.net/p/epubator/home/Home/
 
 History:
+v0.11  (2013-04-07)
+- Added open with ePUBator
+- Added recent folder selector
+- Added dummy entry for first page
+- Added support library
+- Updated iText lib to 5.4.0
+- Some minor fix and improvements
+
 v0.10  (2012-12-22)
 - Improved TOC extraction 
 - Fixed close on rotate
@@ -103,24 +108,21 @@ v0.1  (2011-11-01)
 ----------------------------------------------------------------------------------
 
 
-Convertitore da PDF a ePUB minimale per Android
+Convertitore da PDF a ePUB minimale per Android - ©2011 Ezio Querini
 
 ePUBator estrae il testo da un file PDF e lo inserisce in un file ePUB correttamente formattato (conforme con epubcheck).
 
 L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/> rilasciata sotto licenza AGPL. 
 
-- ePUBator non necessita di una connessione internet.
-- ePUBator non invia i tuoi documenti da qualche parte sulla rete.
-- ePUBator non ha pubblicità.
+- ePUBator E' FATTO PER I LIBRI, NON PER OGNI TIPO DI PDF (NON CHIEDETEGLI TROPPO).
+- ePUBator non necessita di una connessione internet (non invia i tuoi documenti da qualche parte sulla rete, non ha pubblicità).
 - ePUBator estrae il testo (nessun testo dalle figure o da PDF raster).
 - ePUBator cerca di estrarre le immagini (solo png, jpg e gif) ma le mette alla fine della pagina.
 - ePUBator cerca di estrarre l'indice dal PDF se presente (o ne crea uno fittizio).
-- ePUBator non estrae lo stile e dimensioni dei caratteri.
-- ePUBator salva il file ePUB nella stessa cartella del file PDF.
-- ePUBator usa il nome del file PDF per generare il nome del file ePUB e il titolo di copertina.
-- ePUBator funziona bene con i PDF a singola colonna (può essere pessimo con quelli multicolonna o le tabelle).
+- ePUBator non estrae lo stile e le dimensioni dei caratteri.
+- ePUBator salva il file ePUB nella stessa cartella del file PDF (usa il nome del file PDF per generare il nome del file ePUB e il titolo di copertina, quindi rinomina il PDF prima della conversione).
+- ePUBator funziona bene solo con i PDF a singola colonna (peggio con quelli multicolonna o le tabelle).
 - ePUBator può fallire l'estrazione (5 of 358 libri con la v0.8.1 sul mio Atrix).
-- ePUBator E' FATTO PER I LIBRI, NON PER OGNI TIPO DI PDF (NON CHIEDETEGLI TROPPO).
 
 ATTENZIONE!!!
 Nel caso di crash, interruzioni inaspettate o memoria insufficente prova ad impostare Pagine per file a 1 e/o disabilitare l'estrazione delle immagini e riprova (a volte aiuta).
@@ -144,6 +146,14 @@ Per commenti / feedback / bug / suggerimenti / localizzazioni scrivi a: iiizio A
 Per sorgenti / tutti i file apk / donazioni vai su sourceforge: https://sourceforge.net/p/epubator/home/Home/
 
 Storico:
+v0.11  (07-04-2013)
+- Aggiunto apri con ePUBator
+- Aggiunto selettore delle cartelle recenti
+- Aggiunto capitolo fittizio per la prima pagina
+- Aggiunta libreria di supporto
+- Aggiornata iText lib alla 5.4.0
+- Alcune correzioni e miglioramenti minori
+
 v0.10  (22-12-2012)
 - Migliorata l'estrazione del indice
 - Corretta chiusura alla rotazione

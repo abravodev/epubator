@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <CheckBoxPreference
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="include_images"
         android:summary="@string/images_summary"
         android:title="@string/images_title" />
@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:title="@string/repeated_title" />
     
     <ListPreference
-        android:defaultValue="10"
+        android:defaultValue="5"
         android:entries="@array/pageArray"
         android:entryValues="@array/pageValues"
         android:key="page_per_file"
