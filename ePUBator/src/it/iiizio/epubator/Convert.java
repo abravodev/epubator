@@ -280,7 +280,7 @@ public class Convert extends Activity {
 			// Remove bad files
 			String path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
 			String[] files = new File(path).list();
-			if(files.length > 0){
+			if((files != null) && (files.length > 0)){
 				for (int i = 0; i < files.length; i++) {
 					if (files[i].endsWith(TEMP_EXT) || files[i].endsWith(OLD_EXT)) {
 						new File(path + files[i]).delete();
