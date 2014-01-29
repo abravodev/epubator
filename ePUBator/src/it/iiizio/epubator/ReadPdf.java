@@ -156,6 +156,8 @@ class renderListener implements RenderListener {
 			System.err.println("Failed to extract image (renderListener) " + e.getMessage());
 		} catch (OutOfMemoryError e) {
 			System.err.println("Out of memory in image extraction (renderListener) " + e.getMessage());
+		} catch (NullPointerException e) {
+			System.err.println("Null pointer exception in image extraction (renderListener) " + e.getMessage());
 		}
 	}
 
