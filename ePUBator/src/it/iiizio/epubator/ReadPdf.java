@@ -99,6 +99,8 @@ public class ReadPdf {
 			System.err.println("Failed to extract image " + e.getMessage());
 		} catch (OutOfMemoryError e) {
 			System.err.println("Out of memory in image extraction " + e.getMessage());
+		} catch (RuntimeException e) {
+			System.err.println("Runtime exception in image extraction " + e.getMessage());
 		}
 		return imageList;
 	}
