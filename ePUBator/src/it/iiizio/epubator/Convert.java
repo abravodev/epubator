@@ -343,7 +343,7 @@ public class Convert extends Activity {
 					deleteTmp();
 				} else {
 					// Ask for keeping ePUB with errors
-					if (!isFinishing()) {
+					if (hasWindowFocus()) {
 						showDialog(0);
 					} else {
 						keepEpub();
@@ -362,7 +362,7 @@ public class Convert extends Activity {
 				}
 			}
 
-			if (isFinishing()) {
+			if (!hasWindowFocus()) {
 				// Send notification
 				sendNotification();
 			}
