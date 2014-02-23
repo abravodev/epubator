@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="convert">Convert</string>
     <string name="preview">Preview</string>
     <string name="cip">Conversion in progress</string>
-    <string name="wrongfile">ePUBator can\'t handle this file</string>
+    <string name="wrongfile">ePUBator can only show you the preview of converted files</string>
     
     <!-- Menu -->
     <string name="prefs">Settings</string>

@@ -362,7 +362,7 @@ public class Convert extends Activity {
 				}
 			}
 
-			if (!hasWindowFocus()) {
+			if (isFinishing()) {
 				// Send notification
 				sendNotification();
 			}
