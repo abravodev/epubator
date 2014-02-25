@@ -95,6 +95,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="toc">Add toc.ncx</string>
     <string name="frontpage">Add frontpage.html</string>
     <string name="frontpagepng">Add frontpage.png</string>
+    <string name="imagecover">Create cover with image</string>
+    <string name="titlecover">Create cover with title</string>
     <string name="html">Add page%d.html</string>
     <string name="image">Add %s</string>
     <string name="close">Close file</string>

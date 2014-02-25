@@ -42,6 +42,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -722,44 +723,75 @@ public class Convert extends Activity {
 			Canvas canvas = new Canvas(bmp);
 			canvas.drawRect(0, 0, maxWidth, maxHeight, paint);
 
-			// Add ePUBator logo
-			Bitmap img = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
-			canvas.drawBitmap(img, maxWidth - img.getWidth(), maxHeight - img.getHeight(), new Paint(Paint.FILTER_BITMAP_FLAG));
+			// Check cover image
+			String cover_file = null;
+			if(new File(filename + ".png").exists()) {
+				cover_file = filename + ".png";
+			} else if(new File(filename + ".jpg").exists()) {
+				cover_file = filename + ".jpg";
+			} else if(new File(filename + ".jpeg").exists()) {
+				cover_file = filename + ".jpeg";
+			}
+			
+			// Load image
+			Bitmap img = null;
+			if (cover_file != null) {
+				// Get dimensions
+			    final BitmapFactory.Options options = new BitmapFactory.Options();
+			    options.inJustDecodeBounds = true;
+			    BitmapFactory.decodeFile(cover_file, options);
 
-			// Add title
-			paint.setTextSize(fontsize);
-			paint.setColor(Color.BLACK);
-			paint.setAntiAlias(true);
-			paint.setStyle(Paint.Style.FILL);
+			    // Get image
+			    options.inSampleSize = calculateInSampleSize(options, maxWidth, maxHeight);
+			    options.inJustDecodeBounds = false;
+			    img = BitmapFactory.decodeFile(cover_file, options);
+			}
 
-			String name = filename.substring(filename.lastIndexOf("/") + 1, filename.length()).replaceAll("_", " ");
-			String words[] = name.split("\\s");
+			// Add image as cover
+			if (img != null) {
+				canvas.drawBitmap(img, null , new Rect(0, 0, maxWidth, maxHeight), new Paint(Paint.FILTER_BITMAP_FLAG));
+				publishProgress(getResources().getString(R.string.imagecover));
+			} else {
+				// Add ePUBator logo
+				img = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+				canvas.drawBitmap(img, maxWidth - img.getWidth(), maxHeight - img.getHeight(), new Paint(Paint.FILTER_BITMAP_FLAG));
 
-			float newline = paint.getFontSpacing();
-			float x = border;
-			float y = newline;
+				// Add title as cover
+				paint.setTextSize(fontsize);
+				paint.setColor(Color.BLACK);
+				paint.setAntiAlias(true);
+				paint.setStyle(Paint.Style.FILL);
 
-			for (String word : words) {
-				float len = paint.measureText(word + " ");
+				String name = filename.substring(filename.lastIndexOf("/") + 1, filename.length()).replaceAll("_", " ");
+				String words[] = name.split("\\s");
 
-				// Line wrap
-				if ((x > border) && ((x + len) > maxWidth)) {
-					x = border;
-					y += newline;
+				float newline = paint.getFontSpacing();
+				float x = border;
+				float y = newline;
+
+				for (String word : words) {
+					float len = paint.measureText(word + " ");
+
+					// Line wrap
+					if ((x > border) && ((x + len) > maxWidth)) {
+						x = border;
+						y += newline;
+					}
+
+					// Word wrap
+					while ((x + len) > maxWidth) {
+						int maxChar = (int) (word.length() * (maxWidth - border - x) / paint.measureText(word));
+						canvas.drawText(word.substring(0, maxChar), x, y, paint);
+						word = word.substring(maxChar);
+						len = paint.measureText(word + " ");
+						x = border;
+						y += newline;
+					}
+
+					canvas.drawText(word, x, y, paint);
+					x += len;
 				}
-
-				// Word wrap
-				while ((x + len) > maxWidth) {
-					int maxChar = (int) (word.length() * (maxWidth - border - x) / paint.measureText(word));
-					canvas.drawText(word.substring(0, maxChar), x, y, paint);
-					word = word.substring(maxChar);
-					len = paint.measureText(word + " ");
-					x = border;
-					y += newline;
-				}
-
-				canvas.drawText(word, x, y, paint);
-				x += len;
+				publishProgress(getResources().getString(R.string.titlecover));
 			}
 
 			// Save bmp as png
@@ -768,7 +800,29 @@ public class Convert extends Activity {
 			return WriteZip.addImage("OEBPS/frontpage.png", baos.toByteArray());
 		}
 
+		// calculateInSampleSize from Android Developers site
+		// https://developer.android.com/training/displaying-bitmaps/load-bitmap.html
+		public int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+			// Raw height and width of image
+			final int height = options.outHeight;
+			final int width = options.outWidth;
+			int inSampleSize = 1;
 
+			if (height > reqHeight || width > reqWidth) {
+
+				final int halfHeight = height / 2;
+				final int halfWidth = width / 2;
+
+				// Calculate the largest inSampleSize value that is a power of 2 and keeps both
+				// height and width larger than the requested height and width.
+				while ((halfHeight / inSampleSize) > reqHeight && (halfWidth / inSampleSize) > reqWidth) {
+					inSampleSize *= 2;
+				}
+			}
+
+			return inSampleSize;
+		}
+		
 		//  stringToHTMLString found on the web, no license indicated
 		//  http://www.rgagnon.com/javadetails/java-0306.html
 		//	Author: S. Bayer.
