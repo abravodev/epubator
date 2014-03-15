@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <!-- ePUBator -->
     <string name="app_name">ePUBator</string>
     <string name="convert">Convert</string>
-    <string name="preview">Preview</string>
+    <string name="verify">Verify</string>
     <string name="cip">Conversion in progress</string>
     <string name="wrongfile">ePUBator can only show you the preview of converted files</string>
     
@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="info">Information</string>
     <string name="license">License</string>
     
-    <!-- Preview -->
+    <!-- Verify -->
     <string name="prev">Previous page</string>
     <string name="next">Next page</string>
     
@@ -56,9 +56,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="all_files_summary">Show all files</string>
     <string name="detail_title">Hide detail</string>
     <string name="detail_summary">Show only filenames</string>
-    <string name="preview_group">Preview</string>
+    <string name="verify_group">Verify</string>
     <string name="show_images_title">Show images</string>
-    <string name="show_images_summary">Show images in preview</string>
+    <string name="show_images_summary">Show images in Verify</string>
     
     <!-- FileChooser -->
     <string name="path">Path: %s</string>

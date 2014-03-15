@@ -33,7 +33,7 @@
 		<activity android:name="FileChooser"></activity>
 		<activity android:name="Convert"></activity>
 		<activity android:name="Prefs"></activity>
-		<activity android:name="Preview"></activity>
+		<activity android:name="Verify"></activity>
 		<activity android:name="Info"></activity>
 		<activity android:name="License"></activity>
 	</application>

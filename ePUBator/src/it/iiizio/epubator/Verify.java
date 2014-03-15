@@ -44,11 +44,11 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class Preview extends Activity {
+public class Verify extends Activity {
 	private static int pageNumber = -1;
 	private static ZipFile epubFile = null;
 	private ArrayList<String>pageList;
-	private WebView previewWv;
+	private WebView verifyWv;
 	private Button prevBt;
 	private Button nextBt;
 	final int BUFFERSIZE = 2048;
@@ -59,11 +59,11 @@ public class Preview extends Activity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_PROGRESS);
 		setProgressBarVisibility(true);
-		setContentView(R.layout.preview);
+		setContentView(R.layout.verify);
 
-		previewWv = (WebView)findViewById(R.id.webview);
-		previewWv.setBackgroundColor(0);
-		previewWv.getSettings().setUseWideViewPort(true);
+		verifyWv = (WebView)findViewById(R.id.webview);
+		verifyWv.setBackgroundColor(0);
+		verifyWv.getSettings().setUseWideViewPort(true);
 		prevBt = (Button)findViewById(R.id.prev);
 		nextBt = (Button)findViewById(R.id.next);
 
@@ -125,7 +125,7 @@ public class Preview extends Activity {
 		// Check prefs
 		if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("show_images", true)) {
 			// Show page without images
-			previewWv.loadData(htmlPage, "text/html", "utf-8");
+			verifyWv.loadData(htmlPage, "text/html", "utf-8");
 			return;
 		}
 
@@ -143,7 +143,7 @@ public class Preview extends Activity {
 			writer.close();
 		} catch (IOException e) {
 			// Fallback to page without images
-			previewWv.loadData(htmlPage, "text/html", "utf-8");
+			verifyWv.loadData(htmlPage, "text/html", "utf-8");
 			return;
 		}
 
@@ -184,8 +184,8 @@ public class Preview extends Activity {
 		}
 
 		// Show page with images
-		previewWv.clearCache(true);
-		previewWv.loadUrl("file://" + url);
+		verifyWv.clearCache(true);
+		verifyWv.loadUrl("file://" + url);
 	}
 
 	// Remove temp files

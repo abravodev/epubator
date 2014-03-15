@@ -200,11 +200,11 @@ public class Convert extends Activity {
 				}
 			})
 			// Preview action
-			.setNeutralButton(getResources().getString(R.string.preview), new DialogInterface.OnClickListener() {
+			.setNeutralButton(getResources().getString(R.string.verify), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
-					Intent preview = new Intent(getBaseContext(), Preview.class);
-					preview.putExtra("filename", filename + TEMP_EXT);
-					startActivityForResult(preview, 0);
+					Intent verify = new Intent(getBaseContext(), Verify.class);
+					verify.putExtra("filename", filename + TEMP_EXT);
+					startActivityForResult(verify, 0);
 				}
 			})
 			.create();

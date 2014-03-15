@@ -80,7 +80,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/preview_group" >
+    <PreferenceCategory android:title="@string/verify_group" >
 
         <CheckBoxPreference
 			android:defaultValue="true"

@@ -46,7 +46,7 @@ public class ePUBator extends Activity {
 		setContentView(R.layout.main);
 
 		((Button) findViewById(R.id.convert)).setOnClickListener(mConvertListener);
-		((Button) findViewById(R.id.preview)).setOnClickListener(mPreviewListener);
+		((Button) findViewById(R.id.verify)).setOnClickListener(mVerifyListener);
 		
 	    Intent intent = getIntent();
 		
@@ -110,8 +110,8 @@ public class ePUBator extends Activity {
 		}
 	};
 
-	// Preview button pressed
-	View.OnClickListener mPreviewListener = new OnClickListener() {
+	// Verify button pressed
+	View.OnClickListener mVerifyListener = new OnClickListener() {
 		public void onClick(View v) {
 			// Select a file
 			Intent chooseFile = new Intent(ePUBator.this, FileChooser.class);
@@ -128,7 +128,7 @@ public class ePUBator extends Activity {
 			pickActivity();		}
 	}
 
-	// Start conversion or preview
+	// Start conversion or verify
 	protected void pickActivity() {
 		path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
 		SharedPreferences.Editor editor = sharedPref.edit();
@@ -140,9 +140,9 @@ public class ePUBator extends Activity {
 			convert.putExtra("filename", filename);
 			startActivity(convert);
 		} else if (filename.endsWith(EPUB_EXT)) {
-			Intent preview = new Intent(ePUBator.this, Preview.class);
-			preview.putExtra("filename", filename);
-			startActivity(preview);
+			Intent verify = new Intent(ePUBator.this, Verify.class);
+			verify.putExtra("filename", filename);
+			startActivity(verify);
 		} else {
 			Toast.makeText(getApplicationContext(), getResources().getString(R.string.wrongfile), Toast.LENGTH_SHORT).show();
 		}
