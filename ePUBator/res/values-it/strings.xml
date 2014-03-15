@@ -93,6 +93,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="container">Aggiungo container.xml</string>
     <string name="content">Aggiungo content.opf</string>
     <string name="toc">Aggiungo toc.ncx</string>
+    <string name="pdftoc">Indice estratto dal file PDF</string>
+    <string name="dummytoc">Il file PDF non ha l\'indice</string>
     <string name="frontpage">Aggiungo frontpage.html</string>
     <string name="frontpagepng">Aggiungo frontpage.png</string>
     <string name="imagecover">Crea copertina con l\'immagine</string>

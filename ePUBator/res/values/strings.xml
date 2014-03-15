@@ -93,6 +93,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="container">Add container.xml</string>
     <string name="content">Add content.opf</string>
     <string name="toc">Add toc.ncx</string>
+    <string name="pdftoc">TOC extracted from PDF file</string>
+    <string name="dummytoc">The PDF file doesn\'t have the TOC</string>
     <string name="frontpage">Add frontpage.html</string>
     <string name="frontpagepng">Add frontpage.png</string>
     <string name="imagecover">Create cover with image</string>

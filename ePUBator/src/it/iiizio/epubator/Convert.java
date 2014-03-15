@@ -670,6 +670,7 @@ public class Convert extends Activity {
 
 			// Create dummy toc
 			if (!extractedToc) {
+				publishProgress(getResources().getString(R.string.dummytoc));
 				for(int i = 1; i <= pages; i += pagesPerFile) {
 					toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
 					toc.append("            <navLabel>\n");
@@ -679,6 +680,8 @@ public class Convert extends Activity {
 					toc.append("        </navPoint>\n");
 					playOrder += 1;
 				}
+			} else {
+				publishProgress(getResources().getString(R.string.pdftoc));
 			}
 			
 			toc.append("    </navMap>\n");
