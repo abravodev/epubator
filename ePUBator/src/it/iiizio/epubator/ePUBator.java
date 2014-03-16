@@ -27,6 +27,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.view.MenuCompat;
 import android.view.Menu;
@@ -133,31 +134,29 @@ public class ePUBator extends Activity {
 
 	// File selected
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch(requestCode) {
-		case SELECT_PDF:
-		case SELECT_EPUB:
-			if (resultCode == RESULT_OK) {
-				filename = data.getAction();
-				pickActivity();
-			}
-			break;
-		case SELECT_IMAGE:
+		if (requestCode == SELECT_IMAGE) {
+			// Get image from gallery
 			if (resultCode == RESULT_OK) {
 				Uri selectedImage = data.getData();
 				String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
-	            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-	            cursor.moveToFirst();
+				Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+				cursor.moveToFirst();
 
-	            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-	            cover_file = cursor.getString(columnIndex);
-	            cursor.close();
+				int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+				cover_file = cursor.getString(columnIndex);
+				cursor.close();
 			} else {
 				cover_file = "";
 			}
 			cover_picked = true;
 			pickActivity();
-			break;
+		} else {
+			// Conversion or verify
+			if (resultCode == RESULT_OK) {
+				filename = data.getAction();
+				pickActivity();
+			}
 		}
 	}
 
@@ -169,9 +168,9 @@ public class ePUBator extends Activity {
 		editor.commit();
 
 		if (filename.endsWith(PDF_EXT)) {
-			boolean pickapic = true; // TODO
 			if (!cover_picked && !Convert.conversionStarted) {
-				if (pickapic) {
+			SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
+				if (prefs.getBoolean("pickapic", false)) {
 					// Choose an image
 					Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
 					photoPickerIntent.setType("image/*");

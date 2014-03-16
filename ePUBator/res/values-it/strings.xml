@@ -51,6 +51,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="notifi_summary">Non inviare le notifiche</string>
     <string name="pdftoc_title">Indice del PDF</string>
     <string name="pdftoc_summary">Prova ad estrarre l\'indice dal PDF</string>
+    <string name="pickapic_title">Copertina dalla galleria</string>
+    <string name="pickapic_summary">Schegli un\'immagine o utilizza quella con lo stesso nome del file PDF</string>
     <string name="filechooser_group">Selettore dei file</string>
     <string name="all_files_title">Mostra tutti</string>
     <string name="all_files_summary">Mostra tutti i files</string>
