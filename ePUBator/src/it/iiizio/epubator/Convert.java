@@ -60,10 +60,11 @@ public class Convert extends Activity {
 	private static Button okBt;
 	private static Button stopBt;
 	private static boolean okBtEnabled = true;
-	private static boolean conversionStarted = false;
+	public static boolean conversionStarted = false;
 	private static boolean notificationSent = false;
 	private static int result;
 	private static String filename = "";
+	private static String cover_file = "";
 
 	private boolean includeImages;
 	private boolean repeatedImages;
@@ -103,6 +104,11 @@ public class Convert extends Activity {
 			// Get filename
 			Bundle extras = getIntent().getExtras();
 			if (extras != null) {
+				if (extras.containsKey("cover")) {
+					cover_file = extras.getString("cover");
+				} else {
+					cover_file = "";
+				}
 				if (extras.containsKey("filename")) {
 					String pdfFilename = extras.getString("filename");
 					filename = pdfFilename.substring(0, pdfFilename.lastIndexOf(PDF_EXT));
@@ -729,20 +735,10 @@ public class Convert extends Activity {
 			paint.setColor(Color.LTGRAY);
 			Canvas canvas = new Canvas(bmp);
 			canvas.drawRect(0, 0, maxWidth, maxHeight, paint);
-
-			// Check cover image
-			String cover_file = null;
-			if(new File(filename + ".png").exists()) {
-				cover_file = filename + ".png";
-			} else if(new File(filename + ".jpg").exists()) {
-				cover_file = filename + ".jpg";
-			} else if(new File(filename + ".jpeg").exists()) {
-				cover_file = filename + ".jpeg";
-			}
 			
 			// Load image
 			Bitmap img = null;
-			if (cover_file != null) {
+			if (cover_file != "") {
 				// Get dimensions
 			    final BitmapFactory.Options options = new BitmapFactory.Options();
 			    options.inJustDecodeBounds = true;
