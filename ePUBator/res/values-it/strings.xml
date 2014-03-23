@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="quickstart">Guida rapida</string>
     <string name="info">Informazioni</string>
     <string name="license">Licenza</string>
+    <string name="myapps">Le mie App</string>
     
     <!-- Verify -->
     <string name="prev">Pagina precedente</string>

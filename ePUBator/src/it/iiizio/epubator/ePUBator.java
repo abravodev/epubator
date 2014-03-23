@@ -122,6 +122,9 @@ public class ePUBator extends Activity {
 		case R.id.license:
 			startActivity(new Intent(ePUBator.this, License.class));
 			return true;
+		case R.id.myapps:
+			startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("market://search?q=pub:iiizio")));
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}

@@ -40,4 +40,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <item
 		android:id="@+id/license"
 		android:title="@string/license" />
+		
+    <item
+		android:id="@+id/myapps"
+		android:title="@string/myapps" />
 </menu>
