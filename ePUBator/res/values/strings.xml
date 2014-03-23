@@ -23,9 +23,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="verify">Verify</string>
     <string name="cip">Conversion in progress</string>
     <string name="wrongfile">ePUBator can only show you the preview of converted files</string>
+    <string name="quickstart_text">Tap on \"Convert\", select a PDF file and after a while you\'ll have the ePUB in the same folder of PDF file.\n\nTap on \"Verify\" to check the result of conversion.\n\nBefore conversion you can set an image as cover in two ways:\n1) Put the image file (PNG or JPG) in the same folder and with the same name of PDF file.\n2) Enable \"Cover from gallery\" in \"Settings\" and choose the image right after selecting the PDF file.</string>
     
     <!-- Menu -->
     <string name="prefs">Settings</string>
+    <string name="openwith">Open with</string>
+    <string name="share">Share</string>
+    <string name="quickstart">Quick start</string>
     <string name="info">Information</string>
     <string name="license">License</string>
     

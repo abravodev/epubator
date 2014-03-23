@@ -23,9 +23,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="verify">Verifica</string>
     <string name="cip">Conversione in corso</string>
     <string name="wrongfile">ePUBator può mostrare l\'anteprima solo dei file che ha convertito</string>
+    <string name="quickstart_text">Tocca \"Converti\", seleziona un file PDF e dopo un po\' avrai l\'ePUB nella stessa cartella del file PDF.\n\nTocca \"Verifica\" per controllare il risultato della conversione.\n\nPrima della conversione puoi impostare un\'immagine come copertina in due modi:\n1) Metti l\'immagine (PNG or JPG) nella stessa cartella e con lo stesso nome del file PDF.\n2) Attiva \"Copertina dalla galleria\" in \"Preferenze\" e scegli l\'immagine subito dopo aver selezionato il file PDF.</string>
     
     <!-- Menu -->
     <string name="prefs">Preferenze</string>
+    <string name="openwith">Apri con</string>
+    <string name="share">Condividi</string>
+    <string name="quickstart">Guida rapida</string>
     <string name="info">Informazioni</string>
     <string name="license">Licenza</string>
     
@@ -52,7 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pdftoc_title">Indice del PDF</string>
     <string name="pdftoc_summary">Prova ad estrarre l\'indice dal PDF</string>
     <string name="pickapic_title">Copertina dalla galleria</string>
-    <string name="pickapic_summary">Schegli un\'immagine o utilizza quella con lo stesso nome del file PDF</string>
+    <string name="pickapic_summary">Scegli un\'immagine o utilizza quella con lo stesso nome del file PDF</string>
     <string name="filechooser_group">Selettore dei file</string>
     <string name="all_files_title">Mostra tutti</string>
     <string name="all_files_summary">Mostra tutti i files</string>

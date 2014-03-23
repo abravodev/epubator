@@ -20,7 +20,10 @@ package it.iiizio.epubator;
 import java.io.File;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -65,6 +68,11 @@ public class ePUBator extends Activity {
 		sharedPref = this.getPreferences(Context.MODE_PRIVATE);
 		path = sharedPref.getString("path", Environment.getExternalStorageDirectory().getPath());
 		
+		// Show quick start on first time
+		if (sharedPref.getBoolean("first_time", true)) {
+			showDialog(0);
+		}
+		
 	    // To get the action of the intent use
 	    String action = intent.getAction();
 	    if (action.equals(Intent.ACTION_VIEW)) {
@@ -91,6 +99,15 @@ public class ePUBator extends Activity {
 		case R.id.prefs:
 			startActivity(new Intent(ePUBator.this, Prefs.class));
 			return true;
+		case R.id.openwith:
+			// TODO
+			return true;
+		case R.id.share:
+			// TODO
+			return true;
+		case R.id.quickstart:
+			showDialog(0);
+			return true;
 		case R.id.info:
 			startActivity(new Intent(ePUBator.this, Info.class));
 			return true;
@@ -100,6 +117,27 @@ public class ePUBator extends Activity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	// Quick start dialog
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		if (id == 0) {
+			// Build dialog
+			return new AlertDialog.Builder(ePUBator.this)
+			.setTitle(getResources().getString(R.string.quickstart))
+			.setMessage(getResources().getString(R.string.quickstart_text))
+			// Preview action
+			.setNeutralButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					SharedPreferences.Editor editor = sharedPref.edit();
+					editor.putBoolean("first_time", false);
+					editor.commit();
+				}
+			})
+			.create();
+		} else
+			return null;
 	}
 
 	// Convert button pressed

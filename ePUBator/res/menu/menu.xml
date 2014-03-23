@@ -22,6 +22,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		android:title="@string/prefs" />
 		
     <item
+		android:id="@+id/openwith"
+		android:title="@string/openwith" />
+    
+	<item
+		android:id="@+id/share"
+		android:title="@string/share" />
+		
+    <item
+		android:id="@+id/quickstart"
+		android:title="@string/quickstart" />
+		
+    <item
 		android:id="@+id/info"
 		android:title="@string/info" />
 		
