@@ -181,6 +181,23 @@ public class ePUBator extends Activity {
 	// File selected
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
+		case OPENWITH:
+			// Open ePUB
+			if (resultCode == RESULT_OK) {
+				filename = data.getAction();
+				updateRecentFolder();
+				try
+				{
+					Intent sendIntent = new Intent(Intent.ACTION_VIEW);  
+					sendIntent.setDataAndType(Uri.fromFile(new File(filename)), "application/epub+zip");
+					startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.openwith)));
+				}
+				catch(Exception e)
+				{
+					System.err.println("Exception in Open with " + e.getMessage());
+				}
+			}
+			break;
 		case SHAREWITH:
 			// Share ePUB
 			if (resultCode == RESULT_OK) {
@@ -195,7 +212,7 @@ public class ePUBator extends Activity {
 				}
 				catch(Exception e)
 				{
-					System.err.println("Exception in Share " + e.getMessage());
+					System.err.println("Exception in Share with " + e.getMessage());
 				}
 			}
 			break;
