@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <!-- Menu -->
     <string name="prefs">Settings</string>
     <string name="openwith">Open with</string>
-    <string name="share">Share</string>
+    <string name="sharewith">Share with</string>
     <string name="quickstart">Quick start</string>
     <string name="info">Information</string>
     <string name="license">License</string>

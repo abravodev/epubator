@@ -49,9 +49,11 @@ public class ePUBator extends Activity {
 	private SharedPreferences sharedPref;
 	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
-	private final int SELECT_PDF = 1;
-	private final int SELECT_EPUB = 2;
-	private final int SELECT_IMAGE = 3;
+	private final int CONVERT = 1;
+	private final int VERIFY = 2;
+	private final int PICKAPIC = 3;
+	private final int OPENWITH = 4;
+	private final int SHAREWITH = 5;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -100,10 +102,16 @@ public class ePUBator extends Activity {
 			startActivity(new Intent(ePUBator.this, Prefs.class));
 			return true;
 		case R.id.openwith:
-			// TODO
+			Intent chooseFile = new Intent(ePUBator.this, FileChooser.class);
+			chooseFile.putExtra("path", path);
+			chooseFile.putExtra("filter", EPUB_EXT);
+			startActivityForResult(chooseFile, OPENWITH);
 			return true;
 		case R.id.share:
-			// TODO
+			chooseFile = new Intent(ePUBator.this, FileChooser.class);
+			chooseFile.putExtra("path", path);
+			chooseFile.putExtra("filter", EPUB_EXT);
+			startActivityForResult(chooseFile, SHAREWITH);
 			return true;
 		case R.id.quickstart:
 			showDialog(0);
@@ -154,7 +162,7 @@ public class ePUBator extends Activity {
 				Intent chooseFile = new Intent(ePUBator.this, FileChooser.class);
 				chooseFile.putExtra("path", path);
 				chooseFile.putExtra("filter", PDF_EXT);
-				startActivityForResult(chooseFile, SELECT_PDF);
+				startActivityForResult(chooseFile, CONVERT);
 			}
 		}
 	};
@@ -166,13 +174,32 @@ public class ePUBator extends Activity {
 			Intent chooseFile = new Intent(ePUBator.this, FileChooser.class);
 			chooseFile.putExtra("path", path);
 			chooseFile.putExtra("filter", EPUB_EXT);
-			startActivityForResult(chooseFile, SELECT_EPUB);
+			startActivityForResult(chooseFile, VERIFY);
 		}
 	};
 
 	// File selected
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == SELECT_IMAGE) {
+		switch (requestCode) {
+		case SHAREWITH:
+			// Share ePUB
+			if (resultCode == RESULT_OK) {
+				filename = data.getAction();
+				updateRecentFolder();
+				try
+				{
+					Intent sendIntent = new Intent(Intent.ACTION_SEND);  
+					sendIntent.setType("application/epub+zip");
+					sendIntent.putExtra(android.content.Intent.EXTRA_STREAM, Uri.fromFile(new File(filename)));
+					startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.sharewith)));
+				}
+				catch(Exception e)
+				{
+					System.err.println("Exception in Share " + e.getMessage());
+				}
+			}
+			break;
+		case PICKAPIC:
 			// Get image from gallery
 			if (resultCode == RESULT_OK) {
 				Uri selectedImage = data.getData();
@@ -189,21 +216,20 @@ public class ePUBator extends Activity {
 			}
 			cover_picked = true;
 			pickActivity();
-		} else {
+			break;
+		default:
 			// Conversion or verify
 			if (resultCode == RESULT_OK) {
 				filename = data.getAction();
 				pickActivity();
 			}
+			break;
 		}
 	}
 
 	// Start conversion or verify
 	protected void pickActivity() {
-		path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
-		SharedPreferences.Editor editor = sharedPref.edit();
-		editor.putString("path", path);
-		editor.commit();
+		updateRecentFolder();
 
 		if (filename.endsWith(PDF_EXT)) {
 			if (!cover_picked && !Convert.conversionStarted) {
@@ -212,7 +238,7 @@ public class ePUBator extends Activity {
 					// Choose an image
 					Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
 					photoPickerIntent.setType("image/*");
-					startActivityForResult(photoPickerIntent, SELECT_IMAGE);
+					startActivityForResult(photoPickerIntent, PICKAPIC);
 				} else {
 					// Check if there an image with the same name of PDF file
 					String name = filename.substring(0, filename.lastIndexOf(PDF_EXT));
@@ -245,5 +271,13 @@ public class ePUBator extends Activity {
 		} else {
 			Toast.makeText(getApplicationContext(), getResources().getString(R.string.wrongfile), Toast.LENGTH_SHORT).show();
 		}
+	}
+	
+	// Update recent folder
+	protected void updateRecentFolder() {
+	path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
+	SharedPreferences.Editor editor = sharedPref.edit();
+	editor.putString("path", path);
+	editor.commit();
 	}
 }
