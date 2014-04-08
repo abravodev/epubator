@@ -22,12 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		android:title="@string/prefs" />
 		
     <item
-		android:id="@+id/openwith"
-		android:title="@string/open_epub" />
+		android:id="@+id/open"
+		android:title="@string/open" />
     
 	<item
 		android:id="@+id/share"
-		android:title="@string/share_epub" />
+		android:title="@string/share" />
 		
     <item
 		android:id="@+id/quickstart"
@@ -42,6 +42,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		android:title="@string/license" />
 		
     <item
-		android:id="@+id/myapps"
+		android:id="@+id/my_apps"
 		android:title="@string/my_apps" />
 </menu>

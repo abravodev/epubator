@@ -396,7 +396,7 @@ public class Convert extends Activity {
 				boolean extractionErrorFlag = false;
 
 				// Create ePUB file
-				publishProgress(getResources().getString(R.string.open));
+				publishProgress(getResources().getString(R.string.create));
 				if (WriteZip.create(filename + TEMP_EXT)) {
 					return 3;
 				}

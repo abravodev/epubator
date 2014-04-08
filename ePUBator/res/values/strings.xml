@@ -27,8 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <!-- Menu -->
     <string name="prefs">Settings</string>
-    <string name="open_epub">Open ePUB</string>
-    <string name="share_epub">Share ePUB</string>
+    <string name="open">Open ePUB</string>
+    <string name="share">Share ePUB</string>
     <string name="quickstart">Quick start</string>
     <string name="info">Information</string>
     <string name="license">License</string>
@@ -95,7 +95,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pagenumber">PageNumber%s</string>
     <string name="load">Loading: %s</string>
     <string name="file">\nePUB file: %s</string>
-    <string name="open">Open ePUB file</string>
+    <string name="create">Create ePUB file</string>
     <string name="mimetype">Add mimetype</string>
     <string name="container">Add container.xml</string>
     <string name="content">Add content.opf</string>

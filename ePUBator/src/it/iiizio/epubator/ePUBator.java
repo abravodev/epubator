@@ -101,7 +101,7 @@ public class ePUBator extends Activity {
 		case R.id.prefs:
 			startActivity(new Intent(ePUBator.this, Prefs.class));
 			return true;
-		case R.id.openwith:
+		case R.id.open:
 			Intent chooseFile = new Intent(ePUBator.this, FileChooser.class);
 			chooseFile.putExtra("path", path);
 			chooseFile.putExtra("filter", EPUB_EXT);
@@ -122,7 +122,7 @@ public class ePUBator extends Activity {
 		case R.id.license:
 			startActivity(new Intent(ePUBator.this, License.class));
 			return true;
-		case R.id.myapps:
+		case R.id.my_apps:
 			startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("market://search?q=pub:iiizio")));
 			return true;
 		default:
@@ -193,7 +193,7 @@ public class ePUBator extends Activity {
 				{
 					Intent sendIntent = new Intent(Intent.ACTION_VIEW);  
 					sendIntent.setDataAndType(Uri.fromFile(new File(filename)), "application/epub+zip");
-					startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.open_epub)));
+					startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.open)));
 				}
 				catch(Exception e)
 				{
@@ -211,7 +211,7 @@ public class ePUBator extends Activity {
 					Intent sendIntent = new Intent(Intent.ACTION_SEND);  
 					sendIntent.setType("application/epub+zip");
 					sendIntent.putExtra(android.content.Intent.EXTRA_STREAM, Uri.fromFile(new File(filename)));
-					startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share_epub)));
+					startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share)));
 				}
 				catch(Exception e)
 				{
