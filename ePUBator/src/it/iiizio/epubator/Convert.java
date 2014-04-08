@@ -132,7 +132,7 @@ public class Convert extends Activity {
 		includeImages = prefs.getBoolean("include_images", true);
 		repeatedImages = prefs.getBoolean("repeated_images", false);
 		pagesPerFile = Integer.parseInt(prefs.getString("page_per_file", "5"));
-		onError = Integer.parseInt(prefs.getString("on_error", "1"));
+		onError = Integer.parseInt(prefs.getString("on_error", "0"));
 		addMarkers = prefs.getBoolean("add_markers", true);
 		hideNotifi = prefs.getBoolean("hide_notifi", false);
 		tocFromPdf = prefs.getBoolean("toc_from_pdf", true);

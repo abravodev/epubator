@@ -193,7 +193,7 @@ public class ePUBator extends Activity {
 				{
 					Intent sendIntent = new Intent(Intent.ACTION_VIEW);  
 					sendIntent.setDataAndType(Uri.fromFile(new File(filename)), "application/epub+zip");
-					startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.openwith)));
+					startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.open_epub)));
 				}
 				catch(Exception e)
 				{
@@ -211,7 +211,7 @@ public class ePUBator extends Activity {
 					Intent sendIntent = new Intent(Intent.ACTION_SEND);  
 					sendIntent.setType("application/epub+zip");
 					sendIntent.putExtra(android.content.Intent.EXTRA_STREAM, Uri.fromFile(new File(filename)));
-					startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.sharewith)));
+					startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share_epub)));
 				}
 				catch(Exception e)
 				{

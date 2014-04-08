@@ -39,7 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:title="@string/page_title" />
 
     <ListPreference
-        android:defaultValue="1"
+        android:defaultValue="0"
         android:entries="@array/errorArray"
         android:entryValues="@array/errorValues"
         android:key="on_error"
