@@ -30,6 +30,10 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -41,6 +45,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -51,6 +56,7 @@ public class Verify extends Activity {
 	private WebView verifyWv;
 	private Button prevBt;
 	private Button nextBt;
+	private String anchor;
 	final int BUFFERSIZE = 2048;
 
 	@Override
@@ -64,6 +70,17 @@ public class Verify extends Activity {
 		verifyWv = (WebView)findViewById(R.id.webview);
 		verifyWv.setBackgroundColor(0);
 		verifyWv.getSettings().setUseWideViewPort(true);
+		verifyWv.getSettings().setJavaScriptEnabled(true);
+		verifyWv.setWebViewClient(new WebViewClient() {
+			public void onPageFinished(final WebView view, final String url) {
+				// make it jump to the internal link
+				if (anchor != null) {
+					view.loadUrl("javascript:location.href=\"#" + anchor + "\"");
+					anchor = null;
+				}
+			}
+		});
+
 		prevBt = (Button)findViewById(R.id.prev);
 		nextBt = (Button)findViewById(R.id.next);
 
@@ -80,6 +97,9 @@ public class Verify extends Activity {
 
 	// Show page
 	private void showPage(int diff) {
+		String url = "";
+		boolean noImages;
+		
 		// No pages
 		int pages = pageList.size();
 		if (pages == 0) {
@@ -108,6 +128,9 @@ public class Verify extends Activity {
 
 		// get html page
 		String pageName = pageList.get(pageNumber - 1);
+		anchor = pageName.substring(pageName.lastIndexOf("/") + 1, pageName.lastIndexOf(".")); // TODO
+		System.err.println(pageName + "+" + anchor);
+		
 		StringBuilder htmlPageSb = new StringBuilder();
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry(pageName))), BUFFERSIZE);
@@ -124,70 +147,75 @@ public class Verify extends Activity {
 
 		// Check prefs
 		if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("show_images", true)) {
+			noImages = true;
+		} else {
+			noImages = false;
+
+			// Remove old files
+			removeFiles();
+
+			// Save html page
+			File file = new File(getFilesDir(), "page.html");
+			url = file.getAbsolutePath();
+			FileWriter writer;
+			try {
+				writer = new FileWriter(file);
+				writer.append(htmlPage);
+				writer.flush();
+				writer.close();
+			} catch (IOException e) {
+				noImages = true;
+			}
+
+			if (!noImages) {
+				// Get images
+				XmlPullParserFactory factory;
+				try {
+					factory = XmlPullParserFactory.newInstance();
+					XmlPullParser xpp = factory.newPullParser();
+
+					xpp.setInput(new StringReader (htmlPage.replaceAll("&nbsp;", "")));
+					int eventType = xpp.getEventType();
+
+					// Search images in html file
+					while (eventType != XmlPullParser.END_DOCUMENT) {
+						if(eventType == XmlPullParser.START_TAG && "img".equals(xpp.getName())) {
+							String imageName = xpp.getAttributeValue(null, "src");
+
+							// Save image
+							ZipEntry entry = epubFile.getEntry("OEBPS/" + imageName);
+							BufferedInputStream in = new BufferedInputStream(epubFile.getInputStream(entry), BUFFERSIZE);
+							FileOutputStream out = new FileOutputStream(new File(getFilesDir() + "/" + imageName));
+							byte[] buffer = new byte[BUFFERSIZE];
+							int len;
+							BufferedOutputStream dest = new BufferedOutputStream(out, BUFFERSIZE);
+							while ((len = in.read(buffer, 0, BUFFERSIZE)) != -1) {
+								dest.write(buffer, 0, len);
+							}
+							dest.flush();
+							dest.close();
+							in.close();
+						}
+						eventType = xpp.next();
+					}
+				} catch (XmlPullParserException e) {
+					System.err.println("XmlPullParserException in image preview");
+				} catch (IOException e) {
+					System.err.println("IOException in image preview");
+				}
+
+				// Show page with images
+				verifyWv.clearCache(true);
+				verifyWv.loadUrl("file://" + url);
+			}
+		}
+
+		if (noImages) {
 			// Show page without images
 			verifyWv.loadData(htmlPage, "text/html", "utf-8");
-			return;
 		}
-
-		// Remove old files
-		removeFiles();
-
-		// Save html page
-		File file = new File(getFilesDir(), "page.html");
-		String url = file.getAbsolutePath();
-		FileWriter writer;
-		try {
-			writer = new FileWriter(file);
-			writer.append(htmlPage);
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			// Fallback to page without images
-			verifyWv.loadData(htmlPage, "text/html", "utf-8");
-			return;
-		}
-
-		// Get images
-		XmlPullParserFactory factory;
-		try {
-			factory = XmlPullParserFactory.newInstance();
-			XmlPullParser xpp = factory.newPullParser();
-
-			xpp.setInput(new StringReader (htmlPage.replaceAll("&nbsp;", "")));
-			int eventType = xpp.getEventType();
-
-			// Search images in html file
-			while (eventType != XmlPullParser.END_DOCUMENT) {
-				if(eventType == XmlPullParser.START_TAG && "img".equals(xpp.getName())) {
-					String imageName = xpp.getAttributeValue(null, "src");
-
-					// Save image
-					ZipEntry entry = epubFile.getEntry("OEBPS/" + imageName);
-					BufferedInputStream in = new BufferedInputStream(epubFile.getInputStream(entry), BUFFERSIZE);
-					FileOutputStream out = new FileOutputStream(new File(getFilesDir() + "/" + imageName));
-					byte[] buffer = new byte[BUFFERSIZE];
-					int len;
-					BufferedOutputStream dest = new BufferedOutputStream(out, BUFFERSIZE);
-					while ((len = in.read(buffer, 0, BUFFERSIZE)) != -1) {
-						dest.write(buffer, 0, len);
-					}
-					dest.flush();
-					dest.close();
-					in.close();
-				}
-				eventType = xpp.next();
-			}
-		} catch (XmlPullParserException e) {
-			System.err.println("XmlPullParserException in image preview");
-		} catch (IOException e) {
-			System.err.println("IOException in image preview");
-		}
-
-		// Show page with images
-		verifyWv.clearCache(true);
-		verifyWv.loadUrl("file://" + url);
 	}
-
+	
 	// Remove temp files
 	private void removeFiles() {
 		File file = new File(getFilesDir(), "");
@@ -241,6 +269,51 @@ public class Verify extends Activity {
 			String name = entry.getName();
 			if (name.endsWith(".html")) {
 				pageList.add(name);
+			}
+		}
+		
+		// Extract toc
+		StringBuilder tocSb = new StringBuilder();
+		try {
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry("OEBPS/toc.ncx"))), BUFFERSIZE);
+			String line;
+			while ((line = bufferedReader.readLine()) != null) {
+				tocSb.append(line);
+			}
+		} catch (IOException e) {
+			readError();
+		}
+
+		// Extract chapters
+		XMLParser parser = new XMLParser();
+		Document doc = parser.getDomElement(tocSb.toString());
+		if (doc != null) {
+			doc.normalize();
+			NodeList nl = doc.getElementsByTagName("navPoint");
+			if (nl != null) {
+				// looping through all item nodes <item>
+				for (int i = 0; i < nl.getLength(); i++) {
+					Element e = (Element) nl.item(i);
+					System.out.println(i+"*"+e.getTextContent().trim()+"*");
+					NodeList nl2 = e.getChildNodes();
+					
+					// TODO
+//					String action = parser.getValue(nl2, "content");
+//					System.out.println(i+"#"+nl2.item(3)+"#");
+					System.out.println(i+"#"+parser.getValue((Element) nl2.item(3), "src")+"#");
+/*					if (action.equals("GoTo")) {
+						String chapter = parser.getElementValue(e).trim();
+						try {
+							int page = Integer.valueOf(parser.getValue(e, "Page").split(" ")[0]);
+
+							// Add entry in toc
+							
+							// Set next entry
+						} catch (RuntimeException ex) {
+							System.err.println("RuntimeException in xml extraction " + ex.getMessage());
+						}
+					}*/
+				}
 			}
 		}
 	}
