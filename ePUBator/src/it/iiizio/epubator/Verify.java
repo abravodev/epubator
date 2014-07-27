@@ -70,12 +70,12 @@ public class Verify extends Activity {
 		verifyWv = (WebView)findViewById(R.id.webview);
 		verifyWv.setBackgroundColor(0);
 		verifyWv.getSettings().setUseWideViewPort(true);
-		verifyWv.getSettings().setJavaScriptEnabled(true);
 		verifyWv.setWebViewClient(new WebViewClient() {
 			public void onPageFinished(final WebView view, final String url) {
 				// make it jump to the internal link
 				if (anchor != null) {
 					view.loadUrl("javascript:location.href=\"#" + anchor + "\"");
+					verifyWv.getSettings().setJavaScriptEnabled(false);
 					anchor = null;
 				}
 			}
@@ -90,16 +90,13 @@ public class Verify extends Activity {
 			pageNumber = 1;
 		}
 
-		showPage(0);
+		changePage(0);
 		prevBt.setOnClickListener(mPrevListener);
 		nextBt.setOnClickListener(mNextListener);
 	}
 
-	// Show page
-	private void showPage(int diff) {
-		String url = "";
-		boolean noImages;
-		
+	// Change page
+	private void changePage(int diff) {
 		// No pages
 		int pages = pageList.size();
 		if (pages == 0) {
@@ -125,12 +122,22 @@ public class Verify extends Activity {
 			nextBt.setEnabled(true);
 		}
 		setProgress(pageNumber*9999/pages);
-
-		// get html page
+		
 		String pageName = pageList.get(pageNumber - 1);
 		anchor = pageName.substring(pageName.lastIndexOf("/") + 1, pageName.lastIndexOf(".")); // TODO
+
+		showPage(pageName);
+	}
+	
+	void showPage(String pageName) {
+		String url = "";
+		boolean noImages;
 		System.err.println(pageName + "+" + anchor);
+
+		verifyWv.getSettings().setJavaScriptEnabled(false);
+		verifyWv.clearView();
 		
+		// get html page
 		StringBuilder htmlPageSb = new StringBuilder();
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry(pageName))), BUFFERSIZE);
@@ -214,6 +221,8 @@ public class Verify extends Activity {
 			// Show page without images
 			verifyWv.loadData(htmlPage, "text/html", "utf-8");
 		}
+
+		verifyWv.getSettings().setJavaScriptEnabled(true);
 	}
 	
 	// Remove temp files
@@ -232,14 +241,14 @@ public class Verify extends Activity {
 	// Prev button pressed
 	View.OnClickListener mPrevListener = new OnClickListener() {
 		public void onClick(View v) {
-			showPage(-1);
+			changePage(-1);
 		}
 	};
 
 	// Next button pressed
 	View.OnClickListener mNextListener = new OnClickListener() {
 		public void onClick(View v) {
-			showPage(+1);
+			changePage(+1);
 		}
 	};
 

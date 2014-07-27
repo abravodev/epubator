@@ -91,7 +91,7 @@ public class ePUBator extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
-		MenuCompat.setShowAsAction(menu.findItem(R.id.prefs), 1);
+		MenuCompat.setShowAsAction(menu.findItem(R.id.prefs), 0);
 		return true;
 	}
 
