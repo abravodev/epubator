@@ -125,14 +125,14 @@ public class Verify extends Activity {
 		
 		String pageName = pageList.get(pageNumber - 1);
 		anchor = pageName.substring(pageName.lastIndexOf("/") + 1, pageName.lastIndexOf(".")); // TODO
-
+		System.out.println(">>>" + pageName + "__" + anchor); // TODO
 		showPage(pageName);
 	}
 	
 	void showPage(String pageName) {
 		String url = "";
 		boolean noImages;
-		System.err.println(pageName + "+" + anchor);
+		System.err.println(">>>" + pageName + " # " + anchor); // TODO
 
 		verifyWv.getSettings().setJavaScriptEnabled(false);
 		verifyWv.clearView();
@@ -303,25 +303,10 @@ public class Verify extends Activity {
 				// looping through all item nodes <item>
 				for (int i = 0; i < nl.getLength(); i++) {
 					Element e = (Element) nl.item(i);
-					System.out.println(i+"*"+e.getTextContent().trim()+"*");
+					System.out.println(">>>" + i+"*"+e.getTextContent().trim()+"*"); // TODO
 					NodeList nl2 = e.getChildNodes();
-					
-					// TODO
-//					String action = parser.getValue(nl2, "content");
-//					System.out.println(i+"#"+nl2.item(3)+"#");
-					System.out.println(i+"#"+parser.getValue((Element) nl2.item(3), "src")+"#");
-/*					if (action.equals("GoTo")) {
-						String chapter = parser.getElementValue(e).trim();
-						try {
-							int page = Integer.valueOf(parser.getValue(e, "Page").split(" ")[0]);
-
-							// Add entry in toc
-							
-							// Set next entry
-						} catch (RuntimeException ex) {
-							System.err.println("RuntimeException in xml extraction " + ex.getMessage());
-						}
-					}*/
+					System.out.println(">>>" + i+"#"+parser.getValue((Element) nl2.item(3), "src")+"#"); // TODO
+					 // TODO creare tabella capitolo link
 				}
 			}
 		}
