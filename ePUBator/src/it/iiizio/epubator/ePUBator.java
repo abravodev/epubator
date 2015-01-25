@@ -90,7 +90,7 @@ public class ePUBator extends Activity {
 	@SuppressWarnings("deprecation")
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.menu, menu);
+		inflater.inflate(R.menu.mainmenu, menu);
 		MenuCompat.setShowAsAction(menu.findItem(R.id.prefs), 0);
 		return true;
 	}

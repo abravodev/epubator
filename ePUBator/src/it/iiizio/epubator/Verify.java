@@ -38,9 +38,15 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuCompat;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -95,6 +101,26 @@ public class Verify extends Activity {
 		nextBt.setOnClickListener(mNextListener);
 	}
 
+	// Inflate menu
+	@SuppressWarnings("deprecation")
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.indexmenu, menu);
+		MenuCompat.setShowAsAction(menu.findItem(R.id.prefs), 0);
+		return true;
+	}
+
+	// Menu item selected
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.index:
+			startActivity(new Intent(Verify.this, Prefs.class));
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
 	// Change page
 	private void changePage(int diff) {
 		// No pages
@@ -129,6 +155,7 @@ public class Verify extends Activity {
 		showPage(pageName);
 	}
 	
+	@SuppressLint("SetJavaScriptEnabled")
 	void showPage(String pageName) {
 		String url = "";
 		boolean noImages;

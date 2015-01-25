@@ -37,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <!-- Verify -->
     <string name="prev">Previous page</string>
     <string name="next">Next page</string>
+    <string name="index">Index</string>
     
     <!-- Prefs -->
     <string name="images_title">Include images</string>
