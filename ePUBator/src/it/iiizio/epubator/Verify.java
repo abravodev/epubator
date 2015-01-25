@@ -59,9 +59,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 public class Verify extends Activity {
-	private static int pageNumber = -1;
 	private static ZipFile epubFile = null;
-	private ArrayList<String>pageList;
+	private ArrayList<String>htmlList;
+	private static int htmlIndex = -1;
 	private List<String> chapters = new ArrayList<String>();
     private List<String> anchors = new ArrayList<String>();
 	private WebView verifyWv;
@@ -97,11 +97,11 @@ public class Verify extends Activity {
 
 		// Initialize
 		fillPageList();
-		if (pageNumber == -1) {
-			pageNumber = 1;
+		if (htmlIndex == -1) {
+			htmlIndex = 1;
 		}
 
-		changePage(0);
+		changeHtmlFile(0);
 		prevBt.setOnClickListener(mPrevListener);
 		nextBt.setOnClickListener(mNextListener);
 	}
@@ -126,59 +126,66 @@ public class Verify extends Activity {
 		}
 	}
 	
+	// Select chapter dialog
 	@Override
 	public Dialog onCreateDialog(int id) {
-	    AlertDialog.Builder builder = new AlertDialog.Builder(Verify.this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(Verify.this);
 		builder.setTitle(R.string.index)
-	           .setItems(chapters.toArray(new CharSequence[chapters.size()]), new DialogInterface.OnClickListener() {
-	               public void onClick(DialogInterface dialog, int which) {
-	               // The 'which' argument contains the index position
-	               // of the selected item
-	           		System.out.println(">>>" + anchors.get(which)); // TODO
-	           }
-	    });
-	    return builder.create();
+		.setItems(chapters.toArray(new CharSequence[chapters.size()]), new DialogInterface.OnClickListener() {
+			// Move to selected chapter
+			public void onClick(DialogInterface dialog, int which) {
+				String[] links = anchors.get(which).split("#");
+				if (links.length > 1)
+					anchor = links[1];
+				else
+					anchor = null;
+				changeHtmlFile(htmlList.indexOf(links[0]) - htmlIndex + 1);
+			}
+		});
+		return builder.create();
 	}
 
-	// Change page
-	private void changePage(int diff) {
-		// No pages
-		int pages = pageList.size();
-		if (pages == 0) {
+	// Change html file
+	private void changeHtmlFile(int diff) {
+		// No html file
+		int htlmFiles = htmlList.size();
+		if (htlmFiles == 0) {
 			closeEpub();
 			readError();
 			return;
 		}
 
-		// Move to prev/next page
-		pageNumber += diff;
+		// Move to prev/next file
+		htmlIndex += diff;
 
 		// Set buttons
-		if (pageNumber <= 1) {
-			pageNumber = 1;
+		if (htmlIndex <= 1) {
+			htmlIndex = 1;
 			prevBt.setEnabled(false);
 		} else {
 			prevBt.setEnabled(true);
 		}
-		if  (pageNumber >= pages) {
-			pageNumber = pages;
+		if  (htmlIndex >= htlmFiles) {
+			htmlIndex = htlmFiles;
 			nextBt.setEnabled(false);
 		} else {
 			nextBt.setEnabled(true);
 		}
-		setProgress(pageNumber*9999/pages);
+		setProgress(htmlIndex*9999/htlmFiles);
 		
-		String pageName = pageList.get(pageNumber - 1);
-		anchor = pageName.substring(pageName.lastIndexOf("/") + 1, pageName.lastIndexOf(".")); // TODO
-		System.out.println(">>>" + pageName + "__" + anchor); // TODO
-		showPage(pageName);
+		// Set html file and position
+		String fileName = htmlList.get(htmlIndex - 1);
+		if (anchor == null) {
+			anchor = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.lastIndexOf("."));
+		}
+		showPage(fileName);
 	}
 	
+	// Show htlm file
 	@SuppressLint("SetJavaScriptEnabled")
-	void showPage(String pageName) {
+	void showPage(String htlmFile) {
 		String url = "";
 		boolean noImages;
-		System.err.println(">>>" + pageName + " # " + anchor); // TODO
 
 		verifyWv.getSettings().setJavaScriptEnabled(false);
 		verifyWv.clearView();
@@ -186,7 +193,7 @@ public class Verify extends Activity {
 		// get html page
 		StringBuilder htmlPageSb = new StringBuilder();
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry(pageName))), BUFFERSIZE);
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry(htlmFile))), BUFFERSIZE);
 			String line;
 			while ((line = bufferedReader.readLine()) != null) {
 				htmlPageSb.append(line);
@@ -287,14 +294,14 @@ public class Verify extends Activity {
 	// Prev button pressed
 	View.OnClickListener mPrevListener = new OnClickListener() {
 		public void onClick(View v) {
-			changePage(-1);
+			changeHtmlFile(-1);
 		}
 	};
 
 	// Next button pressed
 	View.OnClickListener mNextListener = new OnClickListener() {
 		public void onClick(View v) {
-			changePage(+1);
+			changeHtmlFile(+1);
 		}
 	};
 
@@ -317,13 +324,13 @@ public class Verify extends Activity {
 		}
 
 		// Get page list
-		pageList = new ArrayList<String>();
-		Enumeration<? extends ZipEntry>fileList;
-		for (fileList = epubFile.entries(); fileList.hasMoreElements();) {
-			ZipEntry entry = (ZipEntry) fileList.nextElement();
+		htmlList = new ArrayList<String>();
+		Enumeration<? extends ZipEntry>entriesList;
+		for (entriesList = epubFile.entries(); entriesList.hasMoreElements();) {
+			ZipEntry entry = (ZipEntry) entriesList.nextElement();
 			String name = entry.getName();
 			if (name.endsWith(".html")) {
-				pageList.add(name);
+				htmlList.add(name);
 			}
 		}
 		
@@ -349,11 +356,9 @@ public class Verify extends Activity {
 				// looping through all item nodes <item>
 				for (int i = 0; i < nl.getLength(); i++) {
 					Element e = (Element) nl.item(i);
-					System.out.println(">>>" + i+"*"+e.getTextContent().trim()+"*"); // TODO
 					chapters.add(e.getTextContent().trim());
 					NodeList nl2 = e.getChildNodes();
-					System.out.println(">>>" + i+"#"+parser.getValue((Element) nl2.item(3), "src")+"#"); // TODO
-					anchors.add(parser.getValue((Element) nl2.item(3), "src"));
+					anchors.add("OEBPS/" + parser.getValue((Element) nl2.item(3), "src"));
 				}
 			}
 		}
@@ -367,7 +372,7 @@ public class Verify extends Activity {
 
 	// Activity end
 	private void exit() {
-		pageNumber = -1;
+		htmlIndex = -1;
 		removeFiles();
 		finish();
 	}
