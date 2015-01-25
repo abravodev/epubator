@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -40,7 +41,9 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Intent;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.MenuCompat;
@@ -59,6 +62,8 @@ public class Verify extends Activity {
 	private static int pageNumber = -1;
 	private static ZipFile epubFile = null;
 	private ArrayList<String>pageList;
+	private List<String> chapters = new ArrayList<String>();
+    private List<String> anchors = new ArrayList<String>();
 	private WebView verifyWv;
 	private Button prevBt;
 	private Button nextBt;
@@ -114,11 +119,25 @@ public class Verify extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.index:
-			startActivity(new Intent(Verify.this, Prefs.class));
+			showDialog(0);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	@Override
+	public Dialog onCreateDialog(int id) {
+	    AlertDialog.Builder builder = new AlertDialog.Builder(Verify.this);
+		builder.setTitle(R.string.index)
+	           .setItems(chapters.toArray(new CharSequence[chapters.size()]), new DialogInterface.OnClickListener() {
+	               public void onClick(DialogInterface dialog, int which) {
+	               // The 'which' argument contains the index position
+	               // of the selected item
+	           		System.out.println(">>>" + anchors.get(which)); // TODO
+	           }
+	    });
+	    return builder.create();
 	}
 
 	// Change page
@@ -331,9 +350,10 @@ public class Verify extends Activity {
 				for (int i = 0; i < nl.getLength(); i++) {
 					Element e = (Element) nl.item(i);
 					System.out.println(">>>" + i+"*"+e.getTextContent().trim()+"*"); // TODO
+					chapters.add(e.getTextContent().trim());
 					NodeList nl2 = e.getChildNodes();
 					System.out.println(">>>" + i+"#"+parser.getValue((Element) nl2.item(3), "src")+"#"); // TODO
-					 // TODO creare tabella capitolo link
+					anchors.add(parser.getValue((Element) nl2.item(3), "src"));
 				}
 			}
 		}
