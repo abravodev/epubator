@@ -39,14 +39,13 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.view.MenuCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -85,8 +84,7 @@ public class Verify extends Activity {
 			public void onPageFinished(final WebView view, final String url) {
 				// make it jump to the internal link
 				if (anchor != null) {
-					view.loadUrl("javascript:location.href=\"#" + anchor + "\"");
-					verifyWv.getSettings().setJavaScriptEnabled(false);
+					view.loadUrl(url + "#" + anchor);
 					anchor = null;
 				}
 			}
@@ -107,11 +105,10 @@ public class Verify extends Activity {
 	}
 
 	// Inflate menu
-	@SuppressWarnings("deprecation")
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.indexmenu, menu);
-		MenuCompat.setShowAsAction(menu.findItem(R.id.prefs), 0);
+		inflater.inflate(R.menu.verifymenu, menu);
+		MenuItemCompat.setShowAsAction(menu.findItem(R.id.index), 1);
 		return true;
 	}
 
@@ -182,7 +179,6 @@ public class Verify extends Activity {
 	}
 	
 	// Show htlm file
-	@SuppressLint("SetJavaScriptEnabled")
 	void showPage(String htlmFile) {
 		String url = "";
 		boolean noImages;
@@ -272,10 +268,8 @@ public class Verify extends Activity {
 
 		if (noImages) {
 			// Show page without images
-			verifyWv.loadData(htmlPage, "text/html", "utf-8");
+			verifyWv.loadDataWithBaseURL("app:html", htmlPage, "text/html", "utf-8", null);
 		}
-
-		verifyWv.getSettings().setJavaScriptEnabled(true);
 	}
 	
 	// Remove temp files

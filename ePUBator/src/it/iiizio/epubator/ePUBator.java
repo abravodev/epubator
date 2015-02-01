@@ -32,7 +32,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.v4.view.MenuCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -87,11 +87,10 @@ public class ePUBator extends Activity {
 	}
 
 	// Inflate menu
-	@SuppressWarnings("deprecation")
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.mainmenu, menu);
-		MenuCompat.setShowAsAction(menu.findItem(R.id.prefs), 0);
+		MenuItemCompat.setShowAsAction(menu.findItem(R.id.prefs), 0);
 		return true;
 	}
 

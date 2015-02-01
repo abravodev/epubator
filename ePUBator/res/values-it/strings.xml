@@ -37,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <!-- Verify -->
     <string name="prev">Pagina precedente</string>
     <string name="next">Pagina successiva</string>
+    <string name="index">Indice</string>
     
     <!-- Prefs -->
     <string name="images_title">Includi immagini</string>
