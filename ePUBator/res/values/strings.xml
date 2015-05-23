@@ -67,6 +67,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="verify_group">Verify</string>
     <string name="show_images_title">Show images</string>
     <string name="show_images_summary">Show images in Verify</string>
+    <string name="logo_title">Logo on cover</string>
+    <string name="logo_summary">Put ePUBator logo on cover</string>
     
     <!-- FileChooser -->
     <string name="path">Path: %s</string>

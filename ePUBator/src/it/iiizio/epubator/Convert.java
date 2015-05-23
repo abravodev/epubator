@@ -73,6 +73,7 @@ public class Convert extends Activity {
 	private boolean addMarkers;
 	private boolean hideNotifi;
 	private boolean tocFromPdf;
+	private boolean logoOnCover;
 
 	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
@@ -136,6 +137,7 @@ public class Convert extends Activity {
 		addMarkers = prefs.getBoolean("add_markers", true);
 		hideNotifi = prefs.getBoolean("hide_notifi", false);
 		tocFromPdf = prefs.getBoolean("toc_from_pdf", true);
+		logoOnCover = prefs.getBoolean("logo_on_cover", true);
 	}
 
 	// Set buttons state
@@ -756,8 +758,10 @@ public class Convert extends Activity {
 				publishProgress(getResources().getString(R.string.imagecover));
 			} else {
 				// Add ePUBator logo
-				img = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
-				canvas.drawBitmap(img, maxWidth - img.getWidth(), maxHeight - img.getHeight(), new Paint(Paint.FILTER_BITMAP_FLAG));
+				if (logoOnCover) {
+					img = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+					canvas.drawBitmap(img, maxWidth - img.getWidth(), maxHeight - img.getHeight(), new Paint(Paint.FILTER_BITMAP_FLAG));
+				}
 
 				// Add title as cover
 				paint.setTextSize(fontsize);

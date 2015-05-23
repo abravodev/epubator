@@ -70,6 +70,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:summary="@string/pickapic_summary"
         android:title="@string/pickapic_title" />
 
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="logo_on_cover"
+        android:summary="@string/logo_summary"
+        android:title="@string/logo_title" />
+
     <PreferenceCategory android:title="@string/filechooser_group" >
 
 	    <CheckBoxPreference
