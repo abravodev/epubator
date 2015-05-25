@@ -721,7 +721,7 @@ public class Convert extends Activity {
 
 		// Create frontpage.html
 		private String createFrontpage() {
-			return createHtml("Frontpage", "<div><img alt=\"cover\" src=\"frontpage.png\" /></div>");
+			return createHtml("Frontpage", "<div><img height=\"100%\" alt=\"cover\" src=\"frontpage.png\" /></div>");
 		}
 
 		// Create frontpage.png
