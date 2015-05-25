@@ -37,6 +37,7 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -557,7 +558,7 @@ public class Convert extends Activity {
 			content.append("        <dc:creator>" + (ReadPdf.getAuthor()).replaceAll("[<>]", "_") + "</dc:creator>\n");
 			content.append("        <dc:creator opf:role=\"bkp\">ePUBator - Minimal offline PDF to ePUB converter for Android</dc:creator>\n");
 			content.append("        <dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + id + "</dc:identifier>\n");
-			content.append("        <dc:language>en</dc:language>\n");
+			content.append("        <dc:language>" + Resources.getSystem().getConfiguration().locale.getLanguage() + "</dc:language>\n");
 			content.append("    </metadata>\n");
 			content.append("    <manifest>\n");
 			for(int i = 1; i <= pages; i += pagesPerFile) {
