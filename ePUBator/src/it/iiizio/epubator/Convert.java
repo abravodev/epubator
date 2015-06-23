@@ -65,6 +65,11 @@ public class Convert extends Activity {
 	private static boolean notificationSent = false;
 	private static int result;
 	private static String filename = "";
+	private static String path = "";
+	private static String pdfFilename = "";
+	private static String epubFilename = "";
+	private static String oldFilename = "";
+	private static String tempFilename = "";
 	private static String cover_file = "";
 
 	private boolean includeImages;
@@ -78,8 +83,8 @@ public class Convert extends Activity {
 
 	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
-	private final String TEMP_EXT = " - ePUBator.tmp";
 	private final String OLD_EXT = " - ePUBator.old";
+	private final String TEMP_EXT = " - ePUBator.tmp";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -112,8 +117,13 @@ public class Convert extends Activity {
 					cover_file = "";
 				}
 				if (extras.containsKey("filename")) {
-					String pdfFilename = extras.getString("filename");
-					filename = pdfFilename.substring(0, pdfFilename.lastIndexOf(PDF_EXT));
+					pdfFilename = extras.getString("filename");
+					String noExt = pdfFilename.substring(0, pdfFilename.lastIndexOf(PDF_EXT));
+					path = noExt.substring(0, noExt.lastIndexOf('/', noExt.length()) + 1);
+					filename = noExt.substring(noExt.lastIndexOf("/") + 1, noExt.length());
+					epubFilename = noExt + EPUB_EXT;  // TODO check writable and prefs
+					oldFilename = noExt + OLD_EXT;
+					tempFilename = noExt + TEMP_EXT;  // TODO tempdir
 					new convertTask().execute();
 				}
 			}
@@ -212,7 +222,7 @@ public class Convert extends Activity {
 			.setNeutralButton(getResources().getString(R.string.verify), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					Intent verify = new Intent(getBaseContext(), Verify.class);
-					verify.putExtra("filename", filename + TEMP_EXT);
+					verify.putExtra("filename", tempFilename);
 					startActivityForResult(verify, 0);
 				}
 			})
@@ -228,9 +238,9 @@ public class Convert extends Activity {
 
 	// Delete file
 	private void deleteTmp() {
-		new File(filename + TEMP_EXT).delete();
-		if (new File(filename + OLD_EXT).exists()) {
-			new File(filename + OLD_EXT).renameTo(new File(filename + EPUB_EXT));
+		new File(tempFilename).delete();
+		if (new File(oldFilename).exists()) {
+			new File(oldFilename).renameTo(new File(epubFilename));
 			progressSb.append(getResources().getString(R.string.kept_old));
 		} else {
 			progressSb.append(getResources().getString(R.string.deleted));
@@ -248,15 +258,15 @@ public class Convert extends Activity {
 			progressSb.append(String.format(getResources().getString(R.string.lost_pages), "<<#") + pageNumberString);
 		}
 		renameFile();
-		progressSb.append(getResources().getString(R.string.file) + filename + EPUB_EXT);
+		progressSb.append(getResources().getString(R.string.file) + epubFilename);
 		progressTv.setText(progressSb);
 		scroll_up();
 	}
 
 	// Rename tmp file
 	private void renameFile() {
-		new File(filename + TEMP_EXT).renameTo(new File(filename + EPUB_EXT));
-		new File(filename + OLD_EXT).delete();
+		new File(tempFilename).renameTo(new File(epubFilename));
+		new File(oldFilename).delete();
 	}
 
 	// Scroll scroll view up
@@ -287,8 +297,7 @@ public class Convert extends Activity {
 		// Background task
 		@Override
 		protected Void doInBackground(Void... params) {
-			// Remove bad files
-			String path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
+			// Remove bad files // TODO can be removed in the next version
 			String[] files = new File(path).list();
 			if(files != null) {
 				for (int i = 0; i < files.length; i++) {
@@ -299,16 +308,16 @@ public class Convert extends Activity {
 			}
 
 			// Save old ePUB
-			if (new File(filename + EPUB_EXT).exists()) {
-				new File(filename + EPUB_EXT).renameTo(new File(filename + OLD_EXT));
+			if (new File(epubFilename).exists()) {
+				new File(epubFilename).renameTo(new File(oldFilename));
 			}
 
 			// Load PDF
-			publishProgress(String.format(getResources().getString(R.string.load), filename + PDF_EXT));
-			if (!(new File(filename + PDF_EXT).exists())) {
+			publishProgress(String.format(getResources().getString(R.string.load), pdfFilename));
+			if (!(new File(pdfFilename).exists())) {
 				// PDF file not found
 				result = 1;
-			} else if (ReadPdf.open(filename + PDF_EXT)) {
+			} else if (ReadPdf.open(pdfFilename)) {
 				// Failed to read PDF file
 				result = 2;
 			} else if (result != 5) {
@@ -368,7 +377,7 @@ public class Convert extends Activity {
 				} else {
 					// Keep if ok
 					renameFile();
-					publishProgress(String.format(getResources().getString(R.string.file), filename + EPUB_EXT));
+					publishProgress(String.format(getResources().getString(R.string.file), epubFilename));
 				}
 			}
 
@@ -400,7 +409,7 @@ public class Convert extends Activity {
 
 				// Create ePUB file
 				publishProgress(getResources().getString(R.string.create));
-				if (WriteZip.create(filename + TEMP_EXT)) {
+				if (WriteZip.create(tempFilename)) {
 					return 3;
 				}
 
@@ -416,8 +425,7 @@ public class Convert extends Activity {
 					return 3;
 				}
 
-				String name = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
-				String title = name.replaceAll("[^\\p{Alnum}]", " ");
+				String title = filename.replaceAll("[^\\p{Alnum}]", " ");
 				String bookId = title + " - " + new Date().hashCode();
 				
 				publishProgress(getResources().getString(R.string.toc));
@@ -722,7 +730,7 @@ public class Convert extends Activity {
 
 		// Create frontpage.html
 		private String createFrontpage() {
-			return createHtml("Frontpage", "<div><img height=\"100%\" alt=\"cover\" src=\"frontpage.png\" /></div>");
+			return createHtml("Frontpage", "<div><img width=\"100%\" alt=\"cover\" src=\"frontpage.png\" /></div>");
 		}
 
 		// Create frontpage.png
@@ -770,8 +778,8 @@ public class Convert extends Activity {
 				paint.setAntiAlias(true);
 				paint.setStyle(Paint.Style.FILL);
 
-				String name = filename.substring(filename.lastIndexOf("/") + 1, filename.length()).replaceAll("_", " ");
-				String words[] = name.split("\\s");
+				String title = filename.replaceAll("_", " ");
+				String words[] = title.split("\\s");
 
 				float newline = paint.getFontSpacing();
 				float x = border;
