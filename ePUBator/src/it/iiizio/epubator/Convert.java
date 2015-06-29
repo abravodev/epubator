@@ -19,6 +19,7 @@ package it.iiizio.epubator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -46,6 +47,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.Window;
@@ -66,6 +68,7 @@ public class Convert extends Activity {
 	private static int result;
 	private static String filename = "";
 	private static String path = "";
+	private static String tempPath = "";
 	private static String pdfFilename = "";
 	private static String epubFilename = "";
 	private static String oldFilename = "";
@@ -80,6 +83,7 @@ public class Convert extends Activity {
 	private boolean hideNotifi;
 	private boolean tocFromPdf;
 	private boolean logoOnCover;
+	private boolean downloadDir;
 
 	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
@@ -103,6 +107,8 @@ public class Convert extends Activity {
 		stopBt = (Button)findViewById(R.id.stop);
 		stopBt.setOnClickListener(mStopListener);
 
+		getPrefs();
+
 		if (conversionStarted) {
 			// Update screen
 			progressTv.setText(progressSb);
@@ -121,9 +127,27 @@ public class Convert extends Activity {
 					String noExt = pdfFilename.substring(0, pdfFilename.lastIndexOf(PDF_EXT));
 					path = noExt.substring(0, noExt.lastIndexOf('/', noExt.length()) + 1);
 					filename = noExt.substring(noExt.lastIndexOf("/") + 1, noExt.length());
-					epubFilename = noExt + EPUB_EXT;  // TODO check writable and prefs
-					oldFilename = noExt + OLD_EXT;
-					tempFilename = noExt + TEMP_EXT;  // TODO tempdir
+
+					// Check writable
+					boolean writable = false;
+					try {
+						File checkFile = new File(path + TEMP_EXT);
+						writable = checkFile.createNewFile();
+						checkFile.delete();
+					} catch (IOException e) {
+					}
+										
+					// Save ePUB in the Download folder as user choice or if PDF folder is not writable
+					if (downloadDir || !writable) {
+						epubFilename = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + filename + EPUB_EXT;
+					} else {
+						epubFilename = noExt + EPUB_EXT;
+					}
+					
+					tempPath = getExternalCacheDir() + "/";
+					oldFilename = tempPath + filename+ OLD_EXT;
+					tempFilename = tempPath + filename + TEMP_EXT;
+
 					new convertTask().execute();
 				}
 			}
@@ -134,11 +158,15 @@ public class Convert extends Activity {
 		notificationSent = false;
 	}
 
-	// Get preferences
 	@Override
 	public void onResume() {
 		super.onResume();
 
+		getPrefs();
+	}
+	
+	// Get preferences
+	private void getPrefs() {
 		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
 
 		includeImages = prefs.getBoolean("include_images", true);
@@ -149,6 +177,7 @@ public class Convert extends Activity {
 		hideNotifi = prefs.getBoolean("hide_notifi", false);
 		tocFromPdf = prefs.getBoolean("toc_from_pdf", true);
 		logoOnCover = prefs.getBoolean("logo_on_cover", true);
+		downloadDir = prefs.getBoolean("download_dir", false);
 	}
 
 	// Set buttons state
@@ -258,7 +287,7 @@ public class Convert extends Activity {
 			progressSb.append(String.format(getResources().getString(R.string.lost_pages), "<<#") + pageNumberString);
 		}
 		renameFile();
-		progressSb.append(getResources().getString(R.string.file) + epubFilename);
+		progressSb.append(String.format(getResources().getString(R.string.epubfile), epubFilename));
 		progressTv.setText(progressSb);
 		scroll_up();
 	}
@@ -297,8 +326,8 @@ public class Convert extends Activity {
 		// Background task
 		@Override
 		protected Void doInBackground(Void... params) {
-			// Remove bad files // TODO can be removed in the next version
-			String[] files = new File(path).list();
+			// Remove bad files
+			String[] files = new File(tempFilename).list();
 			if(files != null) {
 				for (int i = 0; i < files.length; i++) {
 					if (files[i].endsWith(TEMP_EXT) || files[i].endsWith(OLD_EXT)) {
@@ -377,7 +406,7 @@ public class Convert extends Activity {
 				} else {
 					// Keep if ok
 					renameFile();
-					publishProgress(String.format(getResources().getString(R.string.file), epubFilename));
+					publishProgress(String.format(getResources().getString(R.string.epubfile), epubFilename));
 				}
 			}
 

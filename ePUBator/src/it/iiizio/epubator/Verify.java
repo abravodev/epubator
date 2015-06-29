@@ -62,7 +62,7 @@ public class Verify extends Activity {
 	private ArrayList<String>htmlList;
 	private static int htmlIndex = -1;
 	private List<String> chapters = new ArrayList<String>();
-    private List<String> anchors = new ArrayList<String>();
+	private List<String> anchors = new ArrayList<String>();
 	private WebView verifyWv;
 	private Button prevBt;
 	private Button nextBt;
@@ -122,7 +122,7 @@ public class Verify extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	// Select chapter dialog
 	@Override
 	public Dialog onCreateDialog(int id) {
@@ -169,7 +169,7 @@ public class Verify extends Activity {
 			nextBt.setEnabled(true);
 		}
 		setProgress(htmlIndex*9999/htlmFiles);
-		
+
 		// Set html file and position
 		String fileName = htmlList.get(htmlIndex - 1);
 		if (anchor == null) {
@@ -177,7 +177,7 @@ public class Verify extends Activity {
 		}
 		showPage(fileName);
 	}
-	
+
 	// Show htlm file
 	void showPage(String htlmFile) {
 		String url = "";
@@ -185,7 +185,7 @@ public class Verify extends Activity {
 
 		verifyWv.getSettings().setJavaScriptEnabled(false);
 		verifyWv.clearView();
-		
+
 		// get html page
 		StringBuilder htmlPageSb = new StringBuilder();
 		try {
@@ -271,7 +271,7 @@ public class Verify extends Activity {
 			verifyWv.loadDataWithBaseURL("app:html", htmlPage, "text/html", "utf-8", null);
 		}
 	}
-	
+
 	// Remove temp files
 	private void removeFiles() {
 		File file = new File(getFilesDir(), "");
@@ -310,52 +310,54 @@ public class Verify extends Activity {
 			}
 		}
 
+		htmlList = new ArrayList<String>();
+
 		// open ePUB file
 		try {
 			epubFile = new ZipFile(filename);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			readError();
-		}
-
-		// Get page list
-		htmlList = new ArrayList<String>();
-		Enumeration<? extends ZipEntry>entriesList;
-		for (entriesList = epubFile.entries(); entriesList.hasMoreElements();) {
-			ZipEntry entry = (ZipEntry) entriesList.nextElement();
-			String name = entry.getName();
-			if (name.endsWith(".html")) {
-				htmlList.add(name);
-			}
+			return;
 		}
 		
-		// Extract toc
-		StringBuilder tocSb = new StringBuilder();
-		try {
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry("OEBPS/toc.ncx"))), BUFFERSIZE);
-			String line;
-			while ((line = bufferedReader.readLine()) != null) {
-				tocSb.append(line);
-			}
-		} catch (IOException e) {
-			readError();
-		}
-
-		// Extract chapters
-		XMLParser parser = new XMLParser();
-		Document doc = parser.getDomElement(tocSb.toString());
-		if (doc != null) {
-			doc.normalize();
-			NodeList nl = doc.getElementsByTagName("navPoint");
-			if (nl != null) {
-				// looping through all item nodes <item>
-				for (int i = 0; i < nl.getLength(); i++) {
-					Element e = (Element) nl.item(i);
-					chapters.add(e.getTextContent().trim());
-					NodeList nl2 = e.getChildNodes();
-					anchors.add("OEBPS/" + parser.getValue((Element) nl2.item(3), "src"));
+			// Get page list
+			Enumeration<? extends ZipEntry>entriesList;
+			for (entriesList = epubFile.entries(); entriesList.hasMoreElements();) {
+				ZipEntry entry = (ZipEntry) entriesList.nextElement();
+				String name = entry.getName();
+				if (name.endsWith(".html")) {
+					htmlList.add(name);
 				}
 			}
-		}
+
+			// Extract toc
+			StringBuilder tocSb = new StringBuilder();
+			try {
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry("OEBPS/toc.ncx"))), BUFFERSIZE);
+				String line;
+				while ((line = bufferedReader.readLine()) != null) {
+					tocSb.append(line);
+				}
+			} catch (IOException e) {
+				readError();
+			}
+
+			// Extract chapters
+			XMLParser parser = new XMLParser();
+			Document doc = parser.getDomElement(tocSb.toString());
+			if (doc != null) {
+				doc.normalize();
+				NodeList nl = doc.getElementsByTagName("navPoint");
+				if (nl != null) {
+					// looping through all item nodes <item>
+					for (int i = 0; i < nl.getLength(); i++) {
+						Element e = (Element) nl.item(i);
+						chapters.add(e.getTextContent().trim());
+						NodeList nl2 = e.getChildNodes();
+						anchors.add("OEBPS/" + parser.getValue((Element) nl2.item(3), "src"));
+					}
+				}
+			}
 	}
 
 	// Show error toast
@@ -382,7 +384,7 @@ public class Verify extends Activity {
 	private void closeEpub() {
 		try {
 			epubFile.close();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			readError();
 		}
 	}

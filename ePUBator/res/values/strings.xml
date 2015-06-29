@@ -69,6 +69,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="show_images_summary">Show images in Verify</string>
     <string name="logo_title">Logo on cover</string>
     <string name="logo_summary">Put ePUBator logo on cover</string>
+    <string name="downloaddir_title">ePUB in Download</string>
+    <string name="downloaddir_summary">Always save the ePUB file in the Download folder</string>
     
     <!-- FileChooser -->
     <string name="path">Path: %s</string>
@@ -97,7 +99,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="errors">Errors are marked with %s</string>
     <string name="pagenumber">PageNumber%s</string>
     <string name="load">Loading: %s</string>
-    <string name="file">\nePUB file: %s</string>
+    <string name="epubfile">\nePUB file: %s</string>
     <string name="create">Create ePUB file</string>
     <string name="mimetype">Add mimetype</string>
     <string name="container">Add container.xml</string>

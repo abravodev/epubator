@@ -76,6 +76,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:summary="@string/logo_summary"
         android:title="@string/logo_title" />
 
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="download_dir"
+        android:summary="@string/downloaddir_summary"
+        android:title="@string/downloaddir_title" />
+
     <PreferenceCategory android:title="@string/filechooser_group" >
 
 	    <CheckBoxPreference
