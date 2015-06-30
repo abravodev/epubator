@@ -326,13 +326,11 @@ public class Convert extends Activity {
 		// Background task
 		@Override
 		protected Void doInBackground(Void... params) {
-			// Remove bad files
-			String[] files = new File(tempFilename).list();
+			// Remove cache files
+			String[] files = new File(tempPath).list();
 			if(files != null) {
 				for (int i = 0; i < files.length; i++) {
-					if (files[i].endsWith(TEMP_EXT) || files[i].endsWith(OLD_EXT)) {
-						new File(path + files[i]).delete();
-					}
+					new File(tempPath + files[i]).delete();
 				}
 			}
 
