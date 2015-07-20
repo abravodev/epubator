@@ -4,13 +4,13 @@ ePUBator estrae il testo da un file PDF e lo inserisce in un file ePUB correttam
 
 L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/> rilasciata sotto licenza AGPL. 
 
-- ePUBator E' FATTO PER I LIBRI, NON PER OGNI TIPO DI PDF (NON CHIEDETEGLI TROPPO).
+- ePUBator E' PENSATO PER I LIBRI (NON PER OGNI TIPO DI PDF), MA SE VOLETE UN RISULTATO MIGLIORE PROVATE QUALCOSA D'ALTRO COME CALIBRE.
 - ePUBator non necessita di una connessione internet (non invia i tuoi documenti da qualche parte sulla rete, non ha pubblicità).
 - ePUBator estrae il testo (nessun testo dalle figure o da PDF raster).
 - ePUBator cerca di estrarre le immagini (solo png, jpg e gif) ma le mette alla fine della pagina.
 - ePUBator cerca di estrarre l'indice dal PDF se presente (o ne crea uno fittizio).
 - ePUBator non estrae lo stile e le dimensioni dei caratteri.
-- ePUBator salva il file ePUB nella stessa cartella del file PDF (usa il nome del file PDF per generare il nome del file ePUB e il titolo di copertina, quindi rinomina il PDF prima della conversione).
+- ePUBator salva il file ePUB nella stessa cartella del file PDF o nella cartella Download se la cartella del PDF non è scrivibile o se impostato in Preferenze.
 - ePUBator funziona bene solo con i PDF a singola colonna (peggio con quelli multicolonna o le tabelle).
 - ePUBator può fallire l'estrazione (5 of 358 libri con la v0.8.1 sul mio Atrix).
 
@@ -24,7 +24,7 @@ Non ho mai provato pdf con caratteri arabi o asiatici, scrittura da destra a sin
 In alcuni libri si possono trovare caratteri errati (ad esempio Øø invece di éù), sembra sia un problema di iText (un'altra libreria PDF estrae lo stesso testo correttamente). Ne sto cercando una migliore, gratuita e compatibile con Android.
 
 Autorizzazioni richieste:
-- WRITE_EXTERNAL_STORAGE per salvare il file ePUB
+- READ_EXTERNAL_STORAGE e WRITE_EXTERNAL_STORAGE per salvare il file ePUB
 
 Note legali:
 Questo programma è software libero: è possibile ridistribuirlo e/o modificarlo secondo i termini della GNU General Public License come pubblicata dalla Free Software Foundation, sia la versione 3 della licenza, o (a propria scelta) una versione successiva. 
@@ -36,6 +36,14 @@ Per commenti / feedback / bug / suggerimenti / localizzazioni scrivi a: iiizio A
 Per sorgenti / tutti i file apk / donazioni vai su sourceforge: https://sourceforge.net/p/epubator/home/Home/
 
 Storico:
+v0.12  (19-07-2015)         
+- Aggiunta immagine sulla copertina
+- Aggiunto salva in Download
+- Aggiunta guida rapida
+- Aggiunto condividi ePUB
+- Aggiornate iText lib e libreria di supporto
+- Correzioni varie
+
 v0.11  (07-04-2013)
 - Aggiunto apri con ePUBator
 - Aggiunto selettore delle cartelle recenti

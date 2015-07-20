@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="verify">Verify ePUB</string>
     <string name="cip">Conversion in progress</string>
     <string name="wrongfile">ePUBator can only show you the preview of converted files</string>
-    <string name="quickstart_text">Tap on \"Convert PDF\", select a file and after a while you\'ll have the ePUB in the same folder.\n\nTap on \"Verify ePUB\" to check the result of conversion.\n\nBefore conversion you can set an image as cover in two ways:\n1) Put the image file (PNG or JPG) in the same folder and with the same name of PDF file.\n2) Enable \"Cover from gallery\" in \"Settings\" and choose the image right after selecting the PDF file.</string>
+    <string name="quickstart_text">Tap on \"Convert PDF\", select a file and after a while you\'ll have the ePUB in the same folder or in Download folder.\n\nTap on \"Verify ePUB\" to check the result of conversion.\n\nBefore conversion you can set an image as cover in two ways:\n1) Put the image file (PNG or JPG) in the same folder and with the same name of PDF file.\n2) Enable \"Cover from gallery\" in \"Settings\" and choose the image right after selecting the PDF file.\nOtherwise ePUBator uses the PDF filename to generate the title in the frontpage, so if you dislike it you need to rename the PDF file before conversion.</string>
     
     <!-- Menu -->
     <string name="prefs">Settings</string>

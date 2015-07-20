@@ -4,13 +4,13 @@ ePUBator extract text from a PDF file and put it in a well formed (epubcheck com
 
 PDF extraction based on iText library <http://itextpdf.com/> released under the AGPL license. 
 
-- ePUBator IS MADE FOR BOOKS, NOT FOR EVERY TYPE OF PDF (DON'T ASK IT TOO MUCH).
+- ePUBator IS THINKED FOR BOOKS (NOT FOR EVERY TYPE OF PDF), BUT IF YOU NEED A BETTER RESULT TRY SOMETHING ELSE LIKE CALIBRE.
 - ePUBator doesn't need internet connection (doesn't send your docs somewhere on the net, doesn't have ads).
-- ePUBator extract text (no text from pictures or from raster PDF).
-- ePUBator try to extract images (only png, jpg and gif) but puts them at the page's end.
-- ePUBator try to extract the table of contents if present (or creates a dummy TOC).
+- ePUBator extracts text (no text from pictures or from raster PDF).
+- ePUBator tries to extract images (only png, jpg and gif) but puts them at the page's end.
+- ePUBator tries to extract the table of contents if present (or creates a dummy TOC).
 - ePUBator doesn't extract the font size and style.
-- ePUBator save the ePUB file in the same folder of PDF file (it uses the PDF filename to generate ePUB filename and the title in the frontpage, so rename the PDF before conversion).
+- ePUBator saves the ePUB file in the same folder of PDF file or in Download folder if PDF folder is not writable or if it is set in Settings.
 - ePUBator works fine only with single column PDF (worse with multi column or tables).
 - ePUBator can fail extraction (5 of 358 books with v0.8.1 on my Atrix).
 
@@ -24,7 +24,7 @@ I never try with arabic or asian characters, right to left or vertical writing a
 On some books we can find wrong chars (e.g. Øø instead of éù), it seems a iText's problem (another PDF library extract the same text correctly). I'm looking for a better one, free and Android compatible.
 
 Permissions required:
-- WRITE_EXTERNAL_STORAGE for save the ePUB file
+- READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE for save the ePUB file
 
 Legal stuff:
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -36,6 +36,14 @@ For comment / feedback / bug / suggestion / localization write to: iiizio AT use
 For sources / all apk files / donations go to sourceforge: https://sourceforge.net/p/epubator/home/Home/
 
 History:
+v0.12  (2015-07-19)
+- Added cover image
+- Added save in Download
+- Added quick help
+- Added share ePUB
+- Updated iText lib and support library
+- Fixed some bugs
+
 v0.11  (2013-04-07)
 - Added open with ePUBator
 - Added recent folder selector
@@ -114,13 +122,13 @@ ePUBator estrae il testo da un file PDF e lo inserisce in un file ePUB correttam
 
 L'estrazione dal PDF è basata sulla libreria iText <http://itextpdf.com/> rilasciata sotto licenza AGPL. 
 
-- ePUBator E' FATTO PER I LIBRI, NON PER OGNI TIPO DI PDF (NON CHIEDETEGLI TROPPO).
+- ePUBator E' PENSATO PER I LIBRI (NON PER OGNI TIPO DI PDF), MA SE VOLETE UN RISULTATO MIGLIORE PROVATE QUALCOSA D'ALTRO COME CALIBRE.
 - ePUBator non necessita di una connessione internet (non invia i tuoi documenti da qualche parte sulla rete, non ha pubblicità).
 - ePUBator estrae il testo (nessun testo dalle figure o da PDF raster).
 - ePUBator cerca di estrarre le immagini (solo png, jpg e gif) ma le mette alla fine della pagina.
 - ePUBator cerca di estrarre l'indice dal PDF se presente (o ne crea uno fittizio).
 - ePUBator non estrae lo stile e le dimensioni dei caratteri.
-- ePUBator salva il file ePUB nella stessa cartella del file PDF (usa il nome del file PDF per generare il nome del file ePUB e il titolo di copertina, quindi rinomina il PDF prima della conversione).
+- ePUBator salva il file ePUB nella stessa cartella del file PDF o nella cartella Download se la cartella del PDF non è scrivibile o se impostato in Preferenze.
 - ePUBator funziona bene solo con i PDF a singola colonna (peggio con quelli multicolonna o le tabelle).
 - ePUBator può fallire l'estrazione (5 of 358 libri con la v0.8.1 sul mio Atrix).
 
@@ -134,7 +142,7 @@ Non ho mai provato pdf con caratteri arabi o asiatici, scrittura da destra a sin
 In alcuni libri si possono trovare caratteri errati (ad esempio Øø invece di éù), sembra sia un problema di iText (un'altra libreria PDF estrae lo stesso testo correttamente). Ne sto cercando una migliore, gratuita e compatibile con Android.
 
 Autorizzazioni richieste:
-- WRITE_EXTERNAL_STORAGE per salvare il file ePUB
+- READ_EXTERNAL_STORAGE e WRITE_EXTERNAL_STORAGE per salvare il file ePUB
 
 Note legali:
 Questo programma è software libero: è possibile ridistribuirlo e/o modificarlo secondo i termini della GNU General Public License come pubblicata dalla Free Software Foundation, sia la versione 3 della licenza, o (a propria scelta) una versione successiva. 
@@ -146,6 +154,14 @@ Per commenti / feedback / bug / suggerimenti / localizzazioni scrivi a: iiizio A
 Per sorgenti / tutti i file apk / donazioni vai su sourceforge: https://sourceforge.net/p/epubator/home/Home/
 
 Storico:
+v0.12  (19-07-2015)         
+- Aggiunta immagine sulla copertina
+- Aggiunto salva in Download
+- Aggiunta guida rapida
+- Aggiunto condividi ePUB
+- Aggiornate iText lib e libreria di supporto
+- Correzioni varie
+
 v0.11  (07-04-2013)
 - Aggiunto apri con ePUBator
 - Aggiunto selettore delle cartelle recenti

@@ -4,13 +4,13 @@ ePUBator extract text from a PDF file and put it in a well formed (epubcheck com
 
 PDF extraction based on iText library <http://itextpdf.com/> released under the AGPL license. 
 
-- ePUBator IS MADE FOR BOOKS, NOT FOR EVERY TYPE OF PDF (DON'T ASK IT TOO MUCH).
+- ePUBator IS THINKED FOR BOOKS (NOT FOR EVERY TYPE OF PDF), BUT IF YOU NEED A BETTER RESULT TRY SOMETHING ELSE LIKE CALIBRE.
 - ePUBator doesn't need internet connection (doesn't send your docs somewhere on the net, doesn't have ads).
-- ePUBator extract text (no text from pictures or from raster PDF).
-- ePUBator try to extract images (only png, jpg and gif) but puts them at the page's end.
-- ePUBator try to extract the table of contents if present (or creates a dummy TOC).
+- ePUBator extracts text (no text from pictures or from raster PDF).
+- ePUBator tries to extract images (only png, jpg and gif) but puts them at the page's end.
+- ePUBator tries to extract the table of contents if present (or creates a dummy TOC).
 - ePUBator doesn't extract the font size and style.
-- ePUBator save the ePUB file in the same folder of PDF file (it uses the PDF filename to generate ePUB filename and the title in the frontpage, so rename the PDF before conversion).
+- ePUBator saves the ePUB file in the same folder of PDF file or in Download folder if PDF folder is not writable or if it is set in Settings.
 - ePUBator works fine only with single column PDF (worse with multi column or tables).
 - ePUBator can fail extraction (5 of 358 books with v0.8.1 on my Atrix).
 
@@ -24,7 +24,7 @@ I never try with arabic or asian characters, right to left or vertical writing a
 On some books we can find wrong chars (e.g. Ψψ instead of ιω), it seems a iText's problem (another PDF library extract the same text correctly). I'm looking for a better one, free and Android compatible.
 
 Permissions required:
-- WRITE_EXTERNAL_STORAGE for save the ePUB file
+- READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE for save the ePUB file
 
 Legal stuff:
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -36,6 +36,14 @@ For comment / feedback / bug / suggestion / localization write to: iiizio AT use
 For sources / all apk files / donations go to sourceforge: https://sourceforge.net/p/epubator/home/Home/
 
 History:
+v0.12  (2015-07-19)
+- Added cover image
+- Added save in Download
+- Added quick help
+- Added share ePUB
+- Updated iText lib and support library
+- Fixed some bugs
+
 v0.11  (2013-04-07)
 - Added open with ePUBator
 - Added recent folder selector

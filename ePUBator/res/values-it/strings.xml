@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="verify">Verifica ePUB</string>
     <string name="cip">Conversione in corso</string>
     <string name="wrongfile">ePUBator può mostrare l\'anteprima solo dei file che ha convertito</string>
-    <string name="quickstart_text">Tocca \"Converti PDF\", seleziona un file e dopo un po\' avrai l\'ePUB nella stessa cartella.\n\nTocca \"Verifica ePUB\" per controllare il risultato della conversione.\n\nPrima della conversione puoi impostare un\'immagine come copertina in due modi:\n1) Metti l\'immagine (PNG or JPG) nella stessa cartella e con lo stesso nome del file PDF.\n2) Attiva \"Copertina dalla galleria\" in \"Preferenze\" e scegli l\'immagine subito dopo aver selezionato il file PDF.</string>
+    <string name="quickstart_text">Tocca \"Converti PDF\", seleziona un file e dopo un po\' avrai l\'ePUB nella stessa cartella o in Download.\n\nTocca \"Verifica ePUB\" per controllare il risultato della conversione.\n\nPrima della conversione puoi impostare un\'immagine come copertina in due modi:\n1) Metti l\'immagine (PNG or JPG) nella stessa cartella e con lo stesso nome del file PDF.\n2) Attiva \"Copertina dalla galleria\" in \"Preferenze\" e scegli l\'immagine subito dopo aver selezionato il file PDF.\nAltrimenti ePUBator usa il nome del PDF come titolo sulla copertina, quindi se non ti piace devi rinominare il PDF prima della conversione.</string>
     
     <!-- Menu -->
     <string name="prefs">Preferenze</string>
