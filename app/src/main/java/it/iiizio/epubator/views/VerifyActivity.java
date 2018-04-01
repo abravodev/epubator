@@ -17,28 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package it.iiizio.epubator.views;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -57,20 +35,31 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipFile;
+
 import it.iiizio.epubator.R;
-import it.iiizio.epubator.model.XMLParser;
+import it.iiizio.epubator.model.entities.Book;
+import it.iiizio.epubator.model.utils.FileHelper;
+import it.iiizio.epubator.presenters.VerifyPresenter;
+import it.iiizio.epubator.presenters.VerifyPresenterImpl;
 
 public class VerifyActivity extends Activity {
+
 	private static ZipFile epubFile = null;
-	private ArrayList<String>htmlList;
+	private List<String> htmlList;
 	private static int htmlIndex = -1;
-	private List<String> chapters = new ArrayList<String>();
-	private List<String> anchors = new ArrayList<String>();
-	private WebView verifyWv;
-	private Button prevBt;
-	private Button nextBt;
+	private List<String> chapters = new ArrayList<>();
+	private List<String> anchors = new ArrayList<>();
+	private WebView wv_verifyEpub;
+	private Button bt_previousPage;
+	private Button bt_nextPage;
 	private String anchor;
-	final int BUFFERSIZE = 2048;
+
+	private VerifyPresenter presenter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -79,22 +68,10 @@ public class VerifyActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_PROGRESS);
 		setProgressBarVisibility(true);
 		setContentView(R.layout.verify);
+		presenter = new VerifyPresenterImpl();
 
-		verifyWv = (WebView)findViewById(R.id.webview);
-		verifyWv.setBackgroundColor(0);
-		verifyWv.getSettings().setUseWideViewPort(true);
-		verifyWv.setWebViewClient(new WebViewClient() {
-			public void onPageFinished(final WebView view, final String url) {
-				// make it jump to the internal link
-				if (anchor != null) {
-					view.loadUrl(url + "#" + anchor);
-					anchor = null;
-				}
-			}
-		});
-
-		prevBt = (Button)findViewById(R.id.prev);
-		nextBt = (Button)findViewById(R.id.next);
+		setupWebView();
+		setupPageButtons();
 
 		// Initialize
 		fillPageList();
@@ -103,11 +80,42 @@ public class VerifyActivity extends Activity {
 		}
 
 		changeHtmlFile(0);
-		prevBt.setOnClickListener(mPrevListener);
-		nextBt.setOnClickListener(mNextListener);
 	}
 
-	// Inflate menu
+	private void setupPageButtons() {
+		bt_previousPage = (Button) findViewById(R.id.prev);
+		bt_nextPage = (Button) findViewById(R.id.next);
+
+		bt_previousPage.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				changeHtmlFile(-1);
+			}
+		});
+
+		bt_nextPage.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				changeHtmlFile(+1);
+			}
+		});
+	}
+
+	private void setupWebView() {
+		wv_verifyEpub = (WebView) findViewById(R.id.webview);
+		wv_verifyEpub.setBackgroundColor(0);
+		wv_verifyEpub.getSettings().setUseWideViewPort(true);
+		wv_verifyEpub.setWebViewClient(new WebViewClient() {
+			public void onPageFinished(final WebView view, final String url) {
+				// make it jump to the internal link
+				if (anchor != null) {
+					view.loadUrl(url + "#" + anchor);
+					anchor = null;
+				}
+			}
+		});
+	}
+	
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.verifymenu, menu);
@@ -115,23 +123,21 @@ public class VerifyActivity extends Activity {
 		return true;
 	}
 
-	// Menu item selected
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.index:
-			showDialog(0);
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.index:
+				showDialog(0);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
-	// Select chapter dialog
 	@Override
 	public Dialog onCreateDialog(int id) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(VerifyActivity.this);
 		builder.setTitle(R.string.index)
-		.setItems(chapters.toArray(new CharSequence[chapters.size()]), new DialogInterface.OnClickListener() {
+			.setItems(chapters.toArray(new CharSequence[chapters.size()]), new DialogInterface.OnClickListener() {
 			// Move to selected chapter
 			public void onClick(DialogInterface dialog, int which) {
 				String[] links = anchors.get(which).split("#");
@@ -161,15 +167,15 @@ public class VerifyActivity extends Activity {
 		// Set buttons
 		if (htmlIndex <= 1) {
 			htmlIndex = 1;
-			prevBt.setEnabled(false);
+			bt_previousPage.setEnabled(false);
 		} else {
-			prevBt.setEnabled(true);
+			bt_previousPage.setEnabled(true);
 		}
 		if  (htmlIndex >= htlmFiles) {
 			htmlIndex = htlmFiles;
-			nextBt.setEnabled(false);
+			bt_nextPage.setEnabled(false);
 		} else {
-			nextBt.setEnabled(true);
+			bt_nextPage.setEnabled(true);
 		}
 		setProgress(htmlIndex*9999/htlmFiles);
 
@@ -181,209 +187,97 @@ public class VerifyActivity extends Activity {
 		showPage(fileName);
 	}
 
-	// Show htlm file
-	void showPage(String htlmFile) {
-		String url = "";
-		boolean noImages;
+	void showPage(String htmlFile) {
+		wv_verifyEpub.getSettings().setJavaScriptEnabled(false);
+		wv_verifyEpub.clearView();
 
-		verifyWv.getSettings().setJavaScriptEnabled(false);
-		verifyWv.clearView();
-
-		// get html page
-		StringBuilder htmlPageSb = new StringBuilder();
+		String htmlPage = null;
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry(htlmFile))), BUFFERSIZE);
-			String line;
-			while ((line = bufferedReader.readLine()) != null) {
-				htmlPageSb.append(line);
-			}
+			htmlPage = presenter.getHtmlPage(epubFile, htmlFile);
 		} catch (IOException e) {
 			readError();
 		}
 
-		// Set page colors
-		String htmlPage = htmlPageSb.toString().replace("<body>", "<body bgcolor=\"Black\"><font color=\"White\">").replace("</body>", "</font></body>");
-
-		// Check prefs
-		if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("show_images", true)) {
-			noImages = true;
-		} else {
-			noImages = false;
-
-			// Remove old files
+		boolean showImages = showImages();
+		if(showImages) {
 			removeFiles();
 
-			// Save html page
-			File file = new File(getFilesDir(), "page.html");
-			url = file.getAbsolutePath();
-			FileWriter writer;
+			File outputDirectory = new File(getFilesDir(), "page.html");
+
 			try {
-				writer = new FileWriter(file);
-				writer.append(htmlPage);
-				writer.flush();
-				writer.close();
+				presenter.saveHtmlPage(outputDirectory, htmlPage);
+				presenter.saveImages(epubFile, htmlPage, getFilesDir());
+
+				String url = outputDirectory.getAbsolutePath();
+				wv_verifyEpub.clearCache(true);
+				wv_verifyEpub.loadUrl("file://" + url);
 			} catch (IOException e) {
-				noImages = true;
-			}
-
-			if (!noImages) {
-				// Get images
-				XmlPullParserFactory factory;
-				try {
-					factory = XmlPullParserFactory.newInstance();
-					XmlPullParser xpp = factory.newPullParser();
-
-					xpp.setInput(new StringReader (htmlPage.replaceAll("&nbsp;", "")));
-					int eventType = xpp.getEventType();
-
-					// Search images in html file
-					while (eventType != XmlPullParser.END_DOCUMENT) {
-						if(eventType == XmlPullParser.START_TAG && "img".equals(xpp.getName())) {
-							String imageName = xpp.getAttributeValue(null, "src");
-
-							// Save image
-							ZipEntry entry = epubFile.getEntry("OEBPS/" + imageName);
-							BufferedInputStream in = new BufferedInputStream(epubFile.getInputStream(entry), BUFFERSIZE);
-							FileOutputStream out = new FileOutputStream(new File(getFilesDir() + "/" + imageName));
-							byte[] buffer = new byte[BUFFERSIZE];
-							int len;
-							BufferedOutputStream dest = new BufferedOutputStream(out, BUFFERSIZE);
-							while ((len = in.read(buffer, 0, BUFFERSIZE)) != -1) {
-								dest.write(buffer, 0, len);
-							}
-							dest.flush();
-							dest.close();
-							in.close();
-						}
-						eventType = xpp.next();
-					}
-				} catch (XmlPullParserException e) {
-					System.err.println("XmlPullParserException in image preview");
-				} catch (IOException e) {
-					System.err.println("IOException in image preview");
-				}
-
-				// Show page with images
-				verifyWv.clearCache(true);
-				verifyWv.loadUrl("file://" + url);
+				showImages = false;
 			}
 		}
 
-		if (noImages) {
+		if (!showImages) {
 			// Show page without images
-			verifyWv.loadDataWithBaseURL("app:html", htmlPage, "text/html", "utf-8", null);
+			wv_verifyEpub.loadDataWithBaseURL("app:html", htmlPage, "text/html", "utf-8", null);
 		}
 	}
 
-	// Remove temp files
+	private boolean showImages(){
+		return PreferenceManager.getDefaultSharedPreferences(this).getBoolean("show_images", true);
+	}
+
 	private void removeFiles() {
-		File file = new File(getFilesDir(), "");
-		if (file != null && file.isDirectory()) {
-			File[] files = file.listFiles();
-			if(files != null) {
-				for(File f : files) {   
-					f.delete();
-				}
-			}
-		}
+		File directory = new File(getFilesDir(), "");
+		FileHelper.deleteFilesFromDirectory(directory);
 	}
 
-	// Prev button pressed
-	View.OnClickListener mPrevListener = new OnClickListener() {
-		public void onClick(View v) {
-			changeHtmlFile(-1);
-		}
-	};
-
-	// Next button pressed
-	View.OnClickListener mNextListener = new OnClickListener() {
-		public void onClick(View v) {
-			changeHtmlFile(+1);
-		}
-	};
-
-	// Fill page list
 	private void fillPageList() {
-		// Get filename
-		String filename = "";
-		Bundle extras = getIntent().getExtras();
-		if (extras != null) {
-			if (extras.containsKey("filename")) {
-				filename = extras.getString("filename");
-			}
-		}
+		String filename = getFilename();
 
-		htmlList = new ArrayList<String>();
-
-		// open ePUB file
 		try {
 			epubFile = new ZipFile(filename);
 		} catch (Exception e) {
 			readError();
 			return;
 		}
-		
-			// Get page list
-			Enumeration<? extends ZipEntry>entriesList;
-			for (entriesList = epubFile.entries(); entriesList.hasMoreElements();) {
-				ZipEntry entry = (ZipEntry) entriesList.nextElement();
-				String name = entry.getName();
-				if (name.endsWith(".html")) {
-					htmlList.add(name);
-				}
-			}
 
-			// Extract toc
-			StringBuilder tocSb = new StringBuilder();
-			try {
-				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(epubFile.getInputStream(epubFile.getEntry("OEBPS/toc.ncx"))), BUFFERSIZE);
-				String line;
-				while ((line = bufferedReader.readLine()) != null) {
-					tocSb.append(line);
-				}
-			} catch (IOException e) {
-				readError();
-			}
+		htmlList = presenter.getPages(epubFile);
 
-			// Extract chapters
-			XMLParser parser = new XMLParser();
-			Document doc = parser.getDomElement(tocSb.toString());
-			if (doc != null) {
-				doc.normalize();
-				NodeList nl = doc.getElementsByTagName("navPoint");
-				if (nl != null) {
-					// looping through all item nodes <item>
-					for (int i = 0; i < nl.getLength(); i++) {
-						Element e = (Element) nl.item(i);
-						chapters.add(e.getTextContent().trim());
-						NodeList nl2 = e.getChildNodes();
-						anchors.add("OEBPS/" + parser.getValue((Element) nl2.item(3), "src"));
-					}
-				}
-			}
+		try {
+			Book book = presenter.getBook(epubFile);
+			chapters = book.getChapters();
+			anchors = book.getAnchors();
+		} catch (IOException e) {
+			readError();
+		}
 	}
 
-	// Show error toast
+	private String getFilename(){
+		Bundle extras = getIntent().getExtras();
+		if (extras != null && extras.containsKey("filename")) {
+			return extras.getString("filename");
+		}
+
+		return "";
+	}
+
 	private void readError() {
 		Toast.makeText(getApplicationContext(), getResources().getString(R.string.read_error), Toast.LENGTH_SHORT).show();
 		exit();
 	}
 
-	// Activity end
 	private void exit() {
 		htmlIndex = -1;
 		removeFiles();
 		finish();
 	}
 
-	// Back button pressed
 	@Override
 	public void onBackPressed() {
 		closeEpub();
 		exit();
 	}
 
-	// Close ePUB file
 	private void closeEpub() {
 		try {
 			epubFile.close();
