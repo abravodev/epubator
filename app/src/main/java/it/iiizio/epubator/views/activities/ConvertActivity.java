@@ -53,6 +53,7 @@ import it.iiizio.epubator.model.utils.PdfReadHelper;
 import it.iiizio.epubator.model.utils.ZipWriter;
 import it.iiizio.epubator.presenters.ConvertPresenter;
 import it.iiizio.epubator.presenters.ConvertPresenterImpl;
+import it.iiizio.epubator.views.utils.BundleHelper;
 import it.iiizio.epubator.views.utils.PreferencesHelper;
 
 public class ConvertActivity extends Activity implements ConvertView {
@@ -113,9 +114,11 @@ public class ConvertActivity extends Activity implements ConvertView {
 		} else if (!notificationSent) {
 			Bundle extras = getIntent().getExtras();
 			if (extras != null) {
-				cover_file = (extras.containsKey(BundleKeys.COVER)) ?  extras.getString(BundleKeys.COVER) : "";
-				if (extras.containsKey(BundleKeys.FILENAME)) {
-					pdfFilename = extras.getString(BundleKeys.FILENAME);
+				cover_file = BundleHelper.getExtraStringOrEmpty(extras, BundleKeys.COVER);
+				pdfFilename = BundleHelper.getExtraStringOrDefault(extras, BundleKeys.FILENAME);
+				if(pdfFilename==null){
+					// TODO: Show message
+				} else {
 					String[] parts = FileHelper.getPathAndFilenameOfPdf(pdfFilename);
 					String path = parts[0];
 					filename = parts[1];

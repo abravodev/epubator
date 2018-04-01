@@ -145,9 +145,9 @@ public class MainActivity extends Activity {
 		startActivity(new Intent(MainActivity.this, InfoActivity.class));
 	}
 
-	private void gotoVerifyView() {
+	private void gotoVerifyView(String chosenFile) {
 		Intent verify = new Intent(MainActivity.this, VerifyActivity.class);
-		verify.putExtra(BundleKeys.FILENAME, filename);
+		verify.putExtra(BundleKeys.FILENAME, chosenFile);
 		startActivity(verify);
 	}
 
@@ -245,7 +245,7 @@ public class MainActivity extends Activity {
 
 	private void verifyFile(String chosenFile){
 		updateRecentFolder(chosenFile);
-		gotoVerifyView();
+		gotoVerifyView(chosenFile);
 	}
 
 	private String getRecentFolder(){

@@ -47,6 +47,7 @@ import it.iiizio.epubator.model.entities.Book;
 import it.iiizio.epubator.model.utils.FileHelper;
 import it.iiizio.epubator.presenters.VerifyPresenter;
 import it.iiizio.epubator.presenters.VerifyPresenterImpl;
+import it.iiizio.epubator.views.utils.BundleHelper;
 import it.iiizio.epubator.views.utils.PreferencesHelper;
 
 public class VerifyActivity extends Activity {
@@ -64,8 +65,7 @@ public class VerifyActivity extends Activity {
 	private VerifyPresenter presenter;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_PROGRESS);
 		setProgressBarVisibility(true);
@@ -82,6 +82,49 @@ public class VerifyActivity extends Activity {
 		}
 
 		changeHtmlFile(0);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.verifymenu, menu);
+		MenuItemCompat.setShowAsAction(menu.findItem(R.id.index), 1);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.index:
+				showDialog(0);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	public Dialog onCreateDialog(int id) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(VerifyActivity.this);
+		builder.setTitle(R.string.index)
+			.setItems(chapters.toArray(new CharSequence[chapters.size()]), new DialogInterface.OnClickListener() {
+			// Move to selected chapter
+			public void onClick(DialogInterface dialog, int which) {
+				String[] links = anchors.get(which).split("#");
+				if (links.length > 1)
+					anchor = links[1];
+				else
+					anchor = null;
+				changeHtmlFile(htmlList.indexOf(links[0]) - htmlIndex + 1);
+			}
+		});
+		return builder.create();
+	}
+
+	@Override
+	public void onBackPressed() {
+		closeEpub();
+		exit();
 	}
 
 	private void setupPageButtons() {
@@ -118,42 +161,27 @@ public class VerifyActivity extends Activity {
 		});
 	}
 
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.verifymenu, menu);
-		MenuItemCompat.setShowAsAction(menu.findItem(R.id.index), 1);
-		return true;
-	}
+	private void fillPageList() {
+		String filename = BundleHelper.getExtraStringOrDefault(getIntent(), BundleKeys.FILENAME);
 
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.index:
-				showDialog(0);
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
+		try {
+			epubFile = new ZipFile(filename);
+		} catch (Exception e) {
+			readError();
+			return;
+		}
+
+		htmlList = presenter.getPages(epubFile);
+
+		try {
+			Book book = presenter.getBook(epubFile);
+			chapters = book.getChapters();
+			anchors = book.getAnchors();
+		} catch (IOException e) {
+			readError();
 		}
 	}
 
-	@Override
-	public Dialog onCreateDialog(int id) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(VerifyActivity.this);
-		builder.setTitle(R.string.index)
-			.setItems(chapters.toArray(new CharSequence[chapters.size()]), new DialogInterface.OnClickListener() {
-			// Move to selected chapter
-			public void onClick(DialogInterface dialog, int which) {
-				String[] links = anchors.get(which).split("#");
-				if (links.length > 1)
-					anchor = links[1];
-				else
-					anchor = null;
-				changeHtmlFile(htmlList.indexOf(links[0]) - htmlIndex + 1);
-			}
-		});
-		return builder.create();
-	}
-
-	// Change html file
 	private void changeHtmlFile(int diff) {
 		// No html file
 		int htlmFiles = htmlList.size();
@@ -189,7 +217,7 @@ public class VerifyActivity extends Activity {
 		showPage(fileName);
 	}
 
-	void showPage(String htmlFile) {
+	private void showPage(String htmlFile) {
 		wv_verifyEpub.getSettings().setJavaScriptEnabled(false);
 		wv_verifyEpub.clearView();
 
@@ -233,36 +261,6 @@ public class VerifyActivity extends Activity {
 		FileHelper.deleteFilesFromDirectory(directory);
 	}
 
-	private void fillPageList() {
-		String filename = getFilename();
-
-		try {
-			epubFile = new ZipFile(filename);
-		} catch (Exception e) {
-			readError();
-			return;
-		}
-
-		htmlList = presenter.getPages(epubFile);
-
-		try {
-			Book book = presenter.getBook(epubFile);
-			chapters = book.getChapters();
-			anchors = book.getAnchors();
-		} catch (IOException e) {
-			readError();
-		}
-	}
-
-	private String getFilename(){
-		Bundle extras = getIntent().getExtras();
-		if (extras != null && extras.containsKey(BundleKeys.FILENAME)) {
-			return extras.getString(BundleKeys.FILENAME);
-		}
-
-		return "";
-	}
-
 	private void readError() {
 		Toast.makeText(getApplicationContext(), getResources().getString(R.string.cannot_read_file), Toast.LENGTH_SHORT).show();
 		exit();
@@ -272,12 +270,6 @@ public class VerifyActivity extends Activity {
 		htmlIndex = -1;
 		removeFiles();
 		finish();
-	}
-
-	@Override
-	public void onBackPressed() {
-		closeEpub();
-		exit();
 	}
 
 	private void closeEpub() {
