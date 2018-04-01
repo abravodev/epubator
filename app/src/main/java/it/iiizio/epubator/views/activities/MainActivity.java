@@ -43,6 +43,8 @@ import java.net.URISyntaxException;
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.model.constants.BundleKeys;
 import it.iiizio.epubator.model.constants.PreferencesKeys;
+import it.iiizio.epubator.presenters.MainPresenter;
+import it.iiizio.epubator.presenters.MainPresenterImpl;
 import it.iiizio.epubator.views.utils.PathUtils;
 import it.iiizio.epubator.views.utils.PermissionHelper;
 
@@ -52,7 +54,7 @@ public class MainActivity extends Activity {
 	private String cover_file = "";
 	private static boolean cover_picked = false;
 	private SharedPreferences sharedPref;
-	private final String PDF_EXT = ".pdf";
+	private MainPresenter presenter;
 
 	private static class Actions {
 		static final int CONVERT = 1;
@@ -64,12 +66,46 @@ public class MainActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		presenter = new MainPresenterImpl();
+
 		PermissionHelper.checkWritePermission(this); // TODO: Only check before requesting it
 		setupButtons();
 
 		sharedPref = this.getPreferences(Context.MODE_PRIVATE);
 
 		showInitialDialog();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.mainmenu, menu);
+		MenuItemCompat.setShowAsAction(menu.findItem(R.id.prefs), 0);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.prefs: gotoPreferences(); return true;
+			case R.id.quickstart: showQuickStartDialog(); return true;
+			case R.id.info: gotoInfoView(); return true;
+			case R.id.license: gotoLicenseView(); return true;
+			case R.id.my_apps: gotoStore(); return true;
+			default: return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent result) {
+		if (resultCode == RESULT_OK){
+			switch (requestCode) {
+				case Actions.CONVERT: convertFile(getActualPath(result)); break;
+				case Actions.VERIFY: verifyFile(getActualPath(result)); break;
+				case Actions.PICKAPIC: getImageFromGallery(getActualPath(result)); break;
+				default: errorWhenChoosingFile(); break;
+			}
+		}
 	}
 
 	// Show quick start on first time
@@ -95,25 +131,6 @@ public class MainActivity extends Activity {
 		});
 	}
 
-	// Inflate menu
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.mainmenu, menu);
-		MenuItemCompat.setShowAsAction(menu.findItem(R.id.prefs), 0);
-		return true;
-	}
-
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.prefs: gotoPreferences(); return true;
-			case R.id.quickstart: showQuickStartDialog(); return true;
-			case R.id.info: gotoInfoView(); return true;
-			case R.id.license: gotoLicenseView(); return true;
-			case R.id.my_apps: gotoStore(); return true;
-			default: return super.onOptionsItemSelected(item);
-		}
-	}
-
 	private void gotoPreferences() {
 		startActivity(new Intent(MainActivity.this, PrefsActivity.class));
 	}
@@ -128,6 +145,19 @@ public class MainActivity extends Activity {
 
 	private void gotoInfoView() {
 		startActivity(new Intent(MainActivity.this, InfoActivity.class));
+	}
+
+	private void gotoVerifyView() {
+		Intent verify = new Intent(MainActivity.this, VerifyActivity.class);
+		verify.putExtra(BundleKeys.FILENAME, filename);
+		startActivity(verify);
+	}
+
+	private void gotoConversionView() {
+		Intent convert = new Intent(MainActivity.this, ConvertActivity.class);
+		convert.putExtra(BundleKeys.FILENAME, filename);
+		convert.putExtra(BundleKeys.COVER, cover_file);
+		startActivity(convert);
 	}
 
 	private void showQuickStartDialog(){
@@ -169,18 +199,6 @@ public class MainActivity extends Activity {
 		selectFileFromSystem("image/*", Actions.PICKAPIC);
 	}
 
-	protected void onActivityResult(int requestCode, int resultCode, Intent result) {
-		if (resultCode == RESULT_OK){
-			getActualPath(result);
-			switch (requestCode) {
-				case Actions.CONVERT: convertFile(getActualPath(result)); break;
-				case Actions.VERIFY: verifyFile(getActualPath(result)); break;
-				case Actions.PICKAPIC: getImageFromGallery(getActualPath(result)); break;
-				default: errorWhenChoosingFile(); break;
-			}
-		}
-	}
-
 	private String getActualPath(Intent result){
 		try {
 			return PathUtils.getPath(this, result.getData());
@@ -208,50 +226,31 @@ public class MainActivity extends Activity {
 
 	private void convertFile(){
 		if (!cover_picked && !ConvertActivity.conversionStarted) {
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-			boolean userPrefersToUsePicture = prefs.getBoolean(PreferencesKeys.CHOOSE_PICTURE, false);
-			if (userPrefersToUsePicture) {
-				cover_file = "";
-				selectImageFileFromSystem();
-			} else {
-				// Check if there an image with the same name of PDF file
-				String name = filename.substring(0, filename.lastIndexOf(PDF_EXT));
-				cover_file = getCoverFile(name);
-
-				cover_picked = true;
-			}
+			setCoverImage();
 		}
 
 		if(cover_picked) {
-			// Start conversion
 			cover_picked = false;
-			Intent convert = new Intent(MainActivity.this, ConvertActivity.class);
-			convert.putExtra(BundleKeys.FILENAME, filename);
-			convert.putExtra(BundleKeys.COVER, cover_file);
-			startActivity(convert);
+			gotoConversionView();
 		}
+	}
+
+	private void setCoverImage() {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean userPrefersToUsePicture = prefs.getBoolean(PreferencesKeys.CHOOSE_PICTURE, false);
+		if (userPrefersToUsePicture) {
+            cover_file = "";
+            selectImageFileFromSystem();
+        } else {
+            cover_file = presenter.getCoverFileWithTheSameName(filename);
+
+            cover_picked = true;
+        }
 	}
 
 	private void verifyFile(String chosenFile){
-		filename = chosenFile;
 		updateRecentFolder(chosenFile);
-		Intent verify = new Intent(MainActivity.this, VerifyActivity.class);
-		verify.putExtra(BundleKeys.FILENAME, filename);
-		startActivity(verify);
-	}
-
-	private String getCoverFile(String name){
-		String coverFile = "";
-
-		if(new File(name + ".png").exists()) {
-			coverFile = name + ".png";
-		} else if(new File(name + ".jpg").exists()) {
-			coverFile = name + ".jpg";
-		} else if(new File(name + ".jpeg").exists()) {
-			coverFile = name + ".jpeg";
-		}
-
-		return coverFile;
+		gotoVerifyView();
 	}
 
 	private String getRecentFolder(){

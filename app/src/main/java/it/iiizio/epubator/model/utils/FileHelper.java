@@ -38,4 +38,8 @@ public class FileHelper {
         return writable;
     }
 
+    public static String getPathWithoutExtension(String filename){
+        return filename.substring(0, filename.lastIndexOf("."));
+    }
+
 }
