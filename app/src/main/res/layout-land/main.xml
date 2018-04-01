@@ -47,14 +47,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/convert" />
+            android:text="@string/convert_pdf" />
 
         <Button
             android:id="@+id/verify"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/verify" />
+            android:text="@string/verify_epub" />
     </LinearLayout>
 
 </LinearLayout>

@@ -44,14 +44,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/prev" />
+            android:text="@string/prev_page" />
 
         <Button
             android:id="@+id/next"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/next" />
+            android:text="@string/next_page" />
     </LinearLayout>
 
 </LinearLayout>

@@ -13,30 +13,31 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 -->
 <resources>
 
     <!-- ePUBator -->
     <string name="app_name">ePUBator</string>
-    <string name="convert">Converti PDF</string>
-    <string name="verify">Verifica ePUB</string>
-    <string name="cip">Conversione in corso</string>
+    <string name="convert_pdf">Converti PDF</string>
+    <string name="verify_epub">Verifica ePUB</string>
+    <string name="conversion_in_progress">Conversione in corso</string>
     <string name="wrongfile">ePUBator può mostrare l\'anteprima solo dei file che ha convertito</string>
     <string name="quickstart_text">Tocca \"Converti PDF\", seleziona un file e dopo un po\' avrai l\'ePUB nella stessa cartella o in Download.\n\nTocca \"Verifica ePUB\" per controllare il risultato della conversione.\n\nPrima della conversione puoi impostare un\'immagine come copertina in due modi:\n1) Metti l\'immagine (PNG or JPG) nella stessa cartella e con lo stesso nome del file PDF.\n2) Attiva \"Copertina dalla galleria\" in \"Preferenze\" e scegli l\'immagine subito dopo aver selezionato il file PDF.\nAltrimenti ePUBator usa il nome del PDF come titolo sulla copertina, quindi se non ti piace devi rinominare il PDF prima della conversione.</string>
     
     <!-- Menu -->
     <string name="prefs">Preferenze</string>
-    <string name="open">Apri ePUB</string>
-    <string name="share">Condividi ePUB</string>
+    <string name="open_epub">Apri ePUB</string>
+    <string name="share_epub">Condividi ePUB</string>
     <string name="quickstart">Guida rapida</string>
     <string name="info">Informazioni</string>
     <string name="license">Licenza</string>
     <string name="my_apps">Le mie App</string>
     
     <!-- Verify -->
-    <string name="prev">Pagina precedente</string>
-    <string name="next">Pagina successiva</string>
+    <string name="prev_page">Pagina precedente</string>
+    <string name="next_page">Pagina successiva</string>
     <string name="index">Indice</string>
     
     <!-- Prefs -->
@@ -83,38 +84,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<string name="back_summary">Ritorna al selettore dei files</string>
 	
     <!-- Convert -->
-    <string name="read_error">Non posso leggere il file ePUB</string>
+    <string name="cannot_read_file">Non posso leggere il file ePUB</string>
     <string name="heading">"ePUBator - ©2011 Ezio Querini\nConvertitore da PDF a ePUB minimale per Android\n"</string>
-    <string name="library">"L'estrazione dal PDF è basata sulla libreria iText rilasciata sotto licenza AGPL\n\n"</string>
-    <string name="deleted">File ePUB rimosso</string>
-    <string name="kept_old">Mantenuto il vecchio file ePUB</string>
-    <string name="pages">Numero di pagine: %d\n</string>
+    <string name="pdf_extraction_library">"L'estrazione dal PDF è basata sulla libreria iText rilasciata sotto licenza AGPL\n\n"</string>
+    <string name="epub_was_deleted">File ePUB rimosso</string>
+    <string name="kept_old_epub">Mantenuto il vecchio file ePUB</string>
+    <string name="number_of_pages">Numero di pagine: %d\n</string>
     <string name="extraction_failure">Pagina %d: estrazione fallita</string>
     <string name="extraction_error">Errore di estrazione: il testo può essere incompleto</string>
-    <string name="keep">Devo mantenere il file ePUB?</string>
+    <string name="keep_epub_file">Devo mantenere il file ePUB?</string>
     <string name="ok">OK</string>
     <string name="cancel">Annulla</string>
     <string name="stop">Interrompi</string>
-    <string name="lost_pages">Le pagine mancanti sono indicate con %s</string>
-    <string name="errors">Gli errori sono indicati con %s</string>
+    <string name="lost_pages_are_marked_with">Le pagine mancanti sono indicate con %s</string>
+    <string name="errors_are_marked_with">Gli errori sono indicati con %s</string>
     <string name="pagenumber">NumeroPagina%s</string>
     <string name="load">Carico: %s</string>
     <string name="epubfile">\nFile ePUB: %s</string>
-    <string name="create">Creo il file ePUB</string>
+    <string name="create_epub">Creo il file ePUB</string>
     <string name="mimetype">Aggiungo mimetype</string>
     <string name="container">Aggiungo container.xml</string>
     <string name="content">Aggiungo content.opf</string>
     <string name="toc">Aggiungo toc.ncx</string>
-    <string name="pdf_toc">Indice estratto dal file PDF</string>
-    <string name="no_toc">Il file PDF non ha l\'indice</string>
-    <string name="dummy_toc">Creo un indice fittizio</string>
+    <string name="toc_extracted_from_pdf">Indice estratto dal file PDF</string>
+    <string name="no_toc_found">Il file PDF non ha l\'indice</string>
+    <string name="create_dummy_toc">Creo un indice fittizio</string>
     <string name="frontpage">Aggiungo frontpage.html</string>
     <string name="frontpagepng">Aggiungo frontpage.png</string>
-    <string name="imagecover">Creo copertina con l\'immagine</string>
-    <string name="titlecover">Creo copertina con il titolo</string>
+    <string name="create_cover_with_image">Creo copertina con l\'immagine</string>
+    <string name="create_cover_with_title">Creo copertina con il titolo</string>
     <string name="html">Aggiungo page%d.html</string>
-    <string name="image">Aggiungo %s</string>
-    <string name="close">Chiudo il file</string>
+    <string name="image_added">Aggiungo %s</string>
+    <string name="close_file">Chiudo il file</string>
     <string-array name="message">
         <item>Conversione completata</item>
         <item>File PDF non trovato</item>

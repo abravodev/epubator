@@ -30,7 +30,7 @@ public class ImageRenderListener implements RenderListener {
 					// Save to ePUB
 					String imageName = String.format("image%s.%s", renderInfo.getRef().getNumber(), imageType);
 					if (!ZipWriter.addImage("OEBPS/" + imageName, baos.toByteArray())) {
-						PdfReadHelper.imageList.add(imageName);
+						PdfReadHelper.addImage(imageName);
 					}
 				}
 

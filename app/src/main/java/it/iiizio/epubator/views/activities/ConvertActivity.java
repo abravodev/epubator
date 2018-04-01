@@ -40,18 +40,16 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import it.iiizio.epubator.R;
-import it.iiizio.epubator.model.utils.PdfReadHelper;
-import it.iiizio.epubator.model.utils.ZipWriter;
 import it.iiizio.epubator.model.constants.ConversionStatus;
 import it.iiizio.epubator.model.utils.FileHelper;
 import it.iiizio.epubator.model.utils.HtmlHelper;
+import it.iiizio.epubator.model.utils.PdfReadHelper;
+import it.iiizio.epubator.model.utils.ZipWriter;
 import it.iiizio.epubator.presenters.ConvertPresenter;
 import it.iiizio.epubator.presenters.ConvertPresenterImpl;
 
@@ -68,7 +66,6 @@ public class ConvertActivity extends Activity implements ConvertView {
 	private static boolean notificationSent = false;
 	private static int result;
 	private static String filename = "";
-	private static String path = "";
 	private static String tempPath = "";
 	private static String pdfFilename = "";
 	private static String epubFilename = "";
@@ -81,12 +78,11 @@ public class ConvertActivity extends Activity implements ConvertView {
 	private int pagesPerFile;
 	private int onError;
 	private boolean addMarkers;
-	private boolean hideNotifi;
+	private boolean hideNotification;
 	private boolean tocFromPdf;
-	private boolean logoOnCover;
-	private boolean downloadDir;
+	private boolean showLogoOnCover;
+	private boolean saveOnDownloadDirectory;
 
-	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
 	private final String OLD_EXT = " - ePUBator.old";
 	private final String TEMP_EXT = " - ePUBator.tmp";
@@ -103,7 +99,6 @@ public class ConvertActivity extends Activity implements ConvertView {
 		setProgress(0);
 		presenter = new ConvertPresenterImpl(this);
 
-		// Set variables
 		sv_progress = (ScrollView)findViewById(R.id.scroll);
 		tv_progress = (TextView)findViewById(R.id.progress);
 		setupButtons();
@@ -111,42 +106,22 @@ public class ConvertActivity extends Activity implements ConvertView {
 		getPrefs();
 
 		if (conversionStarted) {
-			// Update screen
 			tv_progress.setText(progressSb);
 			setButtons(okBtEnabled);
 		} else if (!notificationSent) {
-			// Get filename
 			Bundle extras = getIntent().getExtras();
 			if (extras != null) {
-				if (extras.containsKey("cover")) {
-					cover_file = extras.getString("cover");
-				} else {
-					cover_file = "";
-				}
+				cover_file = (extras.containsKey("cover")) ?  extras.getString("cover") : "";
 				if (extras.containsKey("filename")) {
 					pdfFilename = extras.getString("filename");
-					String noExt = pdfFilename.substring(0, pdfFilename.lastIndexOf(PDF_EXT));
-					path = noExt.substring(0, noExt.lastIndexOf('/', noExt.length()) + 1);
-					filename = noExt.substring(noExt.lastIndexOf("/") + 1, noExt.length());
+					String[] parts = FileHelper.getPathAndFilenameOfPdf(pdfFilename);
+					String path = parts[0];
+					filename = parts[1];
 
-					// Check writable
-					boolean writable = false;
-					try {
-						File checkFile = new File(path + TEMP_EXT);
-						writable = checkFile.createNewFile();
-						checkFile.delete();
-					} catch (IOException e) {
-					}
-										
-					// Save ePUB in the Download folder as user choice or if PDF folder is not writable
-					if (downloadDir || !writable) {
-						epubFilename = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + filename + EPUB_EXT;
-					} else {
-						epubFilename = noExt + EPUB_EXT;
-					}
-					
+					epubFilename = getEpubFilename(path, filename, saveOnDownloadDirectory);
+
 					tempPath = getExternalCacheDir() + "/";
-					oldFilename = tempPath + filename+ OLD_EXT;
+					oldFilename = tempPath + filename + OLD_EXT;
 					tempFilename = tempPath + filename + TEMP_EXT;
 
 					convertTask = new ConvertTask();
@@ -155,9 +130,23 @@ public class ConvertActivity extends Activity implements ConvertView {
 			}
 		}
 
-		// Remove notification
+		removeNotification();
+	}
+
+	private void removeNotification() {
 		((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).cancel(R.string.app_name);
 		notificationSent = false;
+	}
+
+	// Save ePUB in the Download folder as user choice or if PDF folder is not writable
+	private String getEpubFilename(String path, String filename, boolean saveOnDownloadDirectory){
+		boolean writable = FileHelper.folderIsWritable(path);
+		String outputDirectory = (saveOnDownloadDirectory || !writable) ? getDownloadDirectory(): path;
+		return outputDirectory + "/" + filename + "/" + EPUB_EXT;
+	}
+
+	private String getDownloadDirectory(){
+		return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/";
 	}
 
 	private void setupButtons() {
@@ -197,10 +186,10 @@ public class ConvertActivity extends Activity implements ConvertView {
 		pagesPerFile = Integer.parseInt(prefs.getString("page_per_file", "5"));
 		onError = Integer.parseInt(prefs.getString("on_error", "0"));
 		addMarkers = prefs.getBoolean("add_markers", true);
-		hideNotifi = prefs.getBoolean("hide_notifi", false);
+		hideNotification = prefs.getBoolean("hide_notifi", false);
 		tocFromPdf = prefs.getBoolean("toc_from_pdf", true);
-		logoOnCover = prefs.getBoolean("logo_on_cover", true);
-		downloadDir = prefs.getBoolean("download_dir", false);
+		showLogoOnCover = prefs.getBoolean("logo_on_cover", true);
+		saveOnDownloadDirectory = prefs.getBoolean("download_dir", false);
 	}
 
 	// Set buttons state
@@ -227,29 +216,27 @@ public class ConvertActivity extends Activity implements ConvertView {
 		return conversionStarted;
 	}
 
-	// Keep file dialog
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		if (id == 0) {
-			// Build dialog
-			return new AlertDialog.Builder(ConvertActivity.this)
+		if(id!=0){
+			return null;
+		}
+
+		return new AlertDialog.Builder(ConvertActivity.this)
 			.setTitle(getResources().getString(R.string.extraction_error))
-			.setMessage(getResources().getString(R.string.keep))
-			// Ok action
+			.setMessage(getResources().getString(R.string.keep_epub_file))
 			.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					keepEpub();
 				}
 			})
-			// Cancel action
 			.setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
-					progressSb.append("\n" + getResources().getStringArray(R.array.message)[4] + "\n");
+					progressSb.append("\n" + getResources().getStringArray(R.array.conversion_result_message)[4] + "\n");
 					deleteTmp();
 				}
 			})
-			// Preview action
-			.setNeutralButton(getResources().getString(R.string.verify), new DialogInterface.OnClickListener() {
+			.setNeutralButton(getResources().getString(R.string.verify_epub), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					Intent verify = new Intent(getBaseContext(), VerifyActivity.class);
 					verify.putExtra("filename", tempFilename);
@@ -257,8 +244,6 @@ public class ConvertActivity extends Activity implements ConvertView {
 				}
 			})
 			.create();
-		} else
-			return null;
 	}
 
 	// Show dialog again after preview activity
@@ -271,9 +256,9 @@ public class ConvertActivity extends Activity implements ConvertView {
 		new File(tempFilename).delete();
 		if (new File(oldFilename).exists()) {
 			new File(oldFilename).renameTo(new File(epubFilename));
-			progressSb.append(getResources().getString(R.string.kept_old));
+			progressSb.append(getResources().getString(R.string.kept_old_epub));
 		} else {
-			progressSb.append(getResources().getString(R.string.deleted));
+			progressSb.append(getResources().getString(R.string.epub_was_deleted));
 		}
 		tv_progress.setText(progressSb);
 		scrollUp();
@@ -281,11 +266,11 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 	// Keep file
 	private void keepEpub() {
-		progressSb.append("\n" + getResources().getStringArray(R.array.message)[0] + "\n");
+		progressSb.append("\n" + getResources().getStringArray(R.array.conversion_result_message)[0] + "\n");
 		if (addMarkers) {
 			String pageNumberString = String.format(getResources().getString(R.string.pagenumber), ">>\n");
-			progressSb.append(String.format(getResources().getString(R.string.errors), "<<@") + pageNumberString);
-			progressSb.append(String.format(getResources().getString(R.string.lost_pages), "<<#") + pageNumberString);
+			progressSb.append(String.format(getResources().getString(R.string.errors_are_marked_with), "<<@") + pageNumberString);
+			progressSb.append(String.format(getResources().getString(R.string.lost_pages_are_marked_with), "<<#") + pageNumberString);
 		}
 		renameFile();
 		progressSb.append(String.format(getResources().getString(R.string.epubfile), epubFilename));
@@ -310,10 +295,10 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 	// Send notification
 	public void sendNotification() {
-		if (!hideNotifi) {
+		if (!hideNotification) {
 			NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, ConvertActivity.class), 0);
-			String message = getResources().getStringArray(R.array.message)[result];
+			String message = getResources().getStringArray(R.array.conversion_result_message)[result];
 			String tickerText = getResources().getString(R.string.app_name);
 			Notification notif = new Notification(R.drawable.ic_launcher, message, System.currentTimeMillis());
 			//notif.setLatestEventInfo(this, tickerText, message, contentIntent); TODO: Not working on newer versions
@@ -324,27 +309,27 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 	@Override
 	public void noTocFoundInThePdfFile() {
-		publishProgressMessage(getResources().getString(R.string.no_toc));
+		publishProgressMessage(getResources().getString(R.string.no_toc_found));
 	}
 
 	@Override
 	public void createdDummyToc() {
-		publishProgressMessage(getResources().getString(R.string.dummy_toc));
+		publishProgressMessage(getResources().getString(R.string.create_dummy_toc));
 	}
 
 	@Override
 	public void tocExtractedFromPdfFile() {
-		publishProgressMessage(getResources().getString(R.string.pdf_toc));
+		publishProgressMessage(getResources().getString(R.string.toc_extracted_from_pdf));
 	}
 
 	@Override
 	public void coverWithImageCreated() {
-		publishProgressMessage(getResources().getString(R.string.imagecover));
+		publishProgressMessage(getResources().getString(R.string.create_cover_with_image));
 	}
 
 	@Override
 	public void coverWithTitleCreated() {
-		publishProgressMessage(getResources().getString(R.string.titlecover));
+		publishProgressMessage(getResources().getString(R.string.create_cover_with_title));
 	}
 
 	@Override
@@ -364,7 +349,6 @@ public class ConvertActivity extends Activity implements ConvertView {
 			publishProgress(message);
 		}
 
-		// Background task
 		@Override
 		protected Void doInBackground(Void... params) {
 			// Remove cache files
@@ -390,7 +374,6 @@ public class ConvertActivity extends Activity implements ConvertView {
 			return null;
 		}
 
-		// Update screen
 		@Override
 		protected void onProgressUpdate(String... messageArray) {
 			for (String message : messageArray)
@@ -401,18 +384,16 @@ public class ConvertActivity extends Activity implements ConvertView {
 			scrollUp();
 		}
 
-		// Prepare background task
 		@Override
 		protected void onPreExecute() {
 			progressSb = new StringBuilder();
 			progressSb.append(getResources().getString(R.string.heading));
-			progressSb.append(getResources().getString(R.string.library));
+			progressSb.append(getResources().getString(R.string.pdf_extraction_library));
 			setButtons(false);
 			result = ConversionStatus.SUCCESS;
 			conversionStarted = true;
 		}
 
-		// Background task ended
 		@Override
 		protected void onPostExecute(Void params) {
 			if (result == ConversionStatus.EXTRACTION_ERROR) {
@@ -434,7 +415,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 				}
 			} else {
 				// Delete on failure
-				publishProgress("\n" + getResources().getStringArray(R.array.message)[result]);
+				publishProgress("\n" + getResources().getStringArray(R.array.conversion_result_message)[result]);
 				if(result == ConversionStatus.SUCCESS){
 					//Keep if ok
 					renameFile();
@@ -453,25 +434,18 @@ public class ConvertActivity extends Activity implements ConvertView {
 			setButtons(true);
 		}
 
-		// Fill ePUB file
 		private int fillEpub() {
 			try {
-				// Stopped?
 				if (result == ConversionStatus.CONVERSION_STOPPED_BY_USER) {
 					return ConversionStatus.CONVERSION_STOPPED_BY_USER;
 				}
 
-				// Set up counter
 				int pages = PdfReadHelper.getPages();
-				publishProgress(String.format(getResources().getString(R.string.pages), pages));
+				publishProgress(String.format(getResources().getString(R.string.number_of_pages), pages));
 				int totalFiles = 2 + pages;
 				int writedFiles = 0;
 
-				// Set flag
-				boolean extractionErrorFlag = false;
-
-				// Create ePUB file
-				publishProgress(getResources().getString(R.string.create));
+				publishProgress(getResources().getString(R.string.create_epub));
 				if (ZipWriter.create(tempFilename)) {
 					return ConversionStatus.CANNOT_WRITE_EPUB;
 				}
@@ -501,23 +475,21 @@ public class ConvertActivity extends Activity implements ConvertView {
 				}
 
 				publishProgress(getResources().getString(R.string.frontpagepng));
-				if (presenter.addFrontpageCover(filename, cover_file, logoOnCover)) {
+				if (presenter.addFrontpageCover(filename, cover_file, showLogoOnCover)) {
 					return ConversionStatus.CANNOT_WRITE_EPUB;
 				}
 
+				boolean extractionErrorFlag = false;
+
 				// Add extracted text and images
-				List<String> allImageList = new ArrayList<String>();
+				List<String> allImageList = new ArrayList<>();
 				for(int i = 1; i <= pages; i += pagesPerFile) {
-					StringBuilder textSb = new StringBuilder();
+					StringBuilder pageText = new StringBuilder();
 
 					publishProgress(String.format(getResources().getString(R.string.html), i));
-					int endPage = i + pagesPerFile - 1;
-					if (endPage > pages) {
-						endPage = pages;
-					}
+					int endPage = Math.min(i + pagesPerFile - 1, pages);
 
 					for (int j = i; j <= endPage; j++) {
-						// Stopped?
 						if (result == ConversionStatus.CONVERSION_STOPPED_BY_USER) {
 							return ConversionStatus.CONVERSION_STOPPED_BY_USER;
 						}
@@ -526,8 +498,8 @@ public class ConvertActivity extends Activity implements ConvertView {
 						setProgress(++writedFiles*9999/totalFiles);
 
 						// Add anchor
-						textSb.append("  <p>\n");
-						textSb.append("  <a id=\"page" + j + "\"/>\n");
+						pageText.append("  <p>\n");
+						pageText.append("  <a id=\"page" + j + "\"/>\n");
 						
 						// extract text
 						String page = HtmlHelper.stringToHTMLString(PdfReadHelper.getPageText(j));
@@ -535,49 +507,45 @@ public class ConvertActivity extends Activity implements ConvertView {
 							publishProgress(String.format(getResources().getString(R.string.extraction_failure), j));
 							extractionErrorFlag = true;
 							if (addMarkers) {
-								textSb.append("&lt;&lt;#" + j + "&gt;&gt;");
+								pageText.append("&lt;&lt;#" + j + "&gt;&gt;");
 							}
 						} else {
 							if (page.matches(".*\\p{Cntrl}.*")) {
 								extractionErrorFlag = true;
 								if (addMarkers) {
-									textSb.append(page.replaceAll("\\p{Cntrl}+", "&lt;&lt;@" + j + "&gt;&gt;"));
+									pageText.append(page.replaceAll("\\p{Cntrl}+", "&lt;&lt;@" + j + "&gt;&gt;"));
 								} else {
-									textSb.append(page.replaceAll("\\p{Cntrl}+", " "));
+									pageText.append(page.replaceAll("\\p{Cntrl}+", " "));
 								}
 							} else {
-								textSb.append(page);
+								pageText.append(page);
 							}
 						}
 
 						// extract images
 						if (includeImages) {
 							List<String> imageList = PdfReadHelper.getPageImages(j);
-							Iterator<String> iterator = imageList.iterator();
-							while (iterator.hasNext()) {
-								// Stopped?
+							for (String imageName: imageList){
 								if (result == ConversionStatus.CONVERSION_STOPPED_BY_USER) {
 									return ConversionStatus.CONVERSION_STOPPED_BY_USER;
 								}
 
-								String imageName = iterator.next();
 								String imageTag = "\n<img alt=\"" + imageName + "\" src=\"" + imageName + "\" /><br/>";
 
 								if (!allImageList.contains(imageName)) {
 									allImageList.add(imageName);
-									publishProgress(String.format(getResources().getString(R.string.image), imageName));
-									textSb.append(imageTag);
+									publishProgress(String.format(getResources().getString(R.string.image_added), imageName));
+									pageText.append(imageTag);
 								} else if (repeatedImages) {
-									textSb.append(imageTag);
+									pageText.append(imageTag);
 								}
 							}
 						}
 						// Close page
-						textSb.append("\n  </p>\n");
+						pageText.append("\n  </p>\n");
 					}
-					
-					String text = textSb.toString();
-					if (presenter.addPage(i, text)) {
+
+					if (presenter.addPage(i, pageText.toString())) {
 						return ConversionStatus.CANNOT_WRITE_EPUB;
 					}
 				}
@@ -590,7 +558,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 				}
 
 				// Close ePUB file
-				publishProgress(getResources().getString(R.string.close));
+				publishProgress(getResources().getString(R.string.close_file));
 				if (ZipWriter.close()) {
 					return ConversionStatus.CANNOT_WRITE_EPUB;
 				}

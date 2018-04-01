@@ -262,7 +262,7 @@ public class VerifyActivity extends Activity {
 	}
 
 	private void readError() {
-		Toast.makeText(getApplicationContext(), getResources().getString(R.string.read_error), Toast.LENGTH_SHORT).show();
+		Toast.makeText(getApplicationContext(), getResources().getString(R.string.cannot_read_file), Toast.LENGTH_SHORT).show();
 		exit();
 	}
 

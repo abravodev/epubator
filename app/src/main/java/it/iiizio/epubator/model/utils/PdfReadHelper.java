@@ -116,5 +116,9 @@ public class PdfReadHelper {
 		}
 		return outputStream.toString();
 	}
+
+	public static void addImage(String image){
+		imageList.add(image);
+	}
 }
 
