@@ -32,22 +32,26 @@ public class ConvertPresenterImpl implements ConvertPresenter {
 
     @Override
     public boolean addMimeType() {
-        return ZipWriter.addText(ZipFileConstants.MIMETYPE, "application/epub+zip", true);
+        String filetype = "application/epub+zip";
+        return ZipWriter.addText(ZipFileConstants.MIMETYPE, filetype, true);
     }
 
     @Override
     public boolean addContainer() {
-        return ZipWriter.addText("META-INF/container.xml", buildContainer(), false);
+        String container = buildContainer();
+        return ZipWriter.addText("META-INF/container.xml", container, false);
     }
 
     @Override
     public boolean addToc(int pages, String tocId, String title, boolean tocFromPdf, int pagesPerFile){
-        return ZipWriter.addText("OEBPS/toc.ncx", buildToc(pages, tocId, title, tocFromPdf, pagesPerFile), false);
+        String toc = buildToc(pages, tocId, title, tocFromPdf, pagesPerFile);
+        return ZipWriter.addText("OEBPS/toc.ncx", toc, false);
     }
 
     @Override
     public boolean addFrontPage() {
-        return ZipWriter.addText(ZipFileConstants.FRONTPAGE, buildFrontPage(), false);
+        String frontPage = buildFrontPage();
+        return ZipWriter.addText(ZipFileConstants.FRONTPAGE, frontPage, false);
     }
 
     @Override
@@ -95,12 +99,14 @@ public class ConvertPresenterImpl implements ConvertPresenter {
 
     @Override
     public boolean addContent(int pages, String bookId, Iterable<String> images, String title, int pagesPerFile) {
-        return ZipWriter.addText(ZipFileConstants.CONTENT, buildContent(pages, bookId, images, title, pagesPerFile), false);
+        String content = buildContent(pages, bookId, images, title, pagesPerFile);
+        return ZipWriter.addText(ZipFileConstants.CONTENT, content, false);
     }
 
     @Override
     public boolean addPage(int page, String text) {
-        return ZipWriter.addText(ZipFileConstants.page(page), HtmlHelper.getBasicHtml("page" + page, text.replaceAll("<br/>(?=[a-z])", "&nbsp;")) , false);
+        String htmlText = HtmlHelper.getBasicHtml("page" + page, text.replaceAll("<br/>(?=[a-z])", "&nbsp;"));
+        return ZipWriter.addText(ZipFileConstants.page(page), htmlText, false);
     }
 
     private String buildToc(int pages, String tocId, String title, boolean tocFromPdf, int pagesPerFile) {
@@ -145,7 +151,7 @@ public class ConvertPresenterImpl implements ConvertPresenter {
                         if (action.equals("GoTo")) {
                             String chapter = parser.getElementValue(e).trim();
                             try {
-                                int page = Integer.valueOf(parser.getValue(e, "Page").split(" ")[0]);
+                                int page = Integer.parseInt(parser.getValue(e, "Page").split(" ")[0]);
 
                                 // First entry not in page one, create a dummy one
                                 if ((lastPage == Integer.MAX_VALUE) && (page > 1))
@@ -284,8 +290,7 @@ public class ConvertPresenterImpl implements ConvertPresenter {
     }
 
     private void addDefaultLogo(int maxWidth, int maxHeight, Canvas coverImage) {
-        Bitmap coverImageFile;
-        coverImageFile = view.getAppLogo();
+        Bitmap coverImageFile = view.getAppLogo();
         coverImage.drawBitmap(coverImageFile, maxWidth - coverImageFile.getWidth(), maxHeight - coverImageFile.getHeight(), new Paint(Paint.FILTER_BITMAP_FLAG));
     }
 
@@ -301,8 +306,7 @@ public class ConvertPresenterImpl implements ConvertPresenter {
         paint.setAntiAlias(true);
         paint.setStyle(Paint.Style.FILL);
 
-        String title = bookFilename.replaceAll("_", " ");
-        String[] words = title.split("\\s");
+        String[] words = getTitleWords(bookFilename);
 
         float newline = paint.getFontSpacing();
         float x = border;
@@ -330,6 +334,11 @@ public class ConvertPresenterImpl implements ConvertPresenter {
             coverImage.drawText(word, x, y, paint);
             x += len;
         }
+    }
+
+    private String[] getTitleWords(String bookFilename){
+        String title = bookFilename.replaceAll("_", " ");
+        return title.split("\\s");
     }
 
 }

@@ -351,15 +351,13 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			// Remove cache files
-			FileHelper.deleteFilesFromDirectory(new File(tempPath));
+			removeCacheFiles();
+			saveOldEPUB();
+			loadPDF();
+			return null;
+		}
 
-			// Save old ePUB
-			if (new File(epubFilename).exists()) {
-				new File(epubFilename).renameTo(new File(oldFilename));
-			}
-
-			// Load PDF
+		private void loadPDF() {
 			publishProgress(String.format(getResources().getString(R.string.load), pdfFilename));
 			if (!(new File(pdfFilename).exists())) {
 				// PDF file not found
@@ -370,8 +368,16 @@ public class ConvertActivity extends Activity implements ConvertView {
 			} else if (result != ConversionStatus.CONVERSION_STOPPED_BY_USER) {
 				result = fillEpub();
 			}
+		}
 
-			return null;
+		private void saveOldEPUB() {
+			if (new File(epubFilename).exists()) {
+				new File(epubFilename).renameTo(new File(oldFilename));
+			}
+		}
+
+		private void removeCacheFiles() {
+			FileHelper.deleteFilesFromDirectory(new File(tempPath));
 		}
 
 		@Override
@@ -522,7 +528,6 @@ public class ConvertActivity extends Activity implements ConvertView {
 							}
 						}
 
-						// extract images
 						if (includeImages) {
 							List<String> imageList = PdfReadHelper.getPageImages(j);
 							for (String imageName: imageList){
@@ -550,14 +555,12 @@ public class ConvertActivity extends Activity implements ConvertView {
 					}
 				}
 
-				// Add content.opf
 				publishProgress(getResources().getString(R.string.content));
 				setProgress(++writedFiles*9999/totalFiles);
 				if (presenter.addContent(pages, bookId, allImageList, title, pagesPerFile)) {
 					return ConversionStatus.CANNOT_WRITE_EPUB;
 				}
 
-				// Close ePUB file
 				publishProgress(getResources().getString(R.string.close_file));
 				if (ZipWriter.close()) {
 					return ConversionStatus.CANNOT_WRITE_EPUB;

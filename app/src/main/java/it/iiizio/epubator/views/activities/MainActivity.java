@@ -17,8 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package it.iiizio.epubator.views.activities;
 
-import java.io.File;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -41,33 +39,33 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.File;
+
 import it.iiizio.epubator.R;
 
 public class MainActivity extends Activity {
-	String filename = "";
-	String cover_file = "";
-	static String path;
-	static boolean cover_picked = false;
+
+	private String filename = "";
+	private String cover_file = "";
+	private static String path;
+	private static boolean cover_picked = false;
 	private SharedPreferences sharedPref;
 	private final String PDF_EXT = ".pdf";
 	private final String EPUB_EXT = " - ePUBator.epub";
+
 	private final int CONVERT = 1;
 	private final int VERIFY = 2;
 	private final int PICKAPIC = 3;
 	private final int OPENWITH = 4;
 	private final int SHAREWITH = 5;
 
-	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		((Button) findViewById(R.id.convert)).setOnClickListener(mConvertListener);
-		((Button) findViewById(R.id.verify)).setOnClickListener(mVerifyListener);
-		
-	    Intent intent = getIntent();
-		
+		setupButtons();
+
 		// Get last path
 		sharedPref = this.getPreferences(Context.MODE_PRIVATE);
 		path = sharedPref.getString("path", Environment.getExternalStorageDirectory().getPath());
@@ -76,7 +74,8 @@ public class MainActivity extends Activity {
 		if (sharedPref.getBoolean("first_time", true)) {
 			showDialog(0);
 		}
-		
+
+		Intent intent = getIntent();
 	    // To get the action of the intent use
 	    String action = intent.getAction();
 	    if (action.equals(Intent.ACTION_VIEW)) {
@@ -86,6 +85,38 @@ public class MainActivity extends Activity {
 				pickActivity();
 			}
 	    }
+	}
+
+	private void setupButtons() {
+		((Button) findViewById(R.id.convert)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				convertFile();
+			}
+		});
+		((Button) findViewById(R.id.verify)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				verifyFile();
+			}
+		});
+	}
+
+	private void convertFile() {
+		if (ConvertActivity.started()) {
+            // Conversion already started, show progress
+            if (ConvertActivity.working()) {
+                Toast.makeText(getApplicationContext(), getResources().getString(R.string.conversion_in_progress), Toast.LENGTH_SHORT).show();
+            }
+            startActivity(new Intent(MainActivity.this, ConvertActivity.class));
+        } else {
+            // Select a file
+            selectAFile(path, PDF_EXT, CONVERT);
+        }
+	}
+
+	private void verifyFile() {
+		selectAFile(path, EPUB_EXT, VERIFY);
 	}
 
 	// Inflate menu
@@ -103,16 +134,10 @@ public class MainActivity extends Activity {
 			startActivity(new Intent(MainActivity.this, PrefsActivity.class));
 			return true;
 		case R.id.open:
-			Intent chooseFile = new Intent(MainActivity.this, FileChooserListActivity.class);
-			chooseFile.putExtra("path", path);
-			chooseFile.putExtra("filter", EPUB_EXT);
-			startActivityForResult(chooseFile, OPENWITH);
+			selectAFile(path, EPUB_EXT, OPENWITH);
 			return true;
 		case R.id.share:
-			chooseFile = new Intent(MainActivity.this, FileChooserListActivity.class);
-			chooseFile.putExtra("path", path);
-			chooseFile.putExtra("filter", EPUB_EXT);
-			startActivityForResult(chooseFile, SHAREWITH);
+			shareFile();
 			return true;
 		case R.id.quickstart:
 			showDialog(0);
@@ -129,6 +154,13 @@ public class MainActivity extends Activity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	private void shareFile() {
+		Intent chooseFile = new Intent(MainActivity.this, FileChooserListActivity.class);
+		chooseFile.putExtra("path", path);
+		chooseFile.putExtra("filter", EPUB_EXT);
+		startActivityForResult(chooseFile, SHAREWITH);
 	}
 
 	// Quick start dialog
@@ -152,100 +184,83 @@ public class MainActivity extends Activity {
 			return null;
 	}
 
-	// Convert button pressed
-	View.OnClickListener mConvertListener = new OnClickListener() {
-		public void onClick(View v) {
-			if (ConvertActivity.started()) {
-				// Conversion already started, show progress
-				if (ConvertActivity.working()) {
-					Toast.makeText(getApplicationContext(), getResources().getString(R.string.conversion_in_progress), Toast.LENGTH_SHORT).show();
-				}
-				startActivity(new Intent(MainActivity.this, ConvertActivity.class));
-			} else {
-				// Select a file
-				Intent chooseFile = new Intent(MainActivity.this, FileChooserListActivity.class);
-				chooseFile.putExtra("path", path);
-				chooseFile.putExtra("filter", PDF_EXT);
-				startActivityForResult(chooseFile, CONVERT);
-			}
-		}
-	};
 
-	// Verify button pressed
-	View.OnClickListener mVerifyListener = new OnClickListener() {
-		public void onClick(View v) {
-			// Select a file
-			Intent chooseFile = new Intent(MainActivity.this, FileChooserListActivity.class);
-			chooseFile.putExtra("path", path);
-			chooseFile.putExtra("filter", EPUB_EXT);
-			startActivityForResult(chooseFile, VERIFY);
-		}
-	};
+
+	private void selectAFile(String filePath, String fileFilter, int action) {
+		Intent chooseFile = new Intent(MainActivity.this, FileChooserListActivity.class);
+		chooseFile.putExtra("path", filePath);
+		chooseFile.putExtra("filter", fileFilter);
+		startActivityForResult(chooseFile, action);
+	}
 
 	// File selected
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
-		case OPENWITH:
-			// Open ePUB
-			if (resultCode == RESULT_OK) {
-				filename = data.getAction();
-				updateRecentFolder();
-				try
-				{
-					Intent sendIntent = new Intent(Intent.ACTION_VIEW);  
-					sendIntent.setDataAndType(Uri.fromFile(new File(filename)), "application/epub+zip");
-					startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.open_epub)));
-				}
-				catch(Exception e)
-				{
-					System.err.println("Exception in Open with " + e.getMessage());
-				}
-			}
-			break;
-		case SHAREWITH:
-			// Share ePUB
-			if (resultCode == RESULT_OK) {
-				filename = data.getAction();
-				updateRecentFolder();
-				try
-				{
-					Intent sendIntent = new Intent(Intent.ACTION_SEND);  
-					sendIntent.setType("application/epub+zip");
-					sendIntent.putExtra(android.content.Intent.EXTRA_STREAM, Uri.fromFile(new File(filename)));
-					startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share_epub)));
-				}
-				catch(Exception e)
-				{
-					System.err.println("Exception in Share with " + e.getMessage());
-				}
-			}
-			break;
-		case PICKAPIC:
-			// Get image from gallery
-			if (resultCode == RESULT_OK) {
-				Uri selectedImage = data.getData();
-				String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-				Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-				cursor.moveToFirst();
-
-				int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-				cover_file = cursor.getString(columnIndex);
-				cursor.close();
-			} else {
-				cover_file = "";
-			}
-			cover_picked = true;
-			pickActivity();
-			break;
-		default:
-			// Conversion or verify
-			if (resultCode == RESULT_OK) {
-				filename = data.getAction();
-				pickActivity();
-			}
-			break;
+			case OPENWITH: openEPUB(resultCode, data); break;
+			case SHAREWITH: shareEPUB(resultCode, data); break;
+			case PICKAPIC: getImageFromGallery(resultCode, data); break;
+			default: conversionOrVerify(resultCode, data); break;
 		}
+	}
+
+	private void conversionOrVerify(int resultCode, Intent data) {
+		if (resultCode == RESULT_OK) {
+            filename = data.getAction();
+            pickActivity();
+        }
+	}
+
+	private void getImageFromGallery(int resultCode, Intent data) {
+		if (resultCode == RESULT_OK) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            cover_file = cursor.getString(columnIndex);
+            cursor.close();
+        } else {
+            cover_file = "";
+        }
+		cover_picked = true;
+		pickActivity();
+	}
+
+	private void shareEPUB(int resultCode, Intent data) {
+		if (resultCode == RESULT_OK) {
+            filename = data.getAction();
+            updateRecentFolder();
+            try
+            {
+                Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                sendIntent.setType("application/epub+zip");
+                sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(filename)));
+                startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share_epub)));
+            }
+            catch(Exception e)
+            {
+                System.err.println("Exception in Share with " + e.getMessage());
+            }
+        }
+	}
+
+	private void openEPUB(int resultCode, Intent data) {
+		if (resultCode == RESULT_OK) {
+            filename = data.getAction();
+            updateRecentFolder();
+            try
+            {
+                Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+                sendIntent.setDataAndType(Uri.fromFile(new File(filename)), "application/epub+zip");
+                startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.open_epub)));
+            }
+            catch(Exception e)
+            {
+                System.err.println("Exception in Open with " + e.getMessage());
+            }
+        }
 	}
 
 	// Start conversion or verify
@@ -293,12 +308,11 @@ public class MainActivity extends Activity {
 			Toast.makeText(getApplicationContext(), getResources().getString(R.string.wrongfile), Toast.LENGTH_SHORT).show();
 		}
 	}
-	
-	// Update recent folder
+
 	protected void updateRecentFolder() {
-	path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
-	SharedPreferences.Editor editor = sharedPref.edit();
-	editor.putString("path", path);
-	editor.commit();
+		path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
+		SharedPreferences.Editor editor = sharedPref.edit();
+		editor.putString("path", path);
+		editor.commit();
 	}
 }
