@@ -20,14 +20,11 @@ package it.iiizio.epubator.views.activities;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -47,13 +44,15 @@ import it.iiizio.epubator.presenters.MainPresenter;
 import it.iiizio.epubator.presenters.MainPresenterImpl;
 import it.iiizio.epubator.views.utils.PathUtils;
 import it.iiizio.epubator.views.utils.PermissionHelper;
+import it.iiizio.epubator.views.utils.PreferencesHelper;
 
 public class MainActivity extends Activity {
 
 	private String filename = "";
 	private String cover_file = "";
 	private static boolean cover_picked = false;
-	private SharedPreferences sharedPref;
+	private PreferencesHelper viewPreferencesHelper;
+	private PreferencesHelper sharedPreferencesHelper;
 	private MainPresenter presenter;
 
 	private static class Actions {
@@ -70,9 +69,8 @@ public class MainActivity extends Activity {
 
 		PermissionHelper.checkWritePermission(this); // TODO: Only check before requesting it
 		setupButtons();
-
-		sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-
+		viewPreferencesHelper = PreferencesHelper.getViewPreferences(this);
+		sharedPreferencesHelper = PreferencesHelper.getAppPreferences(this);
 		showInitialDialog();
 	}
 
@@ -110,7 +108,7 @@ public class MainActivity extends Activity {
 
 	// Show quick start on first time
 	private void showInitialDialog(){
-		if (sharedPref.getBoolean("first_time", true)) {
+		if (viewPreferencesHelper.getBoolean(PreferencesKeys.FIRST_TIME_APP, true)) {
 			showQuickStartDialog();
 		}
 	}
@@ -166,9 +164,7 @@ public class MainActivity extends Activity {
 			.setMessage(getResources().getString(R.string.quickstart_text))
 			.setNeutralButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
-					SharedPreferences.Editor editor = sharedPref.edit();
-					editor.putBoolean("first_time", false);
-					editor.commit();
+					viewPreferencesHelper.save(PreferencesKeys.FIRST_TIME_APP, false);
 				}
 			})
 			.create()
@@ -236,8 +232,7 @@ public class MainActivity extends Activity {
 	}
 
 	private void setCoverImage() {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean userPrefersToUsePicture = prefs.getBoolean(PreferencesKeys.CHOOSE_PICTURE, false);
+		boolean userPrefersToUsePicture = sharedPreferencesHelper.getBoolean(PreferencesKeys.CHOOSE_PICTURE);
 		if (userPrefersToUsePicture) {
             cover_file = "";
             selectImageFileFromSystem();
@@ -254,13 +249,11 @@ public class MainActivity extends Activity {
 	}
 
 	private String getRecentFolder(){
-		return sharedPref.getString(PreferencesKeys.PATH, Environment.getExternalStorageDirectory().getPath());
+		return sharedPreferencesHelper.getString(PreferencesKeys.PATH, Environment.getExternalStorageDirectory().getPath());
 	}
 
 	private void updateRecentFolder(String filename) {
 		String path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
-		SharedPreferences.Editor editor = sharedPref.edit();
-		editor.putString(PreferencesKeys.PATH, path);
-		editor.commit();
+		viewPreferencesHelper.save(PreferencesKeys.PATH, path);
 	}
 }

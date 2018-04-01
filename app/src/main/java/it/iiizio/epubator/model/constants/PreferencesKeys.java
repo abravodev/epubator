@@ -17,5 +17,6 @@ public class PreferencesKeys {
     public static String SHOW_ALL_FILES_WHEN_CHOOSING = "show_all_files";
     public static String SHOW_FILENAME_ONLY = "hide_detail";
     public static String SHOW_IMAGES_ON_VERIFY = "show_images";
+    public static String FIRST_TIME_APP = "first_time";
 
 }

@@ -25,13 +25,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -55,6 +53,7 @@ import it.iiizio.epubator.model.utils.PdfReadHelper;
 import it.iiizio.epubator.model.utils.ZipWriter;
 import it.iiizio.epubator.presenters.ConvertPresenter;
 import it.iiizio.epubator.presenters.ConvertPresenterImpl;
+import it.iiizio.epubator.views.utils.PreferencesHelper;
 
 public class ConvertActivity extends Activity implements ConvertView {
 
@@ -182,17 +181,17 @@ public class ConvertActivity extends Activity implements ConvertView {
 	
 	// Get preferences
 	private void getPrefs() {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		PreferencesHelper prefs = new PreferencesHelper(this);
 
 		includeImages = prefs.getBoolean(PreferencesKeys.ADD_EXTRACTED_IMAGES_FROM_PDF, true);
-		repeatedImages = prefs.getBoolean(PreferencesKeys.ADD_REPEATED_IMAGES, false);
-		pagesPerFile = Integer.parseInt(prefs.getString(PreferencesKeys.PAGES_PER_FILE, "5"));
-		onError = Integer.parseInt(prefs.getString(PreferencesKeys.OPTION_WHEN_ERROR_IN_CONVERSION, String.valueOf(DecissionOnConversionError.KEEP_ITEM)));
+		repeatedImages = prefs.getBoolean(PreferencesKeys.ADD_REPEATED_IMAGES);
+		pagesPerFile = prefs.getParsedString(PreferencesKeys.PAGES_PER_FILE, 5);
+		onError = prefs.getParsedString(PreferencesKeys.OPTION_WHEN_ERROR_IN_CONVERSION, DecissionOnConversionError.KEEP_ITEM);
 		addMarkers = prefs.getBoolean(PreferencesKeys.MARK_ERRORS, true);
-		hideNotification = prefs.getBoolean(PreferencesKeys.NOT_SEND_NOTIFICATIONS, false);
+		hideNotification = prefs.getBoolean(PreferencesKeys.NOT_SEND_NOTIFICATIONS);
 		tocFromPdf = prefs.getBoolean(PreferencesKeys.TRY_TO_EXTRACT_TOC_FROM_PDF, true);
 		showLogoOnCover = prefs.getBoolean(PreferencesKeys.HAVE_LOGO_ON_COVER, true);
-		saveOnDownloadDirectory = prefs.getBoolean(PreferencesKeys.SAVE_ALWAYS_ON_DOWNLOAD_DIRECTORY, false);
+		saveOnDownloadDirectory = prefs.getBoolean(PreferencesKeys.SAVE_ALWAYS_ON_DOWNLOAD_DIRECTORY);
 	}
 
 	// Set buttons state

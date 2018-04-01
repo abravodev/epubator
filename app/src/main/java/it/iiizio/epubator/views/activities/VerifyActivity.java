@@ -22,7 +22,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -48,6 +47,7 @@ import it.iiizio.epubator.model.entities.Book;
 import it.iiizio.epubator.model.utils.FileHelper;
 import it.iiizio.epubator.presenters.VerifyPresenter;
 import it.iiizio.epubator.presenters.VerifyPresenterImpl;
+import it.iiizio.epubator.views.utils.PreferencesHelper;
 
 public class VerifyActivity extends Activity {
 
@@ -225,7 +225,7 @@ public class VerifyActivity extends Activity {
 	}
 
 	private boolean showImages(){
-		return PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PreferencesKeys.SHOW_IMAGES_ON_VERIFY, true);
+		return new PreferencesHelper(this).getBoolean(PreferencesKeys.SHOW_IMAGES_ON_VERIFY, true);
 	}
 
 	private void removeFiles() {
