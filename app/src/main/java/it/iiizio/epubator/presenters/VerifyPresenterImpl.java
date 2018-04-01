@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import it.iiizio.epubator.model.XMLParser;
+import it.iiizio.epubator.model.utils.XMLParser;
 import it.iiizio.epubator.model.entities.Book;
 
 public class VerifyPresenterImpl implements VerifyPresenter {

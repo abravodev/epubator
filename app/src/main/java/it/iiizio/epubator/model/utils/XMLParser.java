@@ -15,7 +15,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.iiizio.epubator.model;
+package it.iiizio.epubator.model.utils;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -24,14 +30,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 public class XMLParser {
-	// Get DOM element
+
 	public Document getDomElement(String xml){
 		Document doc = null;
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -55,20 +55,16 @@ public class XMLParser {
 		return doc;
 	}
 
-	// Get attribute value
 	public String getValue(Element item, String str) {
 		return item.getAttribute(str);
 	}
 
-	// Get element value
 	public final String getElementValue( Node elem ) {
 		Node child;
-		if( elem != null){
-			if (elem.hasChildNodes()){
-				for( child = elem.getFirstChild(); child != null; child = child.getNextSibling() ){
-					if( child.getNodeType() == Node.TEXT_NODE  ){
-						return child.getNodeValue();
-					}
+		if( elem != null && elem.hasChildNodes()){
+			for( child = elem.getFirstChild(); child != null; child = child.getNextSibling() ){
+				if( child.getNodeType() == Node.TEXT_NODE  ){
+					return child.getNodeValue();
 				}
 			}
 		}

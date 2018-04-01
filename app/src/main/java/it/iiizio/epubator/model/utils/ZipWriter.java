@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.iiizio.epubator.model;
+package it.iiizio.epubator.model.utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,10 +24,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
-public class WriteZip {
-	static ZipOutputStream zipOut = null;
-	static final int BUFFER = 1024;
-	static byte data[] = new byte[BUFFER];
+public class ZipWriter {
+
+	private static ZipOutputStream zipOut = null;
 
 	// Create file
 	public static boolean create(String filename) {
@@ -41,7 +40,6 @@ public class WriteZip {
 		return false;
 	}
 
-	// Add text entry
 	public static boolean addText(String filename, String text, boolean store) {
 		CRC32 crc32 = new CRC32();
 		byte[] data = text.getBytes();
@@ -68,7 +66,6 @@ public class WriteZip {
 		return false;
 	}
 
-	// Add image entry
 	public static boolean addImage(String filename, byte[] image) {
 		try {
 			ZipEntry zipEntry = new ZipEntry(filename);
@@ -86,7 +83,6 @@ public class WriteZip {
 		return false;
 	}
 
-	// Close file
 	public static boolean close() {
 		try {
 			zipOut.flush();

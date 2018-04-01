@@ -47,8 +47,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import it.iiizio.epubator.R;
-import it.iiizio.epubator.model.ReadPdf;
-import it.iiizio.epubator.model.WriteZip;
+import it.iiizio.epubator.model.utils.PdfReadHelper;
+import it.iiizio.epubator.model.utils.ZipWriter;
 import it.iiizio.epubator.model.constants.ConversionStatus;
 import it.iiizio.epubator.model.utils.FileHelper;
 import it.iiizio.epubator.model.utils.HtmlHelper;
@@ -380,7 +380,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 			if (!(new File(pdfFilename).exists())) {
 				// PDF file not found
 				result = ConversionStatus.FILE_NOT_FOUND;
-			} else if (ReadPdf.open(pdfFilename)) {
+			} else if (PdfReadHelper.open(pdfFilename)) {
 				// Failed to read PDF file
 				result = ConversionStatus.CANNOT_READ_PDF;
 			} else if (result != ConversionStatus.CONVERSION_STOPPED_BY_USER) {
@@ -462,7 +462,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 				}
 
 				// Set up counter
-				int pages = ReadPdf.getPages();
+				int pages = PdfReadHelper.getPages();
 				publishProgress(String.format(getResources().getString(R.string.pages), pages));
 				int totalFiles = 2 + pages;
 				int writedFiles = 0;
@@ -472,7 +472,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 				// Create ePUB file
 				publishProgress(getResources().getString(R.string.create));
-				if (WriteZip.create(tempFilename)) {
+				if (ZipWriter.create(tempFilename)) {
 					return ConversionStatus.CANNOT_WRITE_EPUB;
 				}
 
@@ -530,7 +530,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 						textSb.append("  <a id=\"page" + j + "\"/>\n");
 						
 						// extract text
-						String page = HtmlHelper.stringToHTMLString(ReadPdf.extractText(j));
+						String page = HtmlHelper.stringToHTMLString(PdfReadHelper.getPageText(j));
 						if (page.length() == 0) {
 							publishProgress(String.format(getResources().getString(R.string.extraction_failure), j));
 							extractionErrorFlag = true;
@@ -552,7 +552,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 						// extract images
 						if (includeImages) {
-							List<String> imageList = ReadPdf.getImages(j);
+							List<String> imageList = PdfReadHelper.getPageImages(j);
 							Iterator<String> iterator = imageList.iterator();
 							while (iterator.hasNext()) {
 								// Stopped?
@@ -591,7 +591,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 				// Close ePUB file
 				publishProgress(getResources().getString(R.string.close));
-				if (WriteZip.close()) {
+				if (ZipWriter.close()) {
 					return ConversionStatus.CANNOT_WRITE_EPUB;
 				}
 

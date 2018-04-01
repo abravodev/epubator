@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.iiizio.epubator.model;
+package it.iiizio.epubator.model.utils;
 
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.SimpleBookmark;
@@ -28,12 +28,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ReadPdf {
+public class PdfReadHelper {
+
 	private static PdfReader reader;
 	private static HashMap<String, String> info;
-	static List<String> imageList;
+	private static List<String> imageList;
 
-	// Open pdf file
 	public static boolean open(String filename) {
 		try {
 			reader = new PdfReader(filename);
@@ -48,12 +48,10 @@ public class ReadPdf {
 		return false;
 	}
 
-	// Number of pages
 	public static int getPages() {
 		return reader.getNumberOfPages();
 	}
 
-	// Title
 	public static String getTitle() {
 		String title = info.get("Title");
 		if (title != null) {
@@ -62,7 +60,6 @@ public class ReadPdf {
 		return "";
 	}
 
-	// Author
 	public static String getAuthor() {
 		String author = info.get("Author");
 		if (author != null) {
@@ -71,8 +68,7 @@ public class ReadPdf {
 		return "";
 	}
 
-	// Extract text
-	public static String extractText(int page) {
+	public static String getPageText(int page) {
 		try {
 			return PdfTextExtractor.getTextFromPage(reader, page) + "\n";
 		} catch(Exception e) {
@@ -85,10 +81,10 @@ public class ReadPdf {
 	}
 
 	// Extract images
-	public static List<String> getImages(int page) {
-		imageList = new ArrayList<String>();
+	public static List<String> getPageImages(int page) {
+		imageList = new ArrayList<>();
 		PdfReaderContentParser parser = new PdfReaderContentParser(reader);
-		CustomRenderListener listener = new CustomRenderListener();
+		ImageRenderListener listener = new ImageRenderListener();
 		try {
 			parser.processContent(page, listener);
 		} catch (IOException e) {
@@ -101,7 +97,6 @@ public class ReadPdf {
 		return imageList;
 	}
 
-	// Extract bookmarks
 	public static String getBookmarks() {
 		List<HashMap<String, Object>> list;
 		try {
@@ -113,13 +108,13 @@ public class ReadPdf {
 			return "";
 		}
 		
-		ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
-			SimpleBookmark.exportToXML(list, baos, "UTF-8", false);
+			SimpleBookmark.exportToXML(list, outputStream, "UTF-8", false);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return baos.toString();
+		return outputStream.toString();
 	}
 }
 

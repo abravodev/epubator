@@ -14,9 +14,9 @@ import org.w3c.dom.NodeList;
 
 import java.io.ByteArrayOutputStream;
 
-import it.iiizio.epubator.model.ReadPdf;
-import it.iiizio.epubator.model.WriteZip;
-import it.iiizio.epubator.model.XMLParser;
+import it.iiizio.epubator.model.utils.PdfReadHelper;
+import it.iiizio.epubator.model.utils.ZipWriter;
+import it.iiizio.epubator.model.utils.XMLParser;
 import it.iiizio.epubator.model.constants.ZipFileConstants;
 import it.iiizio.epubator.model.utils.HtmlHelper;
 import it.iiizio.epubator.views.activities.ConvertView;
@@ -32,22 +32,22 @@ public class ConvertPresenterImpl implements ConvertPresenter {
 
     @Override
     public boolean addMimeType() {
-        return WriteZip.addText(ZipFileConstants.MIMETYPE, "application/epub+zip", true);
+        return ZipWriter.addText(ZipFileConstants.MIMETYPE, "application/epub+zip", true);
     }
 
     @Override
     public boolean addContainer() {
-        return WriteZip.addText("META-INF/container.xml", buildContainer(), false);
+        return ZipWriter.addText("META-INF/container.xml", buildContainer(), false);
     }
 
     @Override
     public boolean addToc(int pages, String tocId, String title, boolean tocFromPdf, int pagesPerFile){
-        return WriteZip.addText("OEBPS/toc.ncx", buildToc(pages, tocId, title, tocFromPdf, pagesPerFile), false);
+        return ZipWriter.addText("OEBPS/toc.ncx", buildToc(pages, tocId, title, tocFromPdf, pagesPerFile), false);
     }
 
     @Override
     public boolean addFrontPage() {
-        return WriteZip.addText(ZipFileConstants.FRONTPAGE, buildFrontPage(), false);
+        return ZipWriter.addText(ZipFileConstants.FRONTPAGE, buildFrontPage(), false);
     }
 
     @Override
@@ -95,12 +95,12 @@ public class ConvertPresenterImpl implements ConvertPresenter {
 
     @Override
     public boolean addContent(int pages, String bookId, Iterable<String> images, String title, int pagesPerFile) {
-        return WriteZip.addText(ZipFileConstants.CONTENT, buildContent(pages, bookId, images, title, pagesPerFile), false);
+        return ZipWriter.addText(ZipFileConstants.CONTENT, buildContent(pages, bookId, images, title, pagesPerFile), false);
     }
 
     @Override
     public boolean addPage(int page, String text) {
-        return WriteZip.addText(ZipFileConstants.page(page), HtmlHelper.getBasicHtml("page" + page, text.replaceAll("<br/>(?=[a-z])", "&nbsp;")) , false);
+        return ZipWriter.addText(ZipFileConstants.page(page), HtmlHelper.getBasicHtml("page" + page, text.replaceAll("<br/>(?=[a-z])", "&nbsp;")) , false);
     }
 
     private String buildToc(int pages, String tocId, String title, boolean tocFromPdf, int pagesPerFile) {
@@ -131,7 +131,7 @@ public class ConvertPresenterImpl implements ConvertPresenter {
         if (tocFromPdf) {
             // Try to extract toc from pdf
             XMLParser parser = new XMLParser();
-            Document doc = parser.getDomElement(ReadPdf.getBookmarks());
+            Document doc = parser.getDomElement(PdfReadHelper.getBookmarks());
             if (doc != null) {
                 doc.normalize();
                 NodeList nl = doc.getElementsByTagName("Title");
@@ -230,7 +230,7 @@ public class ConvertPresenterImpl implements ConvertPresenter {
         content.append("<package xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"BookID\" version=\"2.0\">\n");
         content.append("    <metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:opf=\"http://www.idpf.org/2007/opf\">\n");
         content.append("        <dc:title>" + title + "</dc:title>\n");
-        content.append("        <dc:creator>" + (ReadPdf.getAuthor()).replaceAll("[<>]", "_") + "</dc:creator>\n");
+        content.append("        <dc:creator>" + (PdfReadHelper.getAuthor()).replaceAll("[<>]", "_") + "</dc:creator>\n");
         content.append("        <dc:creator opf:role=\"bkp\">ePUBator - Minimal offline PDF to ePUB converter for Android</dc:creator>\n");
         content.append("        <dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + id + "</dc:identifier>\n");
         content.append("        <dc:language>" + Resources.getSystem().getConfiguration().locale.getLanguage() + "</dc:language>\n");
@@ -292,7 +292,7 @@ public class ConvertPresenterImpl implements ConvertPresenter {
     private boolean saveBmpAsPng(Bitmap bmp) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-        return WriteZip.addImage(ZipFileConstants.FRONTPAGE_IMAGE, outputStream.toByteArray());
+        return ZipWriter.addImage(ZipFileConstants.FRONTPAGE_IMAGE, outputStream.toByteArray());
     }
 
     private void addTitleAsCover(String bookFilename, int maxWidth, int border, int fontsize, Paint paint, Canvas coverImage) {
