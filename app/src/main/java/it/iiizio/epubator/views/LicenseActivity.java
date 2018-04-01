@@ -21,31 +21,27 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import it.iiizio.epubator.R;
+import it.iiizio.epubator.presenters.LicensePresenter;
+import it.iiizio.epubator.presenters.LicensePresenterImpl;
 
 public class LicenseActivity extends Activity {
 
-	/** Called when the activity is first created. */
+	private LicensePresenter presenter;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.infoview);
+		presenter = new LicensePresenterImpl();
 
 		// Get license from raw
 		TextView infoTv = (TextView)findViewById(R.id.infoview);
 		infoTv.setTextSize(18);
 		InputStream is = this.getResources().openRawResource(R.raw.license);
-		try {
-			byte[] buffer = new byte[is.available()];
-			is.read(buffer);
-			is.close();
-			// Remove unwanted newlines
-			infoTv.setText(new String(buffer, "utf-8").replaceAll("(?<!\n)\n(?!\n)", " "));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		String licenseInfo = presenter.getLicenseInfo(is);
+		infoTv.setText(licenseInfo);
 	}
 }
