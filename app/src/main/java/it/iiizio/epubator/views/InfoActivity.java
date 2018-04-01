@@ -21,36 +21,30 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import it.iiizio.epubator.R;
+import it.iiizio.epubator.presenters.InfoPresenter;
+import it.iiizio.epubator.presenters.InfoPresenterImpl;
 
 public class InfoActivity extends Activity {
 
-	/** Called when the activity is first created. */
+	private InfoPresenter presenter;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.infoview);
+		presenter = new InfoPresenterImpl();
 
-		// Get about text from raw
+		setupTextInfo();
+	}
+
+	private void setupTextInfo(){
 		TextView infoTv = (TextView)findViewById(R.id.infoview);
 		infoTv.setTextSize(18);
 		InputStream is = this.getResources().openRawResource(R.raw.info);
-		
-		StringBuilder sb = new StringBuilder();
-		int i;
-		try {
-			i = is.read();
-			while (i != -1) {
-				sb.append((char) i);
-				i = is.read();
-			}
-		} catch (IOException e) {
-			// Auto-generated catch block
-			e.printStackTrace();
-		}
-		infoTv.setText(sb.toString());
+		String info = presenter.getInfo(is);
+		infoTv.setText(info);
 	}
 }
