@@ -45,7 +45,10 @@ import java.util.Date;
 import java.util.List;
 
 import it.iiizio.epubator.R;
+import it.iiizio.epubator.model.constants.BundleKeys;
 import it.iiizio.epubator.model.constants.ConversionStatus;
+import it.iiizio.epubator.model.constants.DecissionOnConversionError;
+import it.iiizio.epubator.model.constants.PreferencesKeys;
 import it.iiizio.epubator.model.utils.FileHelper;
 import it.iiizio.epubator.model.utils.HtmlHelper;
 import it.iiizio.epubator.model.utils.PdfReadHelper;
@@ -111,9 +114,9 @@ public class ConvertActivity extends Activity implements ConvertView {
 		} else if (!notificationSent) {
 			Bundle extras = getIntent().getExtras();
 			if (extras != null) {
-				cover_file = (extras.containsKey("cover")) ?  extras.getString("cover") : "";
-				if (extras.containsKey("filename")) {
-					pdfFilename = extras.getString("filename");
+				cover_file = (extras.containsKey(BundleKeys.COVER)) ?  extras.getString(BundleKeys.COVER) : "";
+				if (extras.containsKey(BundleKeys.FILENAME)) {
+					pdfFilename = extras.getString(BundleKeys.FILENAME);
 					String[] parts = FileHelper.getPathAndFilenameOfPdf(pdfFilename);
 					String path = parts[0];
 					filename = parts[1];
@@ -142,7 +145,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 	private String getEpubFilename(String path, String filename, boolean saveOnDownloadDirectory){
 		boolean writable = FileHelper.folderIsWritable(path);
 		String outputDirectory = (saveOnDownloadDirectory || !writable) ? getDownloadDirectory(): path;
-		return outputDirectory + "/" + filename + "/" + EPUB_EXT;
+		return outputDirectory + filename + EPUB_EXT;
 	}
 
 	private String getDownloadDirectory(){
@@ -181,15 +184,15 @@ public class ConvertActivity extends Activity implements ConvertView {
 	private void getPrefs() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-		includeImages = prefs.getBoolean("include_images", true);
-		repeatedImages = prefs.getBoolean("repeated_images", false);
-		pagesPerFile = Integer.parseInt(prefs.getString("page_per_file", "5"));
-		onError = Integer.parseInt(prefs.getString("on_error", "0"));
-		addMarkers = prefs.getBoolean("add_markers", true);
-		hideNotification = prefs.getBoolean("hide_notifi", false);
-		tocFromPdf = prefs.getBoolean("toc_from_pdf", true);
-		showLogoOnCover = prefs.getBoolean("logo_on_cover", true);
-		saveOnDownloadDirectory = prefs.getBoolean("download_dir", false);
+		includeImages = prefs.getBoolean(PreferencesKeys.ADD_EXTRACTED_IMAGES_FROM_PDF, true);
+		repeatedImages = prefs.getBoolean(PreferencesKeys.ADD_REPEATED_IMAGES, false);
+		pagesPerFile = Integer.parseInt(prefs.getString(PreferencesKeys.PAGES_PER_FILE, "5"));
+		onError = Integer.parseInt(prefs.getString(PreferencesKeys.OPTION_WHEN_ERROR_IN_CONVERSION, String.valueOf(DecissionOnConversionError.KEEP_ITEM)));
+		addMarkers = prefs.getBoolean(PreferencesKeys.MARK_ERRORS, true);
+		hideNotification = prefs.getBoolean(PreferencesKeys.NOT_SEND_NOTIFICATIONS, false);
+		tocFromPdf = prefs.getBoolean(PreferencesKeys.TRY_TO_EXTRACT_TOC_FROM_PDF, true);
+		showLogoOnCover = prefs.getBoolean(PreferencesKeys.HAVE_LOGO_ON_COVER, true);
+		saveOnDownloadDirectory = prefs.getBoolean(PreferencesKeys.SAVE_ALWAYS_ON_DOWNLOAD_DIRECTORY, false);
 	}
 
 	// Set buttons state
@@ -239,7 +242,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 			.setNeutralButton(getResources().getString(R.string.verify_epub), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					Intent verify = new Intent(getBaseContext(), VerifyActivity.class);
-					verify.putExtra("filename", tempFilename);
+					verify.putExtra(BundleKeys.FILENAME, tempFilename);
 					startActivityForResult(verify, 0);
 				}
 			})
@@ -403,11 +406,11 @@ public class ConvertActivity extends Activity implements ConvertView {
 		@Override
 		protected void onPostExecute(Void params) {
 			if (result == ConversionStatus.EXTRACTION_ERROR) {
-				if (onError == 0) {
+				if (onError == DecissionOnConversionError.KEEP_ITEM) {
 					// Keep ePUB with errors
 					keepEpub();
 					result = ConversionStatus.SUCCESS;
-				} else if (onError == 2){
+				} else if (onError == DecissionOnConversionError.DISCARD_ITEM){
 					// Drop ePUB with errors
 					deleteTmp();
 				} else {

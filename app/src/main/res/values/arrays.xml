@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>10</item>
         <item>20</item>
     </string-array>
-    
+
     <string-array name="errorArray">
         <item>@string/keep_item</item>
         <item>@string/ask_item</item>

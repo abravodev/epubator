@@ -20,15 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<item
 		android:id="@+id/prefs"
 		android:title="@string/prefs" />
-		
-    <item
-		android:id="@+id/open"
-		android:title="@string/open_epub" />
-    
-	<item
-		android:id="@+id/share"
-		android:title="@string/share_epub" />
-		
+
     <item
 		android:id="@+id/quickstart"
 		android:title="@string/quickstart" />

@@ -33,6 +33,7 @@ public class FileHelper {
             writable = checkFile.createNewFile();
             checkFile.delete();
         } catch (IOException e) {
+            System.err.println(e.getMessage());
         }
         return writable;
     }

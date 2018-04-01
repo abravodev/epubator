@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.zip.ZipFile;
 
 import it.iiizio.epubator.R;
+import it.iiizio.epubator.model.constants.BundleKeys;
+import it.iiizio.epubator.model.constants.PreferencesKeys;
 import it.iiizio.epubator.model.entities.Book;
 import it.iiizio.epubator.model.utils.FileHelper;
 import it.iiizio.epubator.presenters.VerifyPresenter;
@@ -223,7 +225,7 @@ public class VerifyActivity extends Activity {
 	}
 
 	private boolean showImages(){
-		return PreferenceManager.getDefaultSharedPreferences(this).getBoolean("show_images", true);
+		return PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PreferencesKeys.SHOW_IMAGES_ON_VERIFY, true);
 	}
 
 	private void removeFiles() {
@@ -254,8 +256,8 @@ public class VerifyActivity extends Activity {
 
 	private String getFilename(){
 		Bundle extras = getIntent().getExtras();
-		if (extras != null && extras.containsKey("filename")) {
-			return extras.getString("filename");
+		if (extras != null && extras.containsKey(BundleKeys.FILENAME)) {
+			return extras.getString(BundleKeys.FILENAME);
 		}
 
 		return "";

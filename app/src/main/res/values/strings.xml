@@ -125,5 +125,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>Extraction stopped by user</item>
         <item>Out of memory error</item>
     </string-array>
+    <string name="cannot_choose_file">Cannot choose the file</string>
 
 </resources>
