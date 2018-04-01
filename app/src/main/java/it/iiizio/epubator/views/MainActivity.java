@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.iiizio.epubator;
+package it.iiizio.epubator.views;
 
 import java.io.File;
 
@@ -41,7 +41,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class ePUBator extends Activity {
+import it.iiizio.epubator.R;
+
+public class MainActivity extends Activity {
 	String filename = "";
 	String cover_file = "";
 	static String path;
@@ -98,16 +100,16 @@ public class ePUBator extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.prefs:
-			startActivity(new Intent(ePUBator.this, Prefs.class));
+			startActivity(new Intent(MainActivity.this, PrefsActivity.class));
 			return true;
 		case R.id.open:
-			Intent chooseFile = new Intent(ePUBator.this, FileChooser.class);
+			Intent chooseFile = new Intent(MainActivity.this, FileChooserListActivity.class);
 			chooseFile.putExtra("path", path);
 			chooseFile.putExtra("filter", EPUB_EXT);
 			startActivityForResult(chooseFile, OPENWITH);
 			return true;
 		case R.id.share:
-			chooseFile = new Intent(ePUBator.this, FileChooser.class);
+			chooseFile = new Intent(MainActivity.this, FileChooserListActivity.class);
 			chooseFile.putExtra("path", path);
 			chooseFile.putExtra("filter", EPUB_EXT);
 			startActivityForResult(chooseFile, SHAREWITH);
@@ -116,10 +118,10 @@ public class ePUBator extends Activity {
 			showDialog(0);
 			return true;
 		case R.id.info:
-			startActivity(new Intent(ePUBator.this, Info.class));
+			startActivity(new Intent(MainActivity.this, InfoActivity.class));
 			return true;
 		case R.id.license:
-			startActivity(new Intent(ePUBator.this, License.class));
+			startActivity(new Intent(MainActivity.this, LicenseActivity.class));
 			return true;
 		case R.id.my_apps:
 			startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("market://search?q=pub:iiizio")));
@@ -134,7 +136,7 @@ public class ePUBator extends Activity {
 	protected Dialog onCreateDialog(int id) {
 		if (id == 0) {
 			// Build dialog
-			return new AlertDialog.Builder(ePUBator.this)
+			return new AlertDialog.Builder(MainActivity.this)
 			.setTitle(getResources().getString(R.string.quickstart))
 			.setMessage(getResources().getString(R.string.quickstart_text))
 			// Preview action
@@ -153,15 +155,15 @@ public class ePUBator extends Activity {
 	// Convert button pressed
 	View.OnClickListener mConvertListener = new OnClickListener() {
 		public void onClick(View v) {
-			if (Convert.started()) {
+			if (ConvertActivity.started()) {
 				// Conversion already started, show progress
-				if (Convert.working()) {
+				if (ConvertActivity.working()) {
 					Toast.makeText(getApplicationContext(), getResources().getString(R.string.cip), Toast.LENGTH_SHORT).show();
 				}
-				startActivity(new Intent(ePUBator.this, Convert.class));
+				startActivity(new Intent(MainActivity.this, ConvertActivity.class));
 			} else {
 				// Select a file
-				Intent chooseFile = new Intent(ePUBator.this, FileChooser.class);
+				Intent chooseFile = new Intent(MainActivity.this, FileChooserListActivity.class);
 				chooseFile.putExtra("path", path);
 				chooseFile.putExtra("filter", PDF_EXT);
 				startActivityForResult(chooseFile, CONVERT);
@@ -173,7 +175,7 @@ public class ePUBator extends Activity {
 	View.OnClickListener mVerifyListener = new OnClickListener() {
 		public void onClick(View v) {
 			// Select a file
-			Intent chooseFile = new Intent(ePUBator.this, FileChooser.class);
+			Intent chooseFile = new Intent(MainActivity.this, FileChooserListActivity.class);
 			chooseFile.putExtra("path", path);
 			chooseFile.putExtra("filter", EPUB_EXT);
 			startActivityForResult(chooseFile, VERIFY);
@@ -251,7 +253,7 @@ public class ePUBator extends Activity {
 		updateRecentFolder();
 
 		if (filename.endsWith(PDF_EXT)) {
-			if (!cover_picked && !Convert.conversionStarted) {
+			if (!cover_picked && !ConvertActivity.conversionStarted) {
 			SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
 				if (prefs.getBoolean("pickapic", false)) {
 					// Choose an image
@@ -277,14 +279,14 @@ public class ePUBator extends Activity {
 			if(cover_picked) {
 				// Start conversion
 				cover_picked = false;
-				Intent convert = new Intent(ePUBator.this, Convert.class);
+				Intent convert = new Intent(MainActivity.this, ConvertActivity.class);
 				convert.putExtra("filename", filename);
 				convert.putExtra("cover", cover_file);
 				startActivity(convert);
 			}
 		} else if (filename.endsWith(EPUB_EXT)) {
 			// Show ePUB file
-			Intent verify = new Intent(ePUBator.this, Verify.class);
+			Intent verify = new Intent(MainActivity.this, VerifyActivity.class);
 			verify.putExtra("filename", filename);
 			startActivity(verify);
 		} else {

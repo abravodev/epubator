@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.iiizio.epubator;
+package it.iiizio.epubator.views;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,7 +38,9 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class FileChooser extends ListActivity {
+import it.iiizio.epubator.R;
+
+public class FileChooserListActivity extends ListActivity {
 	private	String path = "/";
 	private	String filter = "";
 	private ListView lv;

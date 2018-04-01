@@ -15,35 +15,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.iiizio.epubator;
+package it.iiizio.epubator.views;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import android.app.Activity;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.preference.PreferenceActivity;
 
-public class License extends Activity {
+import it.iiizio.epubator.R;
 
-	/** Called when the activity is first created. */
+public class PrefsActivity extends PreferenceActivity {
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.infoview);
 
-		// Get license from raw
-		TextView infoTv = (TextView)findViewById(R.id.infoview);
-		infoTv.setTextSize(18);
-		InputStream is = this.getResources().openRawResource(R.raw.license);
-		try {
-			byte[] buffer = new byte[is.available()];
-			is.read(buffer);
-			is.close();
-			// Remove unwanted newlines
-			infoTv.setText(new String(buffer, "utf-8").replaceAll("(?<!\n)\n(?!\n)", " "));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		addPreferencesFromResource(R.xml.prefs);
 	}
 }

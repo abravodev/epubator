@@ -15,16 +15,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.iiizio.epubator;
-
-import java.io.IOException;
-import java.io.InputStream;
+package it.iiizio.epubator.views;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-public class Info extends Activity {
+import java.io.IOException;
+import java.io.InputStream;
+
+import it.iiizio.epubator.R;
+
+public class InfoActivity extends Activity {
 
 	/** Called when the activity is first created. */
 	@Override

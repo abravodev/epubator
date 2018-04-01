@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.iiizio.epubator;
+package it.iiizio.epubator.views;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -57,7 +57,10 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class Verify extends Activity {
+import it.iiizio.epubator.R;
+import it.iiizio.epubator.model.XMLParser;
+
+public class VerifyActivity extends Activity {
 	private static ZipFile epubFile = null;
 	private ArrayList<String>htmlList;
 	private static int htmlIndex = -1;
@@ -126,7 +129,7 @@ public class Verify extends Activity {
 	// Select chapter dialog
 	@Override
 	public Dialog onCreateDialog(int id) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(Verify.this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(VerifyActivity.this);
 		builder.setTitle(R.string.index)
 		.setItems(chapters.toArray(new CharSequence[chapters.size()]), new DialogInterface.OnClickListener() {
 			// Move to selected chapter

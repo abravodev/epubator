@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.iiizio.epubator;
+package it.iiizio.epubator.views;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -56,7 +56,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-public class Convert extends Activity {
+import it.iiizio.epubator.R;
+import it.iiizio.epubator.model.ReadPdf;
+import it.iiizio.epubator.model.WriteZip;
+import it.iiizio.epubator.model.XMLParser;
+
+public class ConvertActivity extends Activity {
 	private static StringBuilder progressSb;
 	private static ScrollView progressSv;
 	private static TextView progressTv;
@@ -231,7 +236,7 @@ public class Convert extends Activity {
 	protected Dialog onCreateDialog(int id) {
 		if (id == 0) {
 			// Build dialog
-			return new AlertDialog.Builder(Convert.this)
+			return new AlertDialog.Builder(ConvertActivity.this)
 			.setTitle(getResources().getString(R.string.extraction_error))
 			.setMessage(getResources().getString(R.string.keep))
 			// Ok action
@@ -250,7 +255,7 @@ public class Convert extends Activity {
 			// Preview action
 			.setNeutralButton(getResources().getString(R.string.verify), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
-					Intent verify = new Intent(getBaseContext(), Verify.class);
+					Intent verify = new Intent(getBaseContext(), VerifyActivity.class);
 					verify.putExtra("filename", tempFilename);
 					startActivityForResult(verify, 0);
 				}
@@ -311,7 +316,7 @@ public class Convert extends Activity {
 	public void sendNotification() {
 		if (!hideNotifi) {
 			NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, Convert.class), 0);
+			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, ConvertActivity.class), 0);
 			String message = getResources().getStringArray(R.array.message)[result];
 			String tickerText = getResources().getString(R.string.app_name);
 			Notification notif = new Notification(R.drawable.ic_launcher, message, System.currentTimeMillis());
