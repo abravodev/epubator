@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.iiizio.epubator.views;
+package it.iiizio.epubator.views.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -24,24 +24,27 @@ import android.widget.TextView;
 import java.io.InputStream;
 
 import it.iiizio.epubator.R;
-import it.iiizio.epubator.presenters.LicensePresenter;
-import it.iiizio.epubator.presenters.LicensePresenterImpl;
+import it.iiizio.epubator.presenters.InfoPresenter;
+import it.iiizio.epubator.presenters.InfoPresenterImpl;
 
-public class LicenseActivity extends Activity {
+public class InfoActivity extends Activity {
 
-	private LicensePresenter presenter;
+	private InfoPresenter presenter;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.infoview);
-		presenter = new LicensePresenterImpl();
+		presenter = new InfoPresenterImpl();
 
-		// Get license from raw
+		setupTextInfo();
+	}
+
+	private void setupTextInfo(){
 		TextView infoTv = (TextView)findViewById(R.id.infoview);
 		infoTv.setTextSize(18);
-		InputStream is = this.getResources().openRawResource(R.raw.license);
-		String licenseInfo = presenter.getLicenseInfo(is);
-		infoTv.setText(licenseInfo);
+		InputStream is = this.getResources().openRawResource(R.raw.info);
+		String info = presenter.getInfo(is);
+		infoTv.setText(info);
 	}
 }
