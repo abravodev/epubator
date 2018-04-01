@@ -26,13 +26,8 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -44,11 +39,6 @@ import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,14 +49,20 @@ import java.util.List;
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.model.ReadPdf;
 import it.iiizio.epubator.model.WriteZip;
-import it.iiizio.epubator.model.XMLParser;
+import it.iiizio.epubator.model.constants.ConversionStatus;
+import it.iiizio.epubator.model.utils.FileHelper;
+import it.iiizio.epubator.model.utils.HtmlHelper;
+import it.iiizio.epubator.presenters.ConvertPresenter;
+import it.iiizio.epubator.presenters.ConvertPresenterImpl;
 
-public class ConvertActivity extends Activity {
+public class ConvertActivity extends Activity implements ConvertView {
+
 	private static StringBuilder progressSb;
-	private static ScrollView progressSv;
-	private static TextView progressTv;
-	private static Button okBt;
-	private static Button stopBt;
+	private static ScrollView sv_progress;
+	private static TextView tv_progress;
+	private static Button bt_ok;
+	private static Button bt_stop_conversion;
+
 	private static boolean okBtEnabled = true;
 	public static boolean conversionStarted = false;
 	private static boolean notificationSent = false;
@@ -95,28 +91,28 @@ public class ConvertActivity extends Activity {
 	private final String OLD_EXT = " - ePUBator.old";
 	private final String TEMP_EXT = " - ePUBator.tmp";
 
+	private ConvertPresenter presenter;
+	private ConvertTask convertTask;
+
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_PROGRESS);
 		setProgressBarVisibility(true);
 		setContentView(R.layout.progressview);
 		setProgress(0);
+		presenter = new ConvertPresenterImpl(this);
 
 		// Set variables
-		progressSv = (ScrollView)findViewById(R.id.scroll);
-		progressTv = (TextView)findViewById(R.id.progress);
-		okBt = (Button)findViewById(R.id.ok);
-		okBt.setOnClickListener(mOkListener);
-		stopBt = (Button)findViewById(R.id.stop);
-		stopBt.setOnClickListener(mStopListener);
+		sv_progress = (ScrollView)findViewById(R.id.scroll);
+		tv_progress = (TextView)findViewById(R.id.progress);
+		setupButtons();
 
 		getPrefs();
 
 		if (conversionStarted) {
 			// Update screen
-			progressTv.setText(progressSb);
+			tv_progress.setText(progressSb);
 			setButtons(okBtEnabled);
 		} else if (!notificationSent) {
 			// Get filename
@@ -153,7 +149,8 @@ public class ConvertActivity extends Activity {
 					oldFilename = tempPath + filename+ OLD_EXT;
 					tempFilename = tempPath + filename + TEMP_EXT;
 
-					new convertTask().execute();
+					convertTask = new ConvertTask();
+					convertTask.execute();
 				}
 			}
 		}
@@ -163,16 +160,37 @@ public class ConvertActivity extends Activity {
 		notificationSent = false;
 	}
 
+	private void setupButtons() {
+		bt_ok = (Button)findViewById(R.id.ok);
+		bt_stop_conversion = (Button)findViewById(R.id.stop);
+
+		bt_ok.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				conversionStarted = false;
+				progressSb = null;
+				sv_progress = null;
+				tv_progress = null;
+				finish();
+			}
+		});
+		bt_stop_conversion.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				result = ConversionStatus.CONVERSION_STOPPED_BY_USER;
+			}
+		});
+	}
+
 	@Override
 	public void onResume() {
 		super.onResume();
-
 		getPrefs();
 	}
 	
 	// Get preferences
 	private void getPrefs() {
-		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
 		includeImages = prefs.getBoolean("include_images", true);
 		repeatedImages = prefs.getBoolean("repeated_images", false);
@@ -188,31 +206,9 @@ public class ConvertActivity extends Activity {
 	// Set buttons state
 	private void setButtons(boolean flag) {
 		okBtEnabled = flag;
-		okBt.setEnabled(okBtEnabled);
-		stopBt.setEnabled(!okBtEnabled);
+		bt_ok.setEnabled(okBtEnabled);
+		bt_stop_conversion.setEnabled(!okBtEnabled);
 	}
-
-	// Ok button pressed
-	private OnClickListener mOkListener = new OnClickListener()
-	{
-		public void onClick(View v)
-		{
-			conversionStarted = false;
-			progressSb = null;
-			progressSv = null;
-			progressTv = null;
-			finish();
-		}
-	};
-
-	// Stop button pressed
-	private OnClickListener mStopListener = new OnClickListener()
-	{
-		public void onClick(View v)
-		{
-			result = 5;
-		}
-	};
 
 	// Back button pressed
 	@Override
@@ -279,8 +275,8 @@ public class ConvertActivity extends Activity {
 		} else {
 			progressSb.append(getResources().getString(R.string.deleted));
 		}
-		progressTv.setText(progressSb);
-		scroll_up();
+		tv_progress.setText(progressSb);
+		scrollUp();
 	}
 
 	// Keep file
@@ -293,8 +289,8 @@ public class ConvertActivity extends Activity {
 		}
 		renameFile();
 		progressSb.append(String.format(getResources().getString(R.string.epubfile), epubFilename));
-		progressTv.setText(progressSb);
-		scroll_up();
+		tv_progress.setText(progressSb);
+		scrollUp();
 	}
 
 	// Rename tmp file
@@ -304,10 +300,10 @@ public class ConvertActivity extends Activity {
 	}
 
 	// Scroll scroll view up
-	private void scroll_up() {
-		progressSv.post(new Runnable() {
+	private void scrollUp() {
+		sv_progress.post(new Runnable() {
 			public void run() {
-				progressSv.fullScroll(ScrollView.FOCUS_DOWN);
+				sv_progress.fullScroll(ScrollView.FOCUS_DOWN);
 			}
 		});
 	}
@@ -326,18 +322,53 @@ public class ConvertActivity extends Activity {
 		}
 	}
 
-	// Start background task
-	private class convertTask extends AsyncTask<Void, String, Void> {
+	@Override
+	public void noTocFoundInThePdfFile() {
+		publishProgressMessage(getResources().getString(R.string.no_toc));
+	}
+
+	@Override
+	public void createdDummyToc() {
+		publishProgressMessage(getResources().getString(R.string.dummy_toc));
+	}
+
+	@Override
+	public void tocExtractedFromPdfFile() {
+		publishProgressMessage(getResources().getString(R.string.pdf_toc));
+	}
+
+	@Override
+	public void coverWithImageCreated() {
+		publishProgressMessage(getResources().getString(R.string.imagecover));
+	}
+
+	@Override
+	public void coverWithTitleCreated() {
+		publishProgressMessage(getResources().getString(R.string.titlecover));
+	}
+
+	@Override
+	public Bitmap getAppLogo() {
+		return BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+	}
+
+	private void publishProgressMessage(String message){
+		if(convertTask!=null && !convertTask.isCancelled()){
+			convertTask.publishProgressMessage(message);
+		}
+	}
+
+	private class ConvertTask extends AsyncTask<Void, String, Void> {
+
+		public void publishProgressMessage(String message) {
+			publishProgress(message);
+		}
+
 		// Background task
 		@Override
 		protected Void doInBackground(Void... params) {
 			// Remove cache files
-			String[] files = new File(tempPath).list();
-			if(files != null) {
-				for (int i = 0; i < files.length; i++) {
-					new File(tempPath + files[i]).delete();
-				}
-			}
+			FileHelper.deleteFilesFromDirectory(new File(tempPath));
 
 			// Save old ePUB
 			if (new File(epubFilename).exists()) {
@@ -348,11 +379,11 @@ public class ConvertActivity extends Activity {
 			publishProgress(String.format(getResources().getString(R.string.load), pdfFilename));
 			if (!(new File(pdfFilename).exists())) {
 				// PDF file not found
-				result = 1;
+				result = ConversionStatus.FILE_NOT_FOUND;
 			} else if (ReadPdf.open(pdfFilename)) {
 				// Failed to read PDF file
-				result = 2;
-			} else if (result != 5) {
+				result = ConversionStatus.CANNOT_READ_PDF;
+			} else if (result != ConversionStatus.CONVERSION_STOPPED_BY_USER) {
 				result = fillEpub();
 			}
 
@@ -366,8 +397,8 @@ public class ConvertActivity extends Activity {
 			{
 				progressSb.append(message + "\n");
 			}
-			progressTv.setText(progressSb);
-			scroll_up();
+			tv_progress.setText(progressSb);
+			scrollUp();
 		}
 
 		// Prepare background task
@@ -377,18 +408,18 @@ public class ConvertActivity extends Activity {
 			progressSb.append(getResources().getString(R.string.heading));
 			progressSb.append(getResources().getString(R.string.library));
 			setButtons(false);
-			result = 0;
+			result = ConversionStatus.SUCCESS;
 			conversionStarted = true;
 		}
 
 		// Background task ended
 		@Override
 		protected void onPostExecute(Void params) {
-			if (result == 4) {
+			if (result == ConversionStatus.EXTRACTION_ERROR) {
 				if (onError == 0) {
 					// Keep ePUB with errors
 					keepEpub();
-					result = 0;
+					result = ConversionStatus.SUCCESS;
 				} else if (onError == 2){
 					// Drop ePUB with errors
 					deleteTmp();
@@ -398,18 +429,18 @@ public class ConvertActivity extends Activity {
 						showDialog(0);
 					} else {
 						keepEpub();
-						result = 0;
+						result = ConversionStatus.SUCCESS;
 					}
 				}
 			} else {
 				// Delete on failure
 				publishProgress("\n" + getResources().getStringArray(R.array.message)[result]);
-				if (result > 0) {
-					deleteTmp();
-				} else {
-					// Keep if ok
+				if(result == ConversionStatus.SUCCESS){
+					//Keep if ok
 					renameFile();
 					publishProgress(String.format(getResources().getString(R.string.epubfile), epubFilename));
+				} else {
+					deleteTmp();
 				}
 			}
 
@@ -426,8 +457,8 @@ public class ConvertActivity extends Activity {
 		private int fillEpub() {
 			try {
 				// Stopped?
-				if (result == 5) {
-					return 5;
+				if (result == ConversionStatus.CONVERSION_STOPPED_BY_USER) {
+					return ConversionStatus.CONVERSION_STOPPED_BY_USER;
 				}
 
 				// Set up counter
@@ -442,38 +473,36 @@ public class ConvertActivity extends Activity {
 				// Create ePUB file
 				publishProgress(getResources().getString(R.string.create));
 				if (WriteZip.create(tempFilename)) {
-					return 3;
+					return ConversionStatus.CANNOT_WRITE_EPUB;
 				}
 
-				// Add required files
 				publishProgress(getResources().getString(R.string.mimetype));
 				setProgress(++writedFiles*9999/totalFiles);
-				if (WriteZip.addText("mimetype", "application/epub+zip", true)) {
-					return 3;
+				if (presenter.addMimeType()) {
+					return ConversionStatus.CANNOT_WRITE_EPUB;
 				}
 
 				publishProgress(getResources().getString(R.string.container));
-				if (WriteZip.addText("META-INF/container.xml", createContainer(), false)) {
-					return 3;
+				if (presenter.addContainer()) {
+					return ConversionStatus.CANNOT_WRITE_EPUB;
 				}
 
 				String title = filename.replaceAll("[^\\p{Alnum}]", " ");
 				String bookId = title + " - " + new Date().hashCode();
 				
 				publishProgress(getResources().getString(R.string.toc));
-				if (WriteZip.addText("OEBPS/toc.ncx", createToc(pages, bookId, title), false)) {
-					return 3;
+				if (presenter.addToc(pages, bookId, title, tocFromPdf, pagesPerFile)) {
+					return ConversionStatus.CANNOT_WRITE_EPUB;
 				}
 
-				// Add frontpage
 				publishProgress(getResources().getString(R.string.frontpage));
-				if (WriteZip.addText("OEBPS/frontpage.html", createFrontpage(), false)) {
-					return 3;
+				if (presenter.addFrontPage()) {
+					return ConversionStatus.CANNOT_WRITE_EPUB;
 				}
 
 				publishProgress(getResources().getString(R.string.frontpagepng));
-				if (createFrontpagePng()) {
-					return 3;
+				if (presenter.addFrontpageCover(filename, cover_file, logoOnCover)) {
+					return ConversionStatus.CANNOT_WRITE_EPUB;
 				}
 
 				// Add extracted text and images
@@ -489,8 +518,8 @@ public class ConvertActivity extends Activity {
 
 					for (int j = i; j <= endPage; j++) {
 						// Stopped?
-						if (result == 5) {
-							return 5;
+						if (result == ConversionStatus.CONVERSION_STOPPED_BY_USER) {
+							return ConversionStatus.CONVERSION_STOPPED_BY_USER;
 						}
 
 						// Update progress bar
@@ -501,7 +530,7 @@ public class ConvertActivity extends Activity {
 						textSb.append("  <a id=\"page" + j + "\"/>\n");
 						
 						// extract text
-						String page = stringToHTMLString(ReadPdf.extractText(j));
+						String page = HtmlHelper.stringToHTMLString(ReadPdf.extractText(j));
 						if (page.length() == 0) {
 							publishProgress(String.format(getResources().getString(R.string.extraction_failure), j));
 							extractionErrorFlag = true;
@@ -527,8 +556,8 @@ public class ConvertActivity extends Activity {
 							Iterator<String> iterator = imageList.iterator();
 							while (iterator.hasNext()) {
 								// Stopped?
-								if (result == 5) {
-									return 5;
+								if (result == ConversionStatus.CONVERSION_STOPPED_BY_USER) {
+									return ConversionStatus.CONVERSION_STOPPED_BY_USER;
 								}
 
 								String imageName = iterator.next();
@@ -548,388 +577,33 @@ public class ConvertActivity extends Activity {
 					}
 					
 					String text = textSb.toString();
-					if (WriteZip.addText("OEBPS/page" + i + ".html", createHtml("page" + i, text.replaceAll("<br/>(?=[a-z])", "&nbsp;")) , false)) {
-						return 3;
+					if (presenter.addPage(i, text)) {
+						return ConversionStatus.CANNOT_WRITE_EPUB;
 					}
 				}
 
 				// Add content.opf
 				publishProgress(getResources().getString(R.string.content));
 				setProgress(++writedFiles*9999/totalFiles);
-				if (WriteZip.addText("OEBPS/content.opf", createContent(pages, bookId, allImageList, title), false)) {
-					return 3;
+				if (presenter.addContent(pages, bookId, allImageList, title, pagesPerFile)) {
+					return ConversionStatus.CANNOT_WRITE_EPUB;
 				}
 
 				// Close ePUB file
 				publishProgress(getResources().getString(R.string.close));
 				if (WriteZip.close()) {
-					return 3;
+					return ConversionStatus.CANNOT_WRITE_EPUB;
 				}
 
 				if (extractionErrorFlag) {
-					return 4;
+					return ConversionStatus.EXTRACTION_ERROR;
 				} else {
-					return 0;
+					return ConversionStatus.SUCCESS;
 				}
 			} catch(OutOfMemoryError e) {
-				return 6;
+				return ConversionStatus.OUT_OF_MEMORY_ERROR;
 			}
 		}
 
-		// Create container.xml
-		private String createContainer() {
-			StringBuilder container = new StringBuilder();
-			container.append("<?xml version=\"1.0\"?>\n");
-			container.append("<container version=\"1.0\" xmlns=\"urn:oasis:names:tc:opendocument:xmlns:container\">\n");
-			container.append("   <rootfiles>\n");
-			container.append("      <rootfile full-path=\"OEBPS/content.opf\" media-type=\"application/oebps-package+xml\"/>\n");
-			container.append("   </rootfiles>\n");
-			container.append("</container>\n");
-			return container.toString();
-		}
-
-		// Create content.opf
-		private String createContent(int pages, String id, Iterable<String> images, String title) {
-			StringBuilder content = new StringBuilder();
-			content.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-			content.append("<package xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"BookID\" version=\"2.0\">\n");
-			content.append("    <metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:opf=\"http://www.idpf.org/2007/opf\">\n");
-			content.append("        <dc:title>" + title + "</dc:title>\n");
-			content.append("        <dc:creator>" + (ReadPdf.getAuthor()).replaceAll("[<>]", "_") + "</dc:creator>\n");
-			content.append("        <dc:creator opf:role=\"bkp\">ePUBator - Minimal offline PDF to ePUB converter for Android</dc:creator>\n");
-			content.append("        <dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + id + "</dc:identifier>\n");
-			content.append("        <dc:language>" + Resources.getSystem().getConfiguration().locale.getLanguage() + "</dc:language>\n");
-			content.append("    </metadata>\n");
-			content.append("    <manifest>\n");
-			for(int i = 1; i <= pages; i += pagesPerFile) {
-				content.append("        <item id=\"page" + i + "\" href=\"page" + i + ".html\" media-type=\"application/xhtml+xml\"/>\n");
-			}
-			content.append("        <item id=\"ncx\" href=\"toc.ncx\" media-type=\"application/x-dtbncx+xml\"/>\n");
-			content.append("        <item id=\"frontpage\" href=\"frontpage.html\" media-type=\"application/xhtml+xml\"/>\n");
-			content.append("        <item id=\"cover\" href=\"frontpage.png\" media-type=\"image/png\"/>\n");
-			for(String name : images) {
-				content.append("        <item id=\"" + name + "\" href=\"" + name + "\" media-type=\"image/" + name.substring(name.lastIndexOf('.') + 1) + "\"/>\n");
-			}
-			content.append("    </manifest>\n");
-			content.append("    <spine toc=\"ncx\">\n");
-			content.append("        <itemref idref=\"frontpage\"/>\n");
-			for(int i = 1; i <= pages; i += pagesPerFile) {
-				content.append("        <itemref idref=\"page" + i + "\"/>\n");
-			}
-			content.append("    </spine>\n");
-			content.append("    <guide>\n");
-			content.append("        <reference type=\"cover\" title=\"Frontpage\" href=\"frontpage.html\"/>\n");
-			content.append("    </guide>\n");
-			content.append("</package>\n");
-			return content.toString();
-		}
-
-		// Create toc.ncx
-		private String createToc(int pages, String id, String title) {
-			StringBuilder toc = new StringBuilder();
-			toc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-			toc.append("<!DOCTYPE ncx PUBLIC \"-//NISO//DTD ncx 2005-1//EN\"\n");
-			toc.append("   \"http://www.daisy.org/z3986/2005/ncx-2005-1.dtd\">\n");
-			toc.append("<ncx xmlns=\"http://www.daisy.org/z3986/2005/ncx/\" version=\"2005-1\">\n");
-			toc.append("    <head>\n");
-			toc.append("        <meta name=\"dtb:uid\" content=\"" + id + "\"/>\n");
-			toc.append("        <meta name=\"dtb:depth\" content=\"1\"/>\n");
-			toc.append("        <meta name=\"dtb:totalPageCount\" content=\"0\"/>\n");
-			toc.append("        <meta name=\"dtb:maxPageNumber\" content=\"0\"/>\n");
-			toc.append("    </head>\n");
-			toc.append("    <docTitle>\n");
-			toc.append("        <text>" + title + "</text>\n");
-			toc.append("    </docTitle>\n");
-			toc.append("    <navMap>\n");
-			toc.append("        <navPoint id=\"navPoint-1\" playOrder=\"1\">\n");
-			toc.append("            <navLabel>\n");
-			toc.append("                <text>Frontpage</text>\n");
-			toc.append("            </navLabel>\n");
-			toc.append("            <content src=\"frontpage.html\"/>\n");
-			toc.append("        </navPoint>\n");
-
-			int playOrder = 2;
-			boolean extractedToc = false;
-			if (tocFromPdf) {
-				// Try to extract toc from pdf
-				XMLParser parser = new XMLParser();
-				Document doc = parser.getDomElement(ReadPdf.getBookmarks());
-				if (doc != null) {
-					doc.normalize();
-					NodeList nl = doc.getElementsByTagName("Title");
-					if (nl != null) {
-						int lastPage = Integer.MAX_VALUE;
-						StringBuilder sb = new StringBuilder();
-						// looping through all item nodes <item>
-						for (int i = 0; i < nl.getLength(); i++) {
-							Element e = (Element) nl.item(i);
-							String action = parser.getValue(e, "Action");
-							if (action.equals("GoTo")) {
-								String chapter = parser.getElementValue(e).trim();
-								try {
-									int page = Integer.valueOf(parser.getValue(e, "Page").split(" ")[0]);
-									
-									// First entry not in page one, create a dummy one
-									if ((lastPage == Integer.MAX_VALUE) && (page > 1))
-									{
-										sb.append(title);
-										sb.append("\n");
-										lastPage = 1;
-									}
-									
-									// Add entry in toc
-									if (page > lastPage) {
-										int pageFile = ((int) ((lastPage - 1) / pagesPerFile)) * pagesPerFile + 1;
-										toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
-										toc.append("            <navLabel>\n");
-										toc.append("                <text>" + sb.toString() + "                </text>\n");
-										toc.append("            </navLabel>\n");
-										toc.append("            <content src=\"page" + pageFile + ".html#page" + lastPage + "\"/>\n");
-										toc.append("        </navPoint>\n");
-										playOrder += 1;
-
-										sb = new StringBuilder();
-									}
-									
-									// Set next entry
-									sb.append(chapter);
-									sb.append("\n");
-									lastPage = page;
-								} catch (RuntimeException ex) {
-									System.err.println("RuntimeException in xml extraction " + ex.getMessage());
-								}
-							}
-							extractedToc = true;
-						}
-						
-						// Add last entry
-						if (sb.length() > 0) {
-							int pageFile = ((int) ((lastPage - 1) / pagesPerFile)) * pagesPerFile + 1;
-							toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
-							toc.append("            <navLabel>\n");
-							toc.append("                <text>" + sb.toString() + "                </text>\n");
-							toc.append("            </navLabel>\n");
-							toc.append("            <content src=\"page" + pageFile + ".html#page" + lastPage + "\"/>\n");
-							toc.append("        </navPoint>\n");
-						}
-
-					}
-				}
-			}
-
-			// Create dummy toc
-			if (!extractedToc) {
-				if(tocFromPdf) {
-					publishProgress(getResources().getString(R.string.no_toc));
-				}
-				publishProgress(getResources().getString(R.string.dummy_toc));
-
-				for(int i = 1; i <= pages; i += pagesPerFile) {
-					toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
-					toc.append("            <navLabel>\n");
-					toc.append("                <text>Page" + i + "</text>\n");
-					toc.append("            </navLabel>\n");
-					toc.append("            <content src=\"page" + i + ".html\"/>\n");
-					toc.append("        </navPoint>\n");
-					playOrder += 1;
-				}
-			} else {
-				publishProgress(getResources().getString(R.string.pdf_toc));
-			}
-			
-			toc.append("    </navMap>\n");
-			toc.append("</ncx>\n");
-			return toc.toString();
-		}
-
-		// Create html
-		private String createHtml(String title, String body) {
-			StringBuilder html = new StringBuilder();
-			html.append("  <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n");
-			html.append("  \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n");
-			html.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">\n");
-			html.append("<head>\n");
-			html.append("  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>\n");
-			html.append("  <meta name=\"generator\" content=\"ePUBator - Minimal offline PDF to ePUB converter for Android\"/>\n");
-			html.append("  <title>" + title + "</title>\n");
-			html.append("</head>\n");
-			html.append("<body>\n");
-			html.append(body);
-			html.append("\n</body>\n");
-			html.append("</html>\n");
-			return html.toString();
-		}
-
-		// Create frontpage.html
-		private String createFrontpage() {
-			return createHtml("Frontpage", "<div><img width=\"100%\" alt=\"cover\" src=\"frontpage.png\" /></div>");
-		}
-
-		// Create frontpage.png
-		private boolean createFrontpagePng() {
-			final int maxWidth = 300;
-			final int maxHeight = 410;
-			final int border = 10;
-			final int fontsize = 48;
-
-			// Grey background
-			Bitmap bmp = Bitmap.createBitmap(maxWidth, maxHeight, Bitmap.Config.RGB_565);
-			Paint paint  = new Paint();
-			paint.setColor(Color.LTGRAY);
-			Canvas canvas = new Canvas(bmp);
-			canvas.drawRect(0, 0, maxWidth, maxHeight, paint);
-			
-			// Load image
-			Bitmap img = null;
-			if (cover_file != "") {
-				// Get dimensions
-			    final BitmapFactory.Options options = new BitmapFactory.Options();
-			    options.inJustDecodeBounds = true;
-			    BitmapFactory.decodeFile(cover_file, options);
-
-			    // Get image
-			    options.inSampleSize = calculateInSampleSize(options, maxWidth, maxHeight);
-			    options.inJustDecodeBounds = false;
-			    img = BitmapFactory.decodeFile(cover_file, options);
-			}
-
-			// Add image as cover
-			if (img != null) {
-				canvas.drawBitmap(img, null , new Rect(0, 0, maxWidth, maxHeight), new Paint(Paint.FILTER_BITMAP_FLAG));
-				publishProgress(getResources().getString(R.string.imagecover));
-			} else {
-				// Add ePUBator logo
-				if (logoOnCover) {
-					img = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
-					canvas.drawBitmap(img, maxWidth - img.getWidth(), maxHeight - img.getHeight(), new Paint(Paint.FILTER_BITMAP_FLAG));
-				}
-
-				// Add title as cover
-				paint.setTextSize(fontsize);
-				paint.setColor(Color.BLACK);
-				paint.setAntiAlias(true);
-				paint.setStyle(Paint.Style.FILL);
-
-				String title = filename.replaceAll("_", " ");
-				String words[] = title.split("\\s");
-
-				float newline = paint.getFontSpacing();
-				float x = border;
-				float y = newline;
-
-				for (String word : words) {
-					float len = paint.measureText(word + " ");
-
-					// Line wrap
-					if ((x > border) && ((x + len) > maxWidth)) {
-						x = border;
-						y += newline;
-					}
-
-					// Word wrap
-					while ((x + len) > maxWidth) {
-						int maxChar = (int) (word.length() * (maxWidth - border - x) / paint.measureText(word));
-						canvas.drawText(word.substring(0, maxChar), x, y, paint);
-						word = word.substring(maxChar);
-						len = paint.measureText(word + " ");
-						x = border;
-						y += newline;
-					}
-
-					canvas.drawText(word, x, y, paint);
-					x += len;
-				}
-				publishProgress(getResources().getString(R.string.titlecover));
-			}
-
-			// Save bmp as png
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
-			return WriteZip.addImage("OEBPS/frontpage.png", baos.toByteArray());
-		}
-
-		// calculateInSampleSize from Android Developers site
-		// https://developer.android.com/training/displaying-bitmaps/load-bitmap.html
-		public int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-			// Raw height and width of image
-			final int height = options.outHeight;
-			final int width = options.outWidth;
-			int inSampleSize = 1;
-
-			if (height > reqHeight || width > reqWidth) {
-
-				final int halfHeight = height / 2;
-				final int halfWidth = width / 2;
-
-				// Calculate the largest inSampleSize value that is a power of 2 and keeps both
-				// height and width larger than the requested height and width.
-				while ((halfHeight / inSampleSize) > reqHeight && (halfWidth / inSampleSize) > reqWidth) {
-					inSampleSize *= 2;
-				}
-			}
-
-			return inSampleSize;
-		}
-		
-		//  stringToHTMLString found on the web, no license indicated
-		//  http://www.rgagnon.com/javadetails/java-0306.html
-		//	Author: S. Bayer.
-		private  String stringToHTMLString(String string) {
-			StringBuilder sb = new StringBuilder(); // changed StringBuffer to StringBuilder to prevent buffer overflow (iiizio)
-			// true if last char was blank
-			boolean lastWasBlankChar = false;
-			int len = string.length();
-			char c;
-
-			for (int i = 0; i < len; i++)
-			{
-				c = string.charAt(i);
-				if (c == ' ') {
-					// blank gets extra work,
-					// this solves the problem you get if you replace all
-					// blanks with &nbsp;, if you do that you loss 
-					// word breaking
-					if (lastWasBlankChar) {
-						lastWasBlankChar = false;
-						sb.append("&nbsp;");
-					}
-					else {
-						lastWasBlankChar = true;
-						sb.append(' ');
-					}
-				}
-				else {
-					lastWasBlankChar = false;
-					//
-					// HTML Special Chars
-					if (c == '"')
-						sb.append("&quot;");
-					else if (c == '&')
-						sb.append("&amp;");
-					else if (c == '<')
-						sb.append("&lt;");
-					else if (c == '>')
-						sb.append("&gt;");
-					else if (c == '%') // Android browser doesn't like % (iiizio)
-						sb.append("&#37;");
-					else if (c == '\n')
-						// Handle Newline
-						sb.append("\n<br/>");
-					else {
-						int ci = 0xffff & c;
-						if (ci < 160 ) {
-							// nothing special only 7 Bit
-							sb.append(c);
-						} else {
-							// Not 7 Bit use the unicode system
-							sb.append("&#");
-							sb.append(Integer.valueOf(ci).toString());
-							sb.append(';');
-						}
-					}
-				}
-			}
-			return sb.toString();
-		}
 	}
 }
