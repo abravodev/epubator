@@ -30,6 +30,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -142,33 +143,29 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 		convertTask = new ConvertTask();
 		progressSb = new StringBuilder();
+		sendStartNotification();
 		convertTask.execute();
 	}
 
     @Override
     public void onResume() {
         super.onResume();
+		EventBus.getDefault().register(this);
         getPrefs();
     }
 
-    @Override
+	@Override
+	protected void onPause() {
+		super.onPause();
+		EventBus.getDefault().unregister(this);
+	}
+
+	@Override
     public void onBackPressed() {
         conversionStarted = conversionInProgress();
         finish();
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        EventBus.getDefault().unregister(this);
-    }
-
+    
 	/**
 	 * Save ePUB in the Download folder as user choice or if PDF folder is not writable
 	 * @param path
@@ -280,12 +277,12 @@ public class ConvertActivity extends Activity implements ConvertView {
 	private void keepEpub() {
 		progressSb.append("\n" + getResources().getStringArray(R.array.conversion_result_message)[0] + "\n");
 		if (addMarkers) {
-			String pageNumberString = String.format(getResources().getString(R.string.pagenumber), ">>\n");
-			progressSb.append(String.format(getResources().getString(R.string.errors_are_marked_with), "<<@") + pageNumberString);
-			progressSb.append(String.format(getResources().getString(R.string.lost_pages_are_marked_with), "<<#") + pageNumberString);
+			String pageNumberString = getResources().getString(R.string.pagenumber, ">>\n");
+			progressSb.append(getResources().getString(R.string.errors_are_marked_with, "<<@") + pageNumberString);
+			progressSb.append(getResources().getString(R.string.lost_pages_are_marked_with, "<<#") + pageNumberString);
 		}
 		renameFile();
-		progressSb.append(String.format(getResources().getString(R.string.epubfile), epubFilename));
+		progressSb.append(getResources().getString(R.string.epubfile, epubFilename));
 		tv_progress.setText(progressSb);
 	}
 
@@ -296,7 +293,8 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 	@Subscribe(threadMode = ThreadMode.MAIN)
 	public void onFinishedConversion(FinishedConversionEvent event){
-        sendNotification();
+		sendFinishNotification();
+		setButtons(true);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -305,14 +303,32 @@ public class ConvertActivity extends Activity implements ConvertView {
 		tv_progress.setText(progressSb);
 	}
 
-	private void sendNotification() {
-		NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+	private void sendStartNotification(){
+		sendNotification(getResources().getString(R.string.conversion_in_progress), true);
+	}
+
+	private void sendFinishNotification(){
+		sendNotification(getResources().getStringArray(R.array.conversion_result_message)[result], false);
+	}
+
+	private void sendNotification(String statusTitle, boolean fixed) {
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, ConvertActivity.class), 0);
-		String message = getResources().getStringArray(R.array.conversion_result_message)[result];
-		String tickerText = getResources().getString(R.string.app_name);
-		Notification notif = new Notification(R.drawable.ic_launcher, message, System.currentTimeMillis());
-		//notif.setLatestEventInfo(this, tickerText, message, contentIntent); TODO: Not working on newer versions
-		nm.notify(R.string.app_name, notif);
+
+		Notification notification = new NotificationCompat.Builder(this)
+			.setSmallIcon(R.drawable.ic_launcher)
+			.setContentTitle(statusTitle)
+			.setContentText(filename)
+			.setStyle(new NotificationCompat.BigTextStyle().bigText(filename))
+			.setContentIntent(contentIntent)
+			.setOngoing(fixed)
+			.setAutoCancel(!fixed)
+			.build();
+
+		getNotificationManager().notify(R.string.app_name, notification);
+	}
+
+	private NotificationManager getNotificationManager(){
+		return (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 	}
 
 	@Override
@@ -366,7 +382,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 		}
 
 		private void loadPDF() {
-			publishProgress(String.format(getResources().getString(R.string.load), pdfFilename));
+			publishProgress(getResources().getString(R.string.load, pdfFilename));
 			if (!(new File(pdfFilename).exists())) {
 				// PDF file not found
 				result = ConversionStatus.FILE_NOT_FOUND;
@@ -428,18 +444,13 @@ public class ConvertActivity extends Activity implements ConvertView {
 				if(result == ConversionStatus.SUCCESS){
 					//Keep if ok
 					renameFile();
-					publishProgress(String.format(getResources().getString(R.string.epubfile), epubFilename));
+					publishProgress(getResources().getString(R.string.epubfile, epubFilename));
 				} else {
 					deleteTmp();
 				}
 			}
 
-			if (isFinishing()) {
-				EventBus.getDefault().post(new FinishedConversionEvent());
-			}
-
-			// Enable ok, disable stop
-			setButtons(true);
+			EventBus.getDefault().post(new FinishedConversionEvent());
 		}
 
 		private int fillEpub() {
@@ -449,7 +460,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 				}
 
 				int pages = PdfReadHelper.getPages();
-				publishProgress(String.format(getResources().getString(R.string.number_of_pages), pages));
+				publishProgress(getResources().getString(R.string.number_of_pages, pages));
 				int totalFiles = 2 + pages;
 				int writedFiles = 0;
 
@@ -494,7 +505,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 				for(int i = 1; i <= pages; i += pagesPerFile) {
 					StringBuilder pageText = new StringBuilder();
 
-					publishProgress(String.format(getResources().getString(R.string.html), i));
+					publishProgress(getResources().getString(R.string.html, i));
 					int endPage = Math.min(i + pagesPerFile - 1, pages);
 
 					for (int j = i; j <= endPage; j++) {
@@ -512,7 +523,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 						// extract text
 						String page = HtmlHelper.stringToHTMLString(PdfReadHelper.getPageText(j));
 						if (page.length() == 0) {
-							publishProgress(String.format(getResources().getString(R.string.extraction_failure), j));
+							publishProgress(getResources().getString(R.string.extraction_failure, j));
 							extractionErrorFlag = true;
 							if (addMarkers) {
 								pageText.append("&lt;&lt;#" + j + "&gt;&gt;");
@@ -541,7 +552,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 								if (!allImageList.contains(imageName)) {
 									allImageList.add(imageName);
-									publishProgress(String.format(getResources().getString(R.string.image_added), imageName));
+									publishProgress(getResources().getString(R.string.image_added, imageName));
 									pageText.append(imageTag);
 								} else if (repeatedImages) {
 									pageText.append(imageTag);
