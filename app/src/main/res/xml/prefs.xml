@@ -13,7 +13,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
@@ -53,12 +54,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:title="@string/mark_title" />
 
     <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="hide_notifi"
-        android:summary="@string/notifi_summary"
-        android:title="@string/notifi_title" />
-
-    <CheckBoxPreference
         android:defaultValue="true"
         android:key="toc_from_pdf"
         android:summary="@string/pdftoc_summary"
@@ -81,31 +76,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:key="download_dir"
         android:summary="@string/downloaddir_summary"
         android:title="@string/downloaddir_title" />
-
-    <PreferenceCategory android:title="@string/filechooser_group" >
-
-	    <CheckBoxPreference
-	        android:defaultValue="false"
-	        android:key="show_all_files"
-	        android:summary="@string/all_files_summary"
-	        android:title="@string/all_files_title" />
-	
-	    <CheckBoxPreference
-	        android:defaultValue="false"
-	        android:key="hide_detail"
-	        android:summary="@string/detail_summary"
-	        android:title="@string/detail_title" />
-    
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/verify_group" >
-
-        <CheckBoxPreference
-			android:defaultValue="true"
-	        android:key="show_images"
-	        android:title="@string/show_images_title"
-	        android:summary="@string/show_images_summary" />
-
-    </PreferenceCategory>
 
 </PreferenceScreen>

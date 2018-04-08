@@ -23,4 +23,5 @@ dependencies {
     compile 'com.itextpdf:itext-pdfa:5.5.10'
     compile 'com.itextpdf:itextg:5.5.9'
     compile 'com.android.support:support-v4:25.4.0'
+    compile 'org.greenrobot:eventbus:3.1.1'
 }

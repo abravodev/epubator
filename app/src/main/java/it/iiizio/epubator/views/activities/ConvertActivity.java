@@ -30,12 +30,17 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -53,20 +58,20 @@ import it.iiizio.epubator.model.utils.PdfReadHelper;
 import it.iiizio.epubator.model.utils.ZipWriter;
 import it.iiizio.epubator.presenters.ConvertPresenter;
 import it.iiizio.epubator.presenters.ConvertPresenterImpl;
+import it.iiizio.epubator.views.events.FinishedConversionEvent;
+import it.iiizio.epubator.views.events.ProgressUpdateEvent;
 import it.iiizio.epubator.views.utils.BundleHelper;
 import it.iiizio.epubator.views.utils.PreferencesHelper;
 
 public class ConvertActivity extends Activity implements ConvertView {
 
 	private static StringBuilder progressSb;
-	private static ScrollView sv_progress;
 	private static TextView tv_progress;
 	private static Button bt_ok;
 	private static Button bt_stop_conversion;
 
 	private static boolean okBtEnabled = true;
 	public static boolean conversionStarted = false;
-	private static boolean notificationSent = false;
 	private static int result;
 	private static String filename = "";
 	private static String tempPath = "";
@@ -81,7 +86,6 @@ public class ConvertActivity extends Activity implements ConvertView {
 	private int pagesPerFile;
 	private int onError;
 	private boolean addMarkers;
-	private boolean hideNotification;
 	private boolean tocFromPdf;
 	private boolean showLogoOnCover;
 	private boolean saveOnDownloadDirectory;
@@ -102,7 +106,6 @@ public class ConvertActivity extends Activity implements ConvertView {
 		setProgress(0);
 		presenter = new ConvertPresenterImpl(this);
 
-		sv_progress = (ScrollView)findViewById(R.id.scroll);
 		tv_progress = (TextView)findViewById(R.id.progress);
 		setupButtons();
 
@@ -111,39 +114,68 @@ public class ConvertActivity extends Activity implements ConvertView {
 		if (conversionStarted) {
 			tv_progress.setText(progressSb);
 			setButtons(okBtEnabled);
-		} else if (!notificationSent) {
-			Bundle extras = getIntent().getExtras();
-			if (extras != null) {
-				cover_file = BundleHelper.getExtraStringOrEmpty(extras, BundleKeys.COVER);
-				pdfFilename = BundleHelper.getExtraStringOrDefault(extras, BundleKeys.FILENAME);
-				if(pdfFilename==null){
-					// TODO: Show message
-				} else {
-					String[] parts = FileHelper.getPathAndFilenameOfPdf(pdfFilename);
-					String path = parts[0];
-					filename = parts[1];
-
-					epubFilename = getEpubFilename(path, filename, saveOnDownloadDirectory);
-
-					tempPath = getExternalCacheDir() + "/";
-					oldFilename = tempPath + filename + OLD_EXT;
-					tempFilename = tempPath + filename + TEMP_EXT;
-
-					convertTask = new ConvertTask();
-					convertTask.execute();
-				}
-			}
+			return;
 		}
 
-		removeNotification();
+		Bundle extras = getIntent().getExtras();
+		if (extras == null) {
+			Toast.makeText(this, getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
+			return;
+		}
+
+		cover_file = BundleHelper.getExtraStringOrEmpty(extras, BundleKeys.COVER);
+		pdfFilename = BundleHelper.getExtraStringOrDefault(extras, BundleKeys.FILENAME);
+		if(pdfFilename==null){
+			Toast.makeText(this, getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
+			return;
+		}
+
+		String[] parts = FileHelper.getPathAndFilenameOfPdf(pdfFilename);
+		String path = parts[0];
+		filename = parts[1];
+
+		epubFilename = getEpubFilename(path, filename, saveOnDownloadDirectory);
+
+		tempPath = getExternalCacheDir() + "/";
+		oldFilename = tempPath + filename + OLD_EXT;
+		tempFilename = tempPath + filename + TEMP_EXT;
+
+		convertTask = new ConvertTask();
+		progressSb = new StringBuilder();
+		convertTask.execute();
 	}
 
-	private void removeNotification() {
-		((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).cancel(R.string.app_name);
-		notificationSent = false;
-	}
+    @Override
+    public void onResume() {
+        super.onResume();
+        getPrefs();
+    }
 
-	// Save ePUB in the Download folder as user choice or if PDF folder is not writable
+    @Override
+    public void onBackPressed() {
+        conversionStarted = conversionInProgress();
+        finish();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+	/**
+	 * Save ePUB in the Download folder as user choice or if PDF folder is not writable
+	 * @param path
+	 * @param filename
+	 * @param saveOnDownloadDirectory
+	 * @return
+	 */
 	private String getEpubFilename(String path, String filename, boolean saveOnDownloadDirectory){
 		boolean writable = FileHelper.folderIsWritable(path);
 		String outputDirectory = (saveOnDownloadDirectory || !writable) ? getDownloadDirectory(): path;
@@ -163,7 +195,6 @@ public class ConvertActivity extends Activity implements ConvertView {
 			public void onClick(View v) {
 				conversionStarted = false;
 				progressSb = null;
-				sv_progress = null;
 				tv_progress = null;
 				finish();
 			}
@@ -176,13 +207,6 @@ public class ConvertActivity extends Activity implements ConvertView {
 		});
 	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		getPrefs();
-	}
-	
-	// Get preferences
 	private void getPrefs() {
 		PreferencesHelper prefs = new PreferencesHelper(this);
 
@@ -191,34 +215,20 @@ public class ConvertActivity extends Activity implements ConvertView {
 		pagesPerFile = prefs.getParsedString(PreferencesKeys.PAGES_PER_FILE, 5);
 		onError = prefs.getParsedString(PreferencesKeys.OPTION_WHEN_ERROR_IN_CONVERSION, DecissionOnConversionError.KEEP_ITEM);
 		addMarkers = prefs.getBoolean(PreferencesKeys.MARK_ERRORS, true);
-		hideNotification = prefs.getBoolean(PreferencesKeys.NOT_SEND_NOTIFICATIONS);
 		tocFromPdf = prefs.getBoolean(PreferencesKeys.TRY_TO_EXTRACT_TOC_FROM_PDF, true);
 		showLogoOnCover = prefs.getBoolean(PreferencesKeys.HAVE_LOGO_ON_COVER, true);
 		saveOnDownloadDirectory = prefs.getBoolean(PreferencesKeys.SAVE_ALWAYS_ON_DOWNLOAD_DIRECTORY);
 	}
 
-	// Set buttons state
 	private void setButtons(boolean flag) {
 		okBtEnabled = flag;
 		bt_ok.setEnabled(okBtEnabled);
 		bt_stop_conversion.setEnabled(!okBtEnabled);
 	}
 
-	// Back button pressed
-	@Override
-	public void onBackPressed() {
-		conversionStarted = working();
-		finish();
-	}
-
 	// Conversion in progress?
-	public static boolean working() {
+	public boolean conversionInProgress() {
 		return !okBtEnabled;
-	}
-
-	// Conversion started?
-	public static boolean started() {
-		return conversionStarted;
 	}
 
 	@Override
@@ -251,12 +261,11 @@ public class ConvertActivity extends Activity implements ConvertView {
 			.create();
 	}
 
-	// Show dialog again after preview activity
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		showDialog(0);
 	}
 
-	// Delete file
 	private void deleteTmp() {
 		new File(tempFilename).delete();
 		if (new File(oldFilename).exists()) {
@@ -266,10 +275,8 @@ public class ConvertActivity extends Activity implements ConvertView {
 			progressSb.append(getResources().getString(R.string.epub_was_deleted));
 		}
 		tv_progress.setText(progressSb);
-		scrollUp();
 	}
 
-	// Keep file
 	private void keepEpub() {
 		progressSb.append("\n" + getResources().getStringArray(R.array.conversion_result_message)[0] + "\n");
 		if (addMarkers) {
@@ -280,36 +287,32 @@ public class ConvertActivity extends Activity implements ConvertView {
 		renameFile();
 		progressSb.append(String.format(getResources().getString(R.string.epubfile), epubFilename));
 		tv_progress.setText(progressSb);
-		scrollUp();
 	}
 
-	// Rename tmp file
 	private void renameFile() {
 		new File(tempFilename).renameTo(new File(epubFilename));
 		new File(oldFilename).delete();
 	}
 
-	// Scroll scroll view up
-	private void scrollUp() {
-		sv_progress.post(new Runnable() {
-			public void run() {
-				sv_progress.fullScroll(ScrollView.FOCUS_DOWN);
-			}
-		});
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void onFinishedConversion(FinishedConversionEvent event){
+        sendNotification();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onProgressUpdate(ProgressUpdateEvent event){
+		progressSb.append(event.getMessage());
+		tv_progress.setText(progressSb);
 	}
 
-	// Send notification
-	public void sendNotification() {
-		if (!hideNotification) {
-			NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, ConvertActivity.class), 0);
-			String message = getResources().getStringArray(R.array.conversion_result_message)[result];
-			String tickerText = getResources().getString(R.string.app_name);
-			Notification notif = new Notification(R.drawable.ic_launcher, message, System.currentTimeMillis());
-			//notif.setLatestEventInfo(this, tickerText, message, contentIntent); TODO: Not working on newer versions
-			nm.notify(R.string.app_name, notif);
-			notificationSent = true;
-		}
+	private void sendNotification() {
+		NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, ConvertActivity.class), 0);
+		String message = getResources().getStringArray(R.array.conversion_result_message)[result];
+		String tickerText = getResources().getString(R.string.app_name);
+		Notification notif = new Notification(R.drawable.ic_launcher, message, System.currentTimeMillis());
+		//notif.setLatestEventInfo(this, tickerText, message, contentIntent); TODO: Not working on newer versions
+		nm.notify(R.string.app_name, notif);
 	}
 
 	@Override
@@ -387,19 +390,14 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 		@Override
 		protected void onProgressUpdate(String... messageArray) {
-			for (String message : messageArray)
-			{
-				progressSb.append(message + "\n");
-			}
-			tv_progress.setText(progressSb);
-			scrollUp();
+			String message = TextUtils.join("\n", messageArray) + "\n";
+			EventBus.getDefault().post(new ProgressUpdateEvent(message));
 		}
 
 		@Override
 		protected void onPreExecute() {
-			progressSb = new StringBuilder();
-			progressSb.append(getResources().getString(R.string.heading));
-			progressSb.append(getResources().getString(R.string.pdf_extraction_library));
+			EventBus.getDefault().post(new ProgressUpdateEvent(getResources().getString(R.string.heading)));
+			EventBus.getDefault().post(new ProgressUpdateEvent(getResources().getString(R.string.pdf_extraction_library)));
 			setButtons(false);
 			result = ConversionStatus.SUCCESS;
 			conversionStarted = true;
@@ -437,8 +435,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 			}
 
 			if (isFinishing()) {
-				// Send notification
-				sendNotification();
+				EventBus.getDefault().post(new FinishedConversionEvent());
 			}
 
 			// Enable ok, disable stop
@@ -474,7 +471,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 				String title = filename.replaceAll("[^\\p{Alnum}]", " ");
 				String bookId = title + " - " + new Date().hashCode();
-				
+
 				publishProgress(getResources().getString(R.string.toc));
 				if (presenter.addToc(pages, bookId, title, tocFromPdf, pagesPerFile)) {
 					return ConversionStatus.CANNOT_WRITE_EPUB;
@@ -511,7 +508,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 						// Add anchor
 						pageText.append("  <p>\n");
 						pageText.append("  <a id=\"page" + j + "\"/>\n");
-						
+
 						// extract text
 						String page = HtmlHelper.stringToHTMLString(PdfReadHelper.getPageText(j));
 						if (page.length() == 0) {

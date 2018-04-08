@@ -126,5 +126,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>Out of memory error</item>
     </string-array>
     <string name="cannot_choose_file">Cannot choose the file</string>
+    <string name="file_not_found">File not found</string>
 
 </resources>

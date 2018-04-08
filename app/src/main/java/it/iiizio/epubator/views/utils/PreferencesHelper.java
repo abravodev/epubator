@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import it.iiizio.epubator.model.constants.PreferencesKeys;
-
 public class PreferencesHelper {
 
     private final SharedPreferences preferences;
@@ -65,12 +63,14 @@ public class PreferencesHelper {
     }
 
     public void save(String key, boolean value){
-
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(key, value);
+        editor.commit();
     }
 
     public void save(String key, String value){
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(PreferencesKeys.PATH, value);
+        editor.putString(key, value);
         editor.commit();
     }
 }

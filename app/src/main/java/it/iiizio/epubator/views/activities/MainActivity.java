@@ -221,13 +221,14 @@ public class MainActivity extends Activity {
 	}
 
 	private void convertFile(){
-		if (!cover_picked && !ConvertActivity.conversionStarted) {
-			setCoverImage();
-		}
-
 		if(cover_picked) {
 			cover_picked = false;
 			gotoConversionView();
+			return;
+		}
+
+		if (!ConvertActivity.conversionStarted) {
+			setCoverImage();
 		}
 	}
 
@@ -236,11 +237,12 @@ public class MainActivity extends Activity {
 		if (userPrefersToUsePicture) {
             cover_file = "";
             selectImageFileFromSystem();
-        } else {
-            cover_file = presenter.getCoverFileWithTheSameName(filename);
-
-            cover_picked = true;
+            return;
         }
+
+		cover_file = presenter.getCoverFileWithTheSameName(filename);
+		cover_picked = true;
+        gotoConversionView();
 	}
 
 	private void verifyFile(String chosenFile){
