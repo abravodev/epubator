@@ -30,8 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <TextView
             android:id="@+id/progress"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom" />
+            android:layout_height="wrap_content" />
     </ScrollView>
 
     <LinearLayout
