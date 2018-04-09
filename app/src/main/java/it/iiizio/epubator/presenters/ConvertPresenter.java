@@ -4,6 +4,7 @@ import it.iiizio.epubator.model.exceptions.ConversionException;
 
 public interface ConvertPresenter {
 
+    void loadPdfFile(String pdfFilename) throws ConversionException;
     void openFile(String tempFilename) throws ConversionException;
     void addMimeType() throws ConversionException;
     void addContainer() throws ConversionException;

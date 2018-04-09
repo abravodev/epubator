@@ -19,7 +19,6 @@ package it.iiizio.epubator.views.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -74,8 +73,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 	private static Button bt_ok;
 	private static Button bt_stopConversion;
 
-	private static boolean okBtEnabled = true;
-	public static boolean conversionStarted = false;
+	private static boolean conversionInProgress = false;
 	private static int result;
 
 	private ConversionPreferences preferences;
@@ -97,9 +95,9 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 		getPrefs();
 
-		if (conversionStarted) {
+		if (conversionInProgress) {
 			updateProgressText("");
-			setButtons(okBtEnabled);
+			setButtons();
 			return;
 		}
 
@@ -137,66 +135,14 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 	@Override
     public void onBackPressed() {
-        conversionStarted = conversionInProgress();
         finish();
     }
 
-	private String getDownloadDirectory(){
-		return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/";
-	}
-
-	private void setupButtons() {
-		bt_ok = (Button)findViewById(R.id.ok);
-		bt_stopConversion = (Button)findViewById(R.id.stop);
-
-		bt_ok.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				conversionStarted = false;
-				finish();
-			}
-		});
-		bt_stopConversion.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				result = ConversionStatus.CONVERSION_STOPPED_BY_USER;
-				convertTask.cancel(true);
-				sendFinishNotification();
-			}
-		});
-	}
-
-	private void getPrefs() {
-		PreferencesHelper prefs = new PreferencesHelper(this);
-
-		preferences = new ConversionPreferences();
-		preferences.includeImages = prefs.getBoolean(PreferencesKeys.ADD_EXTRACTED_IMAGES_FROM_PDF, true);
-		preferences.repeatedImages = prefs.getBoolean(PreferencesKeys.ADD_REPEATED_IMAGES);
-		preferences.pagesPerFile = prefs.getParsedString(PreferencesKeys.PAGES_PER_FILE, 5);
-		preferences.onError = prefs.getParsedString(PreferencesKeys.OPTION_WHEN_ERROR_IN_CONVERSION, DecissionOnConversionError.KEEP_ITEM);
-		preferences.addMarkers = prefs.getBoolean(PreferencesKeys.MARK_ERRORS, true);
-		preferences.tocFromPdf = prefs.getBoolean(PreferencesKeys.TRY_TO_EXTRACT_TOC_FROM_PDF, true);
-		preferences.showLogoOnCover = prefs.getBoolean(PreferencesKeys.HAVE_LOGO_ON_COVER, true);
-		preferences.saveOnDownloadDirectory = prefs.getBoolean(PreferencesKeys.SAVE_ALWAYS_ON_DOWNLOAD_DIRECTORY);
-	}
-
-	private void setButtons(boolean flag) {
-		okBtEnabled = flag;
-		bt_ok.setEnabled(okBtEnabled);
-		bt_stopConversion.setEnabled(!okBtEnabled);
-	}
-
-	public boolean conversionInProgress() {
-		return !okBtEnabled;
-	}
-
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		if(id!=0){
-			return null;
-		}
-
-		return new AlertDialog.Builder(ConvertActivity.this)
+	/**
+	 * Ask user what to do with the converted file after there has been any error
+	 */
+	private void handleConvertedFileAfterError(){
+		new AlertDialog.Builder(ConvertActivity.this)
 			.setTitle(getResources().getString(R.string.extraction_error))
 			.setMessage(getResources().getString(R.string.keep_epub_file))
 			.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
@@ -216,13 +162,53 @@ public class ConvertActivity extends Activity implements ConvertView {
 					verify.putExtra(BundleKeys.FILENAME, settings.tempFilename);
 					startActivityForResult(verify, 0);
 				}
-			})
-			.create();
+			}).create()
+			.show();
 	}
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		showDialog(0);
+	private String getDownloadDirectory(){
+		return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/";
+	}
+
+	private void setupButtons() {
+		bt_ok = (Button)findViewById(R.id.ok);
+		bt_stopConversion = (Button)findViewById(R.id.stop);
+
+		bt_ok.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				conversionInProgress = false;
+				finish();
+			}
+		});
+		bt_stopConversion.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				result = ConversionStatus.CONVERSION_STOPPED_BY_USER;
+				convertTask.cancel(true);
+				sendFinishNotification();
+				conversionInProgress = false;
+			}
+		});
+	}
+
+	private void getPrefs() {
+		PreferencesHelper prefs = new PreferencesHelper(this);
+
+		preferences = new ConversionPreferences();
+		preferences.includeImages = prefs.getBoolean(PreferencesKeys.ADD_EXTRACTED_IMAGES_FROM_PDF, true);
+		preferences.repeatedImages = prefs.getBoolean(PreferencesKeys.ADD_REPEATED_IMAGES);
+		preferences.pagesPerFile = prefs.getParsedString(PreferencesKeys.PAGES_PER_FILE, 5);
+		preferences.onError = prefs.getParsedString(PreferencesKeys.OPTION_WHEN_ERROR_IN_CONVERSION, DecissionOnConversionError.KEEP_ITEM);
+		preferences.addMarkers = prefs.getBoolean(PreferencesKeys.MARK_ERRORS, true);
+		preferences.tocFromPdf = prefs.getBoolean(PreferencesKeys.TRY_TO_EXTRACT_TOC_FROM_PDF, true);
+		preferences.showLogoOnCover = prefs.getBoolean(PreferencesKeys.HAVE_LOGO_ON_COVER, true);
+		preferences.saveOnDownloadDirectory = prefs.getBoolean(PreferencesKeys.SAVE_ALWAYS_ON_DOWNLOAD_DIRECTORY);
+	}
+
+	private void setButtons() {
+		bt_ok.setEnabled(!conversionInProgress); // Ok button only enabled before or after conversion
+		bt_stopConversion.setEnabled(conversionInProgress); // Stop button only enabled during conversion
 	}
 
 	private void deleteTemporalFile() {
@@ -251,12 +237,12 @@ public class ConvertActivity extends Activity implements ConvertView {
 		new File(settings.oldFilename).delete();
 	}
 
-    public void startConversion(ConversionSettings settings){
+    private void startConversion(ConversionSettings settings){
 		sendStartNotification();
 		result = ConversionStatus.SUCCESS;
 
-		setButtons(false);
-		conversionStarted = true;
+		conversionInProgress = true;
+		setButtons();
 
 		convertTask = new ConvertTask(settings, preferences);
 		convertTask.execute();
@@ -264,9 +250,10 @@ public class ConvertActivity extends Activity implements ConvertView {
 
 	@Subscribe(threadMode = ThreadMode.MAIN)
 	public void onConversionFinished(ConversionFinishedEvent event){
+		conversionInProgress = false;
 		result = event.getResult();
 		sendFinishNotification();
-		setButtons(true);
+		setButtons();
 	}
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -388,55 +375,46 @@ public class ConvertActivity extends Activity implements ConvertView {
 		protected Integer doInBackground(Void... params) {
 			removeCacheFiles();
 			saveOldEPUB();
-			return loadPDF();
+
+			try {
+				publishProgress(getResources().getString(R.string.load, settings.pdfFilename));
+				presenter.loadPdfFile(settings.pdfFilename);
+				fillEpub(preferences.pagesPerFile);
+				return ConversionStatus.SUCCESS;
+			} catch (ConversionException ex){
+				return ex.getStatus();
+			} catch (OutOfMemoryError ex){
+				return ConversionStatus.OUT_OF_MEMORY_ERROR;
+			}
 		}
 
 		@Override
 		protected void onPostExecute(Integer result) {
-			if (result == ConversionStatus.EXTRACTION_ERROR) {
+			publishProgress("\n" + getResources().getStringArray(R.array.conversion_result_message)[result]);
+
+			if(result == ConversionStatus.SUCCESS){
+				renameFile();
+				publishProgress(getResources().getString(R.string.epubfile, settings.epubFilename));
+			} else if (result == ConversionStatus.EXTRACTION_ERROR) {
 				if (preferences.onError == DecissionOnConversionError.KEEP_ITEM) {
-					// Keep ePUB with errors
 					keepEpub();
 					result = ConversionStatus.SUCCESS;
 				} else if (preferences.onError == DecissionOnConversionError.DISCARD_ITEM){
-					// Drop ePUB with errors
 					deleteTemporalFile();
 				} else {
-					// Ask for keeping ePUB with errors
 					if (hasWindowFocus()) {
-						showDialog(0);
+						handleConvertedFileAfterError();
 					} else {
+						// In case of doubt, we keep the epub
 						keepEpub();
 						result = ConversionStatus.SUCCESS;
 					}
 				}
 			} else {
-				// Delete on failure
-				publishProgress("\n" + getResources().getStringArray(R.array.conversion_result_message)[result]);
-				if(result == ConversionStatus.SUCCESS){
-					//Keep if ok
-					renameFile();
-					publishProgress(getResources().getString(R.string.epubfile, settings.epubFilename));
-				} else {
-					deleteTemporalFile();
-				}
+				deleteTemporalFile();
 			}
 
 			EventBus.getDefault().post(new ConversionFinishedEvent(result));
-		}
-
-		private int loadPDF() {
-			publishProgress(getResources().getString(R.string.load, settings.pdfFilename));
-
-			if (!(new File(settings.pdfFilename).exists())) {
-				return ConversionStatus.FILE_NOT_FOUND;
-			}
-
-			if (PdfReadHelper.open(settings.pdfFilename)) {
-				return ConversionStatus.CANNOT_READ_PDF;
-			}
-
-			return fillEpub(preferences.pagesPerFile);
 		}
 
 		private void saveOldEPUB() {
@@ -449,104 +427,96 @@ public class ConvertActivity extends Activity implements ConvertView {
 			FileHelper.deleteFilesFromDirectory(new File(settings.temporalPath));
 		}
 
-		private int fillEpub(int pagesPerFile) {
-			try {
-				int pages = PdfReadHelper.getPages();
-				publishProgress(getResources().getString(R.string.number_of_pages, pages));
+		private void fillEpub(int pagesPerFile) throws ConversionException, OutOfMemoryError {
+			int pages = PdfReadHelper.getPages();
+			publishProgress(getResources().getString(R.string.number_of_pages, pages));
 
-				publishProgress(getResources().getString(R.string.create_epub));
-				presenter.openFile(settings.tempFilename);
+			publishProgress(getResources().getString(R.string.create_epub));
+			presenter.openFile(settings.tempFilename);
 
-				publishProgress(getResources().getString(R.string.mimetype));
-				presenter.addMimeType();
+			publishProgress(getResources().getString(R.string.mimetype));
+			presenter.addMimeType();
 
-				publishProgress(getResources().getString(R.string.container));
-				presenter.addContainer();
+			publishProgress(getResources().getString(R.string.container));
+			presenter.addContainer();
 
-				String title = settings.filename.replaceAll("[^\\p{Alnum}]", " ");
-				String bookId = title + " - " + new Date().hashCode();
+			String title = settings.filename.replaceAll("[^\\p{Alnum}]", " ");
+			String bookId = title + " - " + new Date().hashCode();
 
-				publishProgress(getResources().getString(R.string.toc));
-				presenter.addToc(pages, bookId, title, preferences.tocFromPdf, pagesPerFile);
+			publishProgress(getResources().getString(R.string.toc));
+			presenter.addToc(pages, bookId, title, preferences.tocFromPdf, pagesPerFile);
 
-				publishProgress(getResources().getString(R.string.frontpage));
-				presenter.addFrontPage();
+			publishProgress(getResources().getString(R.string.frontpage));
+			presenter.addFrontPage();
 
-				publishProgress(getResources().getString(R.string.frontpagepng));
-				presenter.addFrontpageCover(settings.filename, settings.coverFile, preferences.showLogoOnCover);
+			publishProgress(getResources().getString(R.string.frontpagepng));
+			presenter.addFrontpageCover(settings.filename, settings.coverFile, preferences.showLogoOnCover);
 
-				boolean hasPartialExtractionError = false;
+			boolean hasPartialExtractionError = false;
 
-				// Add extracted text and images
-				List<String> allImageList = new ArrayList<>();
-				for(int i = 1; i <= pages; i += pagesPerFile) {
-					StringBuilder pageText = new StringBuilder();
+			// Add extracted text and images
+			List<String> allImageList = new ArrayList<>();
+			for(int i = 1; i <= pages; i += pagesPerFile) {
+				StringBuilder pageText = new StringBuilder();
 
-					publishProgress(getResources().getString(R.string.html, i));
-					int endPage = Math.min(i + pagesPerFile - 1, pages);
+				publishProgress(getResources().getString(R.string.html, i));
+				int endPage = Math.min(i + pagesPerFile - 1, pages);
 
-					for (int j = i; j <= endPage; j++) {
-						// Add anchor
-						pageText.append("  <p>\n");
-						pageText.append("  <a id=\"page" + j + "\"/>\n");
+				for (int j = i; j <= endPage; j++) {
+					// Add anchor
+					pageText.append("  <p>\n");
+					pageText.append("  <a id=\"page" + j + "\"/>\n");
 
-						// extract text
-						String page = HtmlHelper.stringToHTMLString(PdfReadHelper.getPageText(j));
-						if (page.length() == 0) {
-							publishProgress(getResources().getString(R.string.extraction_failure, j));
+					// extract text
+					String page = HtmlHelper.stringToHTMLString(PdfReadHelper.getPageText(j));
+					if (page.length() == 0) {
+						publishProgress(getResources().getString(R.string.extraction_failure, j));
+						hasPartialExtractionError = true;
+						if (preferences.addMarkers) {
+							pageText.append("&lt;&lt;#" + j + "&gt;&gt;");
+						}
+					} else {
+						if (page.matches(".*\\p{Cntrl}.*")) {
 							hasPartialExtractionError = true;
 							if (preferences.addMarkers) {
-								pageText.append("&lt;&lt;#" + j + "&gt;&gt;");
+								pageText.append(page.replaceAll("\\p{Cntrl}+", "&lt;&lt;@" + j + "&gt;&gt;"));
+							} else {
+								pageText.append(page.replaceAll("\\p{Cntrl}+", " "));
 							}
 						} else {
-							if (page.matches(".*\\p{Cntrl}.*")) {
-								hasPartialExtractionError = true;
-								if (preferences.addMarkers) {
-									pageText.append(page.replaceAll("\\p{Cntrl}+", "&lt;&lt;@" + j + "&gt;&gt;"));
-								} else {
-									pageText.append(page.replaceAll("\\p{Cntrl}+", " "));
-								}
-							} else {
-								pageText.append(page);
-							}
+							pageText.append(page);
 						}
-
-						if (preferences.includeImages) {
-							List<String> imageList = PdfReadHelper.getPageImages(j);
-							for (String imageName: imageList){
-								String imageTag = "\n<img alt=\"" + imageName + "\" src=\"" + imageName + "\" /><br/>";
-
-								if (!allImageList.contains(imageName)) {
-									allImageList.add(imageName);
-									publishProgress(getResources().getString(R.string.image_added, imageName));
-									pageText.append(imageTag);
-								} else if (preferences.repeatedImages) {
-									pageText.append(imageTag);
-								}
-							}
-						}
-						// Close page
-						pageText.append("\n  </p>\n");
 					}
 
-					presenter.addPage(i, pageText.toString());
+					if (preferences.includeImages) {
+						List<String> imageList = PdfReadHelper.getPageImages(j);
+						for (String imageName: imageList){
+							String imageTag = "\n<img alt=\"" + imageName + "\" src=\"" + imageName + "\" /><br/>";
+
+							if (!allImageList.contains(imageName)) {
+								allImageList.add(imageName);
+								publishProgress(getResources().getString(R.string.image_added, imageName));
+								pageText.append(imageTag);
+							} else if (preferences.repeatedImages) {
+								pageText.append(imageTag);
+							}
+						}
+					}
+					// Close page
+					pageText.append("\n  </p>\n");
 				}
 
-				publishProgress(getResources().getString(R.string.content));
-				presenter.addContent(pages, bookId, title, allImageList, pagesPerFile);
+				presenter.addPage(i, pageText.toString());
+			}
 
-				publishProgress(getResources().getString(R.string.close_file));
-				presenter.closeFile(settings.tempFilename);
+			publishProgress(getResources().getString(R.string.content));
+			presenter.addContent(pages, bookId, title, allImageList, pagesPerFile);
 
-				if (hasPartialExtractionError) {
-					return ConversionStatus.EXTRACTION_ERROR;
-				} else {
-					return ConversionStatus.SUCCESS;
-				}
-			} catch(OutOfMemoryError e) {
-				return ConversionStatus.OUT_OF_MEMORY_ERROR;
-			} catch (ConversionException ex){
-				return ex.getStatus();
+			publishProgress(getResources().getString(R.string.close_file));
+			presenter.closeFile(settings.tempFilename);
+
+			if (hasPartialExtractionError) {
+				throw new ConversionException(ConversionStatus.EXTRACTION_ERROR);
 			}
 		}
 	}

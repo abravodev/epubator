@@ -13,6 +13,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 import it.iiizio.epubator.model.constants.ConversionStatus;
 import it.iiizio.epubator.model.constants.ZipFileConstants;
@@ -30,6 +31,18 @@ public class ConvertPresenterImpl implements ConvertPresenter {
 
     public ConvertPresenterImpl(ConvertView view) {
         this.view = view;
+    }
+
+    @Override
+    public void loadPdfFile(String pdfFilename) throws ConversionException {
+        if (!(new File(pdfFilename).exists())) {
+            throw new ConversionException(ConversionStatus.FILE_NOT_FOUND);
+        }
+
+        boolean error = PdfReadHelper.open(pdfFilename);
+        if (error) {
+            throw new ConversionException(ConversionStatus.CANNOT_READ_PDF);
+        }
     }
 
     @Override

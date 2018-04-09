@@ -49,8 +49,7 @@ import it.iiizio.epubator.views.utils.PreferencesHelper;
 public class MainActivity extends Activity {
 
 	private String filename = "";
-	private String cover_file = "";
-	private static boolean cover_picked = false;
+	private String coverFile = "";
 	private PreferencesHelper viewPreferencesHelper;
 	private PreferencesHelper sharedPreferencesHelper;
 	private MainPresenter presenter;
@@ -154,7 +153,7 @@ public class MainActivity extends Activity {
 	private void gotoConversionView() {
 		Intent convert = new Intent(MainActivity.this, ConvertActivity.class);
 		convert.putExtra(BundleKeys.FILENAME, filename);
-		convert.putExtra(BundleKeys.COVER, cover_file);
+		convert.putExtra(BundleKeys.COVER, coverFile);
 		startActivity(convert);
 	}
 
@@ -208,40 +207,25 @@ public class MainActivity extends Activity {
 	}
 
 	private void getImageFromGallery(String selectedImage) {
-		cover_file = selectedImage;
-		cover_picked = true;
-		convertFile();
+		coverFile = selectedImage;
+		gotoConversionView();
 	}
 
 	private void convertFile(String chosenFile){
 		filename = chosenFile;
-
 		updateRecentFolder(chosenFile);
-		convertFile();
-	}
-
-	private void convertFile(){
-		if(cover_picked) {
-			cover_picked = false;
-			gotoConversionView();
-			return;
-		}
-
-		if (!ConvertActivity.conversionStarted) {
-			setCoverImage();
-		}
+		setCoverImage();
 	}
 
 	private void setCoverImage() {
 		boolean userPrefersToUsePicture = sharedPreferencesHelper.getBoolean(PreferencesKeys.CHOOSE_PICTURE);
 		if (userPrefersToUsePicture) {
-            cover_file = "";
+            coverFile = "";
             selectImageFileFromSystem();
             return;
         }
 
-		cover_file = presenter.getCoverFileWithTheSameName(filename);
-		cover_picked = true;
+		coverFile = presenter.getCoverFileWithTheSameName(filename);
         gotoConversionView();
 	}
 
