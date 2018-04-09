@@ -14,11 +14,13 @@ import org.w3c.dom.NodeList;
 
 import java.io.ByteArrayOutputStream;
 
-import it.iiizio.epubator.model.utils.PdfReadHelper;
-import it.iiizio.epubator.model.utils.ZipWriter;
-import it.iiizio.epubator.model.utils.XMLParser;
+import it.iiizio.epubator.model.constants.ConversionStatus;
 import it.iiizio.epubator.model.constants.ZipFileConstants;
+import it.iiizio.epubator.model.exceptions.ConversionException;
 import it.iiizio.epubator.model.utils.HtmlHelper;
+import it.iiizio.epubator.model.utils.PdfReadHelper;
+import it.iiizio.epubator.model.utils.XMLParser;
+import it.iiizio.epubator.model.utils.ZipWriter;
 import it.iiizio.epubator.views.activities.ConvertView;
 import it.iiizio.epubator.views.utils.BitmapHelper;
 
@@ -31,31 +33,51 @@ public class ConvertPresenterImpl implements ConvertPresenter {
     }
 
     @Override
-    public boolean addMimeType() {
+    public void openFile(String tempFilename) throws ConversionException {
+        boolean error = ZipWriter.create(tempFilename);
+        if(error){
+            throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
+        }
+    }
+
+    @Override
+    public void addMimeType() throws ConversionException {
         String filetype = "application/epub+zip";
-        return ZipWriter.addText(ZipFileConstants.MIMETYPE, filetype, true);
+        boolean error = ZipWriter.addText(ZipFileConstants.MIMETYPE, filetype, true);
+        if(error){
+            throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
+        }
     }
 
     @Override
-    public boolean addContainer() {
+    public void addContainer() throws ConversionException {
         String container = buildContainer();
-        return ZipWriter.addText("META-INF/container.xml", container, false);
+        boolean error = ZipWriter.addText("META-INF/container.xml", container, false);
+        if(error){
+           throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
+        }
     }
 
     @Override
-    public boolean addToc(int pages, String tocId, String title, boolean tocFromPdf, int pagesPerFile){
+    public void addToc(int pages, String tocId, String title, boolean tocFromPdf, int pagesPerFile) throws ConversionException {
         String toc = buildToc(pages, tocId, title, tocFromPdf, pagesPerFile);
-        return ZipWriter.addText("OEBPS/toc.ncx", toc, false);
+        boolean error = ZipWriter.addText("OEBPS/toc.ncx", toc, false);
+        if(error){
+            throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
+        }
     }
 
     @Override
-    public boolean addFrontPage() {
+    public void addFrontPage() throws ConversionException {
         String frontPage = buildFrontPage();
-        return ZipWriter.addText(ZipFileConstants.FRONTPAGE, frontPage, false);
+        boolean error = ZipWriter.addText(ZipFileConstants.FRONTPAGE, frontPage, false);
+        if(error){
+            throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
+        }
     }
 
     @Override
-    public boolean addFrontpageCover(String bookFilename, String coverImageFilename, boolean showLogoOnCover) {
+    public void addFrontpageCover(String bookFilename, String coverImageFilename, boolean showLogoOnCover) throws ConversionException {
         final int maxWidth = 300;
         final int maxHeight = 410;
         final int border = 10;
@@ -94,19 +116,36 @@ public class ConvertPresenterImpl implements ConvertPresenter {
             view.coverWithTitleCreated();
         }
 
-        return saveBmpAsPng(bmp);
+        boolean error = saveBmpAsPng(bmp);
+        if(error){
+            throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
+        }
     }
 
     @Override
-    public boolean addContent(int pages, String bookId, Iterable<String> images, String title, int pagesPerFile) {
-        String content = buildContent(pages, bookId, images, title, pagesPerFile);
-        return ZipWriter.addText(ZipFileConstants.CONTENT, content, false);
-    }
-
-    @Override
-    public boolean addPage(int page, String text) {
+    public void addPage(int page, String text) throws ConversionException {
         String htmlText = HtmlHelper.getBasicHtml("page" + page, text.replaceAll("<br/>(?=[a-z])", "&nbsp;"));
-        return ZipWriter.addText(ZipFileConstants.page(page), htmlText, false);
+        boolean error = ZipWriter.addText(ZipFileConstants.page(page), htmlText, false);
+        if(error){
+            throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
+        }
+    }
+
+    @Override
+    public void addContent(int pages, String bookId, String title, Iterable<String> images, int pagesPerFile) throws ConversionException {
+        String content = buildContent(pages, bookId, images, title, pagesPerFile);
+        boolean error = ZipWriter.addText(ZipFileConstants.CONTENT, content, false);
+        if(error){
+            throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
+        }
+    }
+
+    @Override
+    public void closeFile(String tempFilename) throws ConversionException {
+        boolean error = ZipWriter.close();
+        if(error){
+            throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
+        }
     }
 
     private String buildToc(int pages, String tocId, String title, boolean tocFromPdf, int pagesPerFile) {
