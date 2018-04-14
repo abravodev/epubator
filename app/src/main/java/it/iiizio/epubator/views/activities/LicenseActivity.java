@@ -34,7 +34,7 @@ public class LicenseActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.infoview);
+		setContentView(R.layout.activity_info);
 		presenter = new LicensePresenterImpl();
 
 		// Get license from raw

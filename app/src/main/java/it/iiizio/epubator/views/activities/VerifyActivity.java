@@ -69,7 +69,7 @@ public class VerifyActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_PROGRESS);
 		setProgressBarVisibility(true);
-		setContentView(R.layout.verify);
+		setContentView(R.layout.activity_verify);
 		presenter = new VerifyPresenterImpl();
 
 		setupWebView();

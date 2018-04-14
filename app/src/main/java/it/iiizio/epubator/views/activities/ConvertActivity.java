@@ -85,7 +85,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.progressview);
+		setContentView(R.layout.activity_conversion);
 
 		presenter = new ConvertPresenterImpl(this);
 
@@ -187,7 +187,9 @@ public class ConvertActivity extends Activity implements ConvertView {
 			@Override
 			public void onClick(View v) {
 				result = ConversionStatus.CONVERSION_STOPPED_BY_USER;
-				convertTask.cancel(true);
+				if(convertTask!=null && !convertTask.isCancelled()){
+					convertTask.cancel(true);
+				}
 				sendFinishNotification();
 				conversionInProgress = false;
 			}
