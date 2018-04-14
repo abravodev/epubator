@@ -1,6 +1,7 @@
 package it.iiizio.epubator.presenters;
 
 import it.iiizio.epubator.model.exceptions.ConversionException;
+import it.iiizio.epubator.views.dto.ConversionSettings;
 
 public interface ConvertPresenter {
 
@@ -14,4 +15,6 @@ public interface ConvertPresenter {
     void addPage(int page, String text) throws ConversionException;
     void addContent(int pages, String id, String title, Iterable<String> images, int pagesPerFile) throws ConversionException;
     void closeFile(String tempFilename) throws ConversionException;
+    void saveEpub(ConversionSettings settings);
+    boolean deleteTemporalFile(ConversionSettings settings);
 }

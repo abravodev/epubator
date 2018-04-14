@@ -23,6 +23,7 @@ import it.iiizio.epubator.model.utils.PdfReadHelper;
 import it.iiizio.epubator.model.utils.XMLParser;
 import it.iiizio.epubator.model.utils.ZipWriter;
 import it.iiizio.epubator.views.activities.ConvertView;
+import it.iiizio.epubator.views.dto.ConversionSettings;
 import it.iiizio.epubator.views.utils.BitmapHelper;
 
 public class ConvertPresenterImpl implements ConvertPresenter {
@@ -159,6 +160,22 @@ public class ConvertPresenterImpl implements ConvertPresenter {
         if(error){
             throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
         }
+    }
+
+    @Override
+    public void saveEpub(ConversionSettings settings) {
+        new File(settings.tempFilename).renameTo(new File(settings.epubFilename));
+        new File(settings.oldFilename).delete();
+    }
+
+    @Override
+    public boolean deleteTemporalFile(ConversionSettings settings) {
+        new File(settings.tempFilename).delete();
+        if (new File(settings.oldFilename).exists()) {
+            new File(settings.oldFilename).renameTo(new File(settings.epubFilename));
+            return true;
+        }
+        return false;
     }
 
     private String buildToc(int pages, String tocId, String title, boolean tocFromPdf, int pagesPerFile) {

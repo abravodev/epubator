@@ -148,16 +148,18 @@ public class ConvertActivity extends Activity implements ConvertView {
 			.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					keepEpub();
+					// TODO: Update the notification (remove action requested)
 				}
 			})
 			.setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
-					updateProgressText("\n" + getResources().getStringArray(R.array.conversion_result_message)[4] + "\n");
 					deleteTemporalFile();
+					// TODO: Update the notification (remove action requested)
 				}
 			})
 			.setNeutralButton(getResources().getString(R.string.verify_epub), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
+					// TODO: Update the notification (remove action requested)
 					Intent verify = new Intent(getBaseContext(), VerifyActivity.class);
 					verify.putExtra(BundleKeys.FILENAME, settings.tempFilename);
 					startActivityForResult(verify, 0);
@@ -212,9 +214,8 @@ public class ConvertActivity extends Activity implements ConvertView {
 	}
 
 	private void deleteTemporalFile() {
-		new File(settings.tempFilename).delete();
-		if (new File(settings.oldFilename).exists()) {
-			new File(settings.oldFilename).renameTo(new File(settings.epubFilename));
+		boolean exists = presenter.deleteTemporalFile(settings);
+		if (exists) {
 			updateProgressText(getResources().getString(R.string.kept_old_epub));
 		} else {
 			updateProgressText(getResources().getString(R.string.epub_was_deleted));
@@ -222,19 +223,14 @@ public class ConvertActivity extends Activity implements ConvertView {
 	}
 
 	private void keepEpub() {
-		updateProgressText("\n" + getResources().getStringArray(R.array.conversion_result_message)[0] + "\n");
+		updateProgressText("\n" + getResources().getStringArray(R.array.conversion_result_message)[ConversionStatus.SUCCESS] + "\n");
 		if (preferences.addMarkers) {
 			String pageNumberString = getResources().getString(R.string.pagenumber, ">>\n");
 			updateProgressText(getResources().getString(R.string.errors_are_marked_with, "<<@") + pageNumberString);
 			updateProgressText(getResources().getString(R.string.lost_pages_are_marked_with, "<<#") + pageNumberString);
 		}
-		renameFile();
+		presenter.saveEpub(settings);
 		updateProgressText(getResources().getString(R.string.epubfile, settings.epubFilename));
-	}
-
-	private void renameFile() {
-		new File(settings.tempFilename).renameTo(new File(settings.epubFilename));
-		new File(settings.oldFilename).delete();
 	}
 
     private void startConversion(ConversionSettings settings){
@@ -248,17 +244,21 @@ public class ConvertActivity extends Activity implements ConvertView {
 		convertTask.execute();
 	}
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onProgressUpdate(ProgressUpdateEvent event){
+		updateProgressText(event.getMessage());
+	}
+
 	@Subscribe(threadMode = ThreadMode.MAIN)
 	public void onConversionFinished(ConversionFinishedEvent event){
 		conversionInProgress = false;
 		result = event.getResult();
-		sendFinishNotification();
 		setButtons();
-	}
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onProgressUpdate(ProgressUpdateEvent event){
-		updateProgressText(event.getMessage());
+		if(event.actionRequested()){
+			handleConvertedFileAfterError();
+		} else {
+			sendFinishNotification();
+		}
 	}
 
 	private void updateProgressText(String text){
@@ -345,7 +345,7 @@ public class ConvertActivity extends Activity implements ConvertView {
 		private final ConversionPreferences preferences;
 
 		public ConvertTask(ConversionSettings settings, ConversionPreferences preferences) {
-			progressSb = new StringBuilder();
+			this.progressSb = new StringBuilder();
 			this.settings = settings;
 			this.preferences = preferences;
 		}
@@ -393,27 +393,21 @@ public class ConvertActivity extends Activity implements ConvertView {
 			publishProgress("\n" + getResources().getStringArray(R.array.conversion_result_message)[result]);
 
 			if(result == ConversionStatus.SUCCESS){
-				renameFile();
+				presenter.saveEpub(settings);
 				publishProgress(getResources().getString(R.string.epubfile, settings.epubFilename));
 			} else if (result == ConversionStatus.EXTRACTION_ERROR) {
 				if (preferences.onError == DecissionOnConversionError.KEEP_ITEM) {
-					keepEpub();
-					result = ConversionStatus.SUCCESS;
+                    presenter.saveEpub(settings);
 				} else if (preferences.onError == DecissionOnConversionError.DISCARD_ITEM){
 					deleteTemporalFile();
 				} else {
-					if (hasWindowFocus()) {
-						handleConvertedFileAfterError();
-					} else {
-						// In case of doubt, we keep the epub
-						keepEpub();
-						result = ConversionStatus.SUCCESS;
-					}
+					// TODO: Update the notification, to request action when tapped
+					EventBus.getDefault().post(new ConversionFinishedEvent(result, true));
+					return;
 				}
 			} else {
 				deleteTemporalFile();
 			}
-
 			EventBus.getDefault().post(new ConversionFinishedEvent(result));
 		}
 
