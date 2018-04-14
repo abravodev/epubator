@@ -113,7 +113,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="frontpagepng">Add frontpage.png</string>
     <string name="create_cover_with_image">Create cover with image</string>
     <string name="create_cover_with_title">Create cover with title</string>
-    <string name="html">Add page%d.html</string>
+    <string name="page_added">Add page%d.html</string>
     <string name="image_added">Add %s</string>
     <string name="close_file">Close file</string>
     <string-array name="conversion_result_message">

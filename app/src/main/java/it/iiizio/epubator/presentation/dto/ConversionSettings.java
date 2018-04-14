@@ -1,5 +1,7 @@
 package it.iiizio.epubator.presentation.dto;
 
+import java.util.Date;
+
 import it.iiizio.epubator.domain.utils.FileHelper;
 
 public class ConversionSettings {
@@ -42,5 +44,13 @@ public class ConversionSettings {
         boolean writable = FileHelper.folderIsWritable(path);
         String outputDirectory = (saveOnDownloadDirectory || !writable) ? downloadHistory: path;
         return outputDirectory + filename + EPUB_EXT;
+    }
+
+    public String getTitle(){
+        return filename.replaceAll("[^\\p{Alnum}]", " ");
+    }
+
+    public String getBookId(){
+        return getTitle() + " - " + new Date().hashCode();
     }
 }

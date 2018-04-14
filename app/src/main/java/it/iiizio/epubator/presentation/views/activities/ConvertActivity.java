@@ -44,9 +44,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.constants.BundleKeys;
@@ -55,14 +52,15 @@ import it.iiizio.epubator.domain.constants.DecissionOnConversionError;
 import it.iiizio.epubator.domain.constants.PreferencesKeys;
 import it.iiizio.epubator.domain.exceptions.ConversionException;
 import it.iiizio.epubator.domain.utils.FileHelper;
-import it.iiizio.epubator.domain.utils.HtmlHelper;
 import it.iiizio.epubator.domain.utils.PdfReadHelper;
-import it.iiizio.epubator.presentation.presenters.ConvertPresenter;
-import it.iiizio.epubator.presentation.presenters.ConvertPresenterImpl;
+import it.iiizio.epubator.presentation.callbacks.PageBuild;
 import it.iiizio.epubator.presentation.dto.ConversionPreferences;
 import it.iiizio.epubator.presentation.dto.ConversionSettings;
+import it.iiizio.epubator.presentation.dto.PdfExtraction;
 import it.iiizio.epubator.presentation.events.ConversionFinishedEvent;
 import it.iiizio.epubator.presentation.events.ProgressUpdateEvent;
+import it.iiizio.epubator.presentation.presenters.ConvertPresenter;
+import it.iiizio.epubator.presentation.presenters.ConvertPresenterImpl;
 import it.iiizio.epubator.presentation.utils.BundleHelper;
 import it.iiizio.epubator.presentation.utils.PreferencesHelper;
 
@@ -436,8 +434,8 @@ public class ConvertActivity extends Activity implements ConvertView {
 			publishProgress(getResources().getString(R.string.container));
 			presenter.addContainer();
 
-			String title = settings.filename.replaceAll("[^\\p{Alnum}]", " ");
-			String bookId = title + " - " + new Date().hashCode();
+			String title = settings.getTitle();
+			String bookId = settings.getBookId();
 
 			publishProgress(getResources().getString(R.string.toc));
 			presenter.addToc(pages, bookId, title, preferences.tocFromPdf, pagesPerFile);
@@ -448,70 +446,33 @@ public class ConvertActivity extends Activity implements ConvertView {
 			publishProgress(getResources().getString(R.string.frontpagepng));
 			presenter.addFrontpageCover(settings.filename, settings.coverFile, preferences.showLogoOnCover);
 
-			boolean hasPartialExtractionError = false;
-
-			// Add extracted text and images
-			List<String> allImageList = new ArrayList<>();
-			for(int i = 1; i <= pages; i += pagesPerFile) {
-				StringBuilder pageText = new StringBuilder();
-
-				publishProgress(getResources().getString(R.string.html, i));
-				int endPage = Math.min(i + pagesPerFile - 1, pages);
-
-				for (int j = i; j <= endPage; j++) {
-					// Add anchor
-					pageText.append("  <p>\n");
-					pageText.append("  <a id=\"page" + j + "\"/>\n");
-
-					// extract text
-					String page = HtmlHelper.stringToHTMLString(PdfReadHelper.getPageText(j));
-					if (page.length() == 0) {
-						publishProgress(getResources().getString(R.string.extraction_failure, j));
-						hasPartialExtractionError = true;
-						if (preferences.addMarkers) {
-							pageText.append("&lt;&lt;#" + j + "&gt;&gt;");
-						}
-					} else {
-						if (page.matches(".*\\p{Cntrl}.*")) {
-							hasPartialExtractionError = true;
-							if (preferences.addMarkers) {
-								pageText.append(page.replaceAll("\\p{Cntrl}+", "&lt;&lt;@" + j + "&gt;&gt;"));
-							} else {
-								pageText.append(page.replaceAll("\\p{Cntrl}+", " "));
-							}
-						} else {
-							pageText.append(page);
-						}
-					}
-
-					if (preferences.includeImages) {
-						List<String> imageList = PdfReadHelper.getPageImages(j);
-						for (String imageName: imageList){
-							String imageTag = "\n<img alt=\"" + imageName + "\" src=\"" + imageName + "\" /><br/>";
-
-							if (!allImageList.contains(imageName)) {
-								allImageList.add(imageName);
-								publishProgress(getResources().getString(R.string.image_added, imageName));
-								pageText.append(imageTag);
-							} else if (preferences.repeatedImages) {
-								pageText.append(imageTag);
-							}
-						}
-					}
-					// Close page
-					pageText.append("\n  </p>\n");
+			PageBuild pageBuild = new PageBuild() {
+				@Override
+				public void addPage(int page) {
+					String pageAddedMessage = "\t>> " + getResources().getString(R.string.page_added, page);
+					publishProgress(pageAddedMessage);
 				}
 
-				presenter.addPage(i, pageText.toString());
-			}
+				@Override
+				public void pageFailure(int j) {
+					publishProgress(getResources().getString(R.string.extraction_failure, j));
+				}
+
+				@Override
+				public void imageAdded(String imageName) {
+				    String imageAddedMessage = "\t\t>>>> " + getResources().getString(R.string.image_added, imageName);
+					publishProgress(imageAddedMessage);
+				}
+			};
+			PdfExtraction extraction = presenter.addPages(preferences, pages, pagesPerFile, pageBuild);
 
 			publishProgress(getResources().getString(R.string.content));
-			presenter.addContent(pages, bookId, title, allImageList, pagesPerFile);
+			presenter.addContent(pages, bookId, title, extraction.getPdfImages(), pagesPerFile);
 
 			publishProgress(getResources().getString(R.string.close_file));
 			presenter.closeFile(settings.tempFilename);
 
-			if (hasPartialExtractionError) {
+			if (extraction.hadExtractionError()) {
 				throw new ConversionException(ConversionStatus.EXTRACTION_ERROR);
 			}
 		}

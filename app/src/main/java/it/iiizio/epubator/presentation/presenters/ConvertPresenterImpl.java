@@ -22,6 +22,9 @@ import it.iiizio.epubator.domain.utils.HtmlHelper;
 import it.iiizio.epubator.domain.utils.PdfReadHelper;
 import it.iiizio.epubator.domain.utils.XMLParser;
 import it.iiizio.epubator.domain.utils.ZipWriter;
+import it.iiizio.epubator.presentation.callbacks.PageBuild;
+import it.iiizio.epubator.presentation.dto.ConversionPreferences;
+import it.iiizio.epubator.presentation.dto.PdfExtraction;
 import it.iiizio.epubator.presentation.views.activities.ConvertView;
 import it.iiizio.epubator.presentation.dto.ConversionSettings;
 import it.iiizio.epubator.presentation.utils.BitmapHelper;
@@ -137,12 +140,15 @@ public class ConvertPresenterImpl implements ConvertPresenter {
     }
 
     @Override
-    public void addPage(int page, String text) throws ConversionException {
-        String htmlText = HtmlHelper.getBasicHtml("page" + page, text.replaceAll("<br/>(?=[a-z])", "&nbsp;"));
-        boolean error = ZipWriter.addText(ZipFileConstants.page(page), htmlText, false);
-        if(error){
-            throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
+    public PdfExtraction addPages(ConversionPreferences preferences, int pages, int pagesPerFile, PageBuild build) throws ConversionException {
+        PdfExtraction extraction = new PdfExtraction(preferences, pages, pagesPerFile, build);
+
+        for(int i = 1; i <= pages; i += pagesPerFile) {
+            String pageText = extraction.buildPage(i);
+            addPage(i, pageText);
         }
+
+        return extraction;
     }
 
     @Override
@@ -176,6 +182,14 @@ public class ConvertPresenterImpl implements ConvertPresenter {
             return true;
         }
         return false;
+    }
+
+    private void addPage(int page, String text) throws ConversionException {
+        String htmlText = HtmlHelper.getBasicHtml("page" + page, text.replaceAll("<br/>(?=[a-z])", "&nbsp;"));
+        boolean error = ZipWriter.addText(ZipFileConstants.page(page), htmlText, false);
+        if(error){
+            throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
+        }
     }
 
     private String buildToc(int pages, String tocId, String title, boolean tocFromPdf, int pagesPerFile) {
