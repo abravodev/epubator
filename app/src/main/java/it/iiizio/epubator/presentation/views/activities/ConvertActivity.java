@@ -19,14 +19,10 @@ package it.iiizio.epubator.presentation.views.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.NotificationCompat;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -84,7 +80,7 @@ public class ConvertActivity extends Activity {
 
 		if (conversionInProgress) {
 			updateProgressText("");
-			setButtons();
+			updateButtonStates();
 			return;
 		}
 
@@ -106,7 +102,7 @@ public class ConvertActivity extends Activity {
 		String temporalPath = getExternalCacheDir() + "/";
 		settings = new ConversionSettings(preferences, pdfFilename, temporalPath, getDownloadDirectory(), coverFile);
 		startConversion(settings);
-		setButtons();
+		updateButtonStates();
 	}
 
     @Override
@@ -127,6 +123,35 @@ public class ConvertActivity extends Activity {
         finish();
     }
 
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+
+		String conversionFinishedText = BundleHelper.getExtraStringOrDefault(intent.getExtras(), BundleKeys.CONVERSION_TEXT);
+		if(conversionFinishedText!=null){
+			updateProgressText(conversionFinishedText);
+			conversionInProgress = false;
+			updateButtonStates();
+			return;
+		}
+	}
+
+	@Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+	public void onProgressUpdate(ProgressUpdateEvent event){
+		updateProgressText(event.getMessage());
+	}
+
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void onConversionFinished(ConversionFinishedEvent event){
+		conversionInProgress = false;
+		result = event.getResult();
+		updateButtonStates();
+		if(event.actionRequested()){
+			handleConvertedFileAfterError();
+		}
+	}
+
+	//<editor-fold desc="Private methods">
 	/**
 	 * Ask user what to do with the converted file after there has been any error
 	 */
@@ -157,7 +182,6 @@ public class ConvertActivity extends Activity {
 			.show();
 	}
 
-
 	private String getDownloadDirectory(){
 		return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/";
 	}
@@ -166,13 +190,12 @@ public class ConvertActivity extends Activity {
 		if(ContextHelper.isServiceRunning(this, ConversionService.class)) {
 			return; // Service already started
 		}
-		sendStartNotification();
-		result = ConversionStatus.SUCCESS;
 
+		result = ConversionStatus.SUCCESS;
 		conversionInProgress = true;
-		setButtons();
+		updateButtonStates();
 		Intent conversionServiceIntent = new Intent(this, ConversionService.class);
-		conversionServiceIntent.putExtra(BundleKeys.CONVERSION_PREFERENCES, settings);
+		conversionServiceIntent.putExtra(BundleKeys.CONVERSION_SETTINGS, settings);
 		startService(conversionServiceIntent);
 	}
 
@@ -191,10 +214,9 @@ public class ConvertActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				result = ConversionStatus.CONVERSION_STOPPED_BY_USER;
-				EventBus.getDefault().post(new ConversionCanceledEvent());
-				sendFinishNotification();
+				EventBus.getDefault().post(new ConversionCanceledEvent(result));
 				conversionInProgress = false;
-				setButtons();
+				updateButtonStates();
 			}
 		});
 	}
@@ -213,7 +235,7 @@ public class ConvertActivity extends Activity {
 		preferences.saveOnDownloadDirectory = prefs.getBoolean(PreferencesKeys.SAVE_ALWAYS_ON_DOWNLOAD_DIRECTORY);
 	}
 
-	private void setButtons() {
+	private void updateButtonStates() {
 		bt_ok.setEnabled(!conversionInProgress); // Ok button only enabled before or after conversion
 		bt_stopConversion.setEnabled(conversionInProgress); // Stop button only enabled during conversion
 	}
@@ -238,23 +260,6 @@ public class ConvertActivity extends Activity {
 		updateProgressText(getResources().getString(R.string.epubfile, settings.epubFilename));
 	}
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onProgressUpdate(ProgressUpdateEvent event){
-		updateProgressText(event.getMessage());
-	}
-
-	@Subscribe(threadMode = ThreadMode.MAIN)
-	public void onConversionFinished(ConversionFinishedEvent event){
-		conversionInProgress = false;
-		result = event.getResult();
-		setButtons();
-		if(event.actionRequested()){
-			handleConvertedFileAfterError();
-		} else {
-			sendFinishNotification();
-		}
-	}
-
 	private void updateProgressText(String text){
 		tv_progress.setText(text);
 		scrollUp();
@@ -267,37 +272,5 @@ public class ConvertActivity extends Activity {
 			}
 		});
 	}
-
-	private void sendStartNotification(){
-		sendNotification(getResources().getString(R.string.conversion_in_progress), true);
-	}
-
-	private void sendFinishNotification(){
-		sendNotification(getResources().getStringArray(R.array.conversion_result_message)[result], false);
-	}
-
-	private void sendNotification(String statusTitle, boolean fixed) {
-	    Intent openConvertActivityIntent = new Intent(this, ConvertActivity.class)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                openConvertActivityIntent, 0);
-
-		Notification notification = new NotificationCompat.Builder(this)
-			.setSmallIcon(R.drawable.ic_launcher)
-			.setContentTitle(statusTitle)
-			.setContentText(settings.filename)
-			.setStyle(new NotificationCompat.BigTextStyle().bigText(settings.filename))
-			.setContentIntent(contentIntent)
-			.setOngoing(fixed)
-			.setAutoCancel(!fixed)
-			.build();
-
-		getNotificationManager().notify(R.string.app_name, notification);
-	}
-
-	private NotificationManager getNotificationManager(){
-		return (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-	}
-
+	//</editor-fold>
 }

@@ -1,5 +1,6 @@
 package it.iiizio.epubator.infrastructure.services;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -31,21 +32,29 @@ import it.iiizio.epubator.presentation.dto.PdfExtraction;
 import it.iiizio.epubator.presentation.events.ConversionCanceledEvent;
 import it.iiizio.epubator.presentation.events.ConversionFinishedEvent;
 import it.iiizio.epubator.presentation.events.ProgressUpdateEvent;
+import it.iiizio.epubator.presentation.utils.NotificationHelper;
+import it.iiizio.epubator.presentation.views.activities.ConvertActivity;
 
 public class ConversionService extends Service {
 
+    //<editor-fold desc="Attributes">
     private final StringBuilder progressSb;
     private ConversionSettings settings;
     private ConversionPreferences preferences;
     private final ConvertManager presenter;
     private ConversionTask conversionTask;
+    private int serviceId;
+    //</editor-fold>
 
+    //<editor-fold desc="Constructors">
     public ConversionService() {
         super();
         this.progressSb = new StringBuilder();
         this.presenter = new ConvertManagerImpl(this.pageBuild);
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Methods">
     @Override
     public void onCreate() {
         super.onCreate();
@@ -66,10 +75,13 @@ public class ConversionService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Bundle extras = intent.getExtras();
-        this.settings = (ConversionSettings) extras.getSerializable(BundleKeys.CONVERSION_PREFERENCES);
+        this.settings = (ConversionSettings) extras.getSerializable(BundleKeys.CONVERSION_SETTINGS);
         this.preferences = this.settings.getPreferences();
         conversionTask = new ConversionTask();
         conversionTask.execute();
+		serviceId = startId;
+
+        startForeground(serviceId, makeStartNotification());
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -79,14 +91,51 @@ public class ConversionService extends Service {
         if(conversionTask!=null){
             conversionTask.cancel(true);
         }
-        stopSelf();
+		finishConversion(event.getResult());
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Private methods">
     private void publishProgress(String message){
         if(conversionTask!=null){
             conversionTask.makeProgress(message);
         }
     }
+
+    private Notification makeStartNotification(){
+        return makeNotification(getResources().getString(R.string.conversion_in_progress), true);
+    }
+
+    private void finishConversion(int result){
+		stopForeground(false);
+		sendFinishNotification(result);
+		stopSelf();
+	}
+
+    private void sendFinishNotification(int result){
+    	String resultMessage = getResources().getStringArray(R.array.conversion_result_message)[result];
+		Intent openConvertActivityIntent = new Intent(this, ConvertActivity.class)
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+						| Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		openConvertActivityIntent.putExtra(BundleKeys.CONVERSION_TEXT, progressSb.toString());
+        Notification notification = makeNotification(resultMessage, false, openConvertActivityIntent);
+        notification.defaults |= Notification.DEFAULT_VIBRATE;
+		NotificationHelper.sendNotification(this, R.string.app_name, notification);
+    }
+
+    private Notification makeNotification(String statusTitle, boolean fixed) {
+        Intent openConvertActivityIntent = new Intent(this, ConvertActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		return makeNotification(statusTitle, fixed, openConvertActivityIntent);
+    }
+
+	private Notification makeNotification(String statusTitle, boolean fixed,
+			  Intent openConvertActivityIntent) {
+		return NotificationHelper.makeNotification(this,
+				statusTitle, settings.filename, fixed, openConvertActivityIntent);
+	}
+    //</editor-fold>
 
     private PageBuildEvents pageBuild = new PageBuildEvents() {
         @Override
@@ -198,6 +247,7 @@ public class ConversionService extends Service {
                 deleteTemporalFile();
             }
             EventBus.getDefault().post(new ConversionFinishedEvent(result));
+			finishConversion(result);
         }
 
         private void saveOldEPUB() {

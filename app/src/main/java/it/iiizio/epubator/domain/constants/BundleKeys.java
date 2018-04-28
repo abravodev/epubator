@@ -4,5 +4,6 @@ public class BundleKeys {
 
     public static final String FILENAME = "filename";
     public static final String COVER = "cover";
-    public static final String CONVERSION_PREFERENCES = "conversion_preferences";
+    public static final String CONVERSION_SETTINGS = "conversion_settings";
+    public static final String CONVERSION_TEXT = "conversion_text";
 }
