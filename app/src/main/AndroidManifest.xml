@@ -33,7 +33,7 @@
 				<data android:mimeType="application/epub+zip" />
 			</intent-filter>
 			</activity>
-		<activity android:name=".presentation.views.activities.ConvertActivity" />
+		<activity android:name=".presentation.views.activities.ConvertActivity" android:launchMode="singleTop" />
 		<activity android:name=".presentation.views.activities.PrefsActivity" />
 		<activity android:name=".presentation.views.activities.VerifyActivity" />
 		<activity android:name=".presentation.views.activities.InfoActivity" />

@@ -106,6 +106,7 @@ public class ConvertActivity extends Activity {
 		String temporalPath = getExternalCacheDir() + "/";
 		settings = new ConversionSettings(preferences, pdfFilename, temporalPath, getDownloadDirectory(), coverFile);
 		startConversion(settings);
+		setButtons();
 	}
 
     @Override
@@ -276,7 +277,11 @@ public class ConvertActivity extends Activity {
 	}
 
 	private void sendNotification(String statusTitle, boolean fixed) {
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, ConvertActivity.class), 0);
+	    Intent openConvertActivityIntent = new Intent(this, ConvertActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                openConvertActivityIntent, 0);
 
 		Notification notification = new NotificationCompat.Builder(this)
 			.setSmallIcon(R.drawable.ic_launcher)

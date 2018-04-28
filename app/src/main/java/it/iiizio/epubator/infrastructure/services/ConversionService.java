@@ -157,7 +157,7 @@ public class ConversionService extends Service {
         protected void onProgressUpdate(String... messageArray) {
             String message = TextUtils.join("\n", messageArray) + "\n";
             progressSb.append(message);
-            EventBus.getDefault().post(new ProgressUpdateEvent(progressSb.toString()));
+            EventBus.getDefault().postSticky(new ProgressUpdateEvent(progressSb.toString()));
         }
 
         @Override
