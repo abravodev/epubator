@@ -17,12 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package it.iiizio.epubator.presentation.views.activities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -51,7 +51,7 @@ import it.iiizio.epubator.presentation.utils.BundleHelper;
 import it.iiizio.epubator.presentation.utils.ContextHelper;
 import it.iiizio.epubator.presentation.utils.PreferencesHelper;
 
-public class ConvertActivity extends Activity {
+public class ConvertActivity extends AppCompatActivity {
 
 	//<editor-fold desc="Attributes">
 	private static ScrollView sv_progress;

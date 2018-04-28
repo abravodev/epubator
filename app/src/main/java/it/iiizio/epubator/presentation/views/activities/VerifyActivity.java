@@ -17,12 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package it.iiizio.epubator.presentation.views.activities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -50,7 +50,7 @@ import it.iiizio.epubator.presentation.presenters.VerifyPresenterImpl;
 import it.iiizio.epubator.presentation.utils.BundleHelper;
 import it.iiizio.epubator.presentation.utils.PreferencesHelper;
 
-public class VerifyActivity extends Activity {
+public class VerifyActivity extends AppCompatActivity {
 
 	private static ZipFile epubFile = null;
 	private List<String> htmlList;

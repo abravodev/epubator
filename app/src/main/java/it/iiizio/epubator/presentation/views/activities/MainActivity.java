@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package it.iiizio.epubator.presentation.views.activities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
@@ -26,6 +25,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -46,7 +46,7 @@ import it.iiizio.epubator.presentation.utils.PathUtils;
 import it.iiizio.epubator.presentation.utils.PermissionHelper;
 import it.iiizio.epubator.presentation.utils.PreferencesHelper;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
 	private String filename = "";
 	private String coverFile = "";

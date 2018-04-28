@@ -37,26 +37,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </LinearLayout>
 
     <LinearLayout
-        style="?android:attr/buttonBarStyle"
-        android:layout_width="120sp"
-        android:layout_height="match_parent"
-        android:layout_marginTop="6dp"
-        android:orientation="vertical" >
+        style="@style/ButtonBarStyle.Landscape">
         
         <Button
-            style="?android:attr/buttonBarButtonStyle"
+            style="@style/ButtonBarButtonStyle"
             android:id="@+id/convert"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
             android:text="@string/convert_pdf" />
 
         <Button
-            style="?android:attr/buttonBarButtonStyle"
+            style="@style/ButtonBarButtonStyle"
             android:id="@+id/verify"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
             android:text="@string/verify_epub" />
     </LinearLayout>
 

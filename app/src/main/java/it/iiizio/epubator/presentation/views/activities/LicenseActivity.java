@@ -17,8 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package it.iiizio.epubator.presentation.views.activities;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import java.io.InputStream;
@@ -27,7 +27,7 @@ import it.iiizio.epubator.R;
 import it.iiizio.epubator.presentation.presenters.LicensePresenter;
 import it.iiizio.epubator.presentation.presenters.LicensePresenterImpl;
 
-public class LicenseActivity extends Activity {
+public class LicenseActivity extends AppCompatActivity {
 
 	private LicensePresenter presenter;
 

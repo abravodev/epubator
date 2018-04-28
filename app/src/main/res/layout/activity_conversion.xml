@@ -25,7 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight="1" >
+        android:layout_weight="1"
+        android:padding="@dimen/activity_padding">
 
         <TextView
             android:id="@+id/progress"
@@ -34,24 +35,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </ScrollView>
 
     <LinearLayout
-        style="?android:attr/buttonBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        style="@style/ButtonBarStyle">
 
         <Button
-            style="?android:attr/buttonBarButtonStyle"
+            style="@style/ButtonBarButtonStyle"
             android:id="@+id/ok"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
             android:text="@string/ok" />
 
         <Button
+            style="@style/ButtonBarButtonStyle"
             android:id="@+id/stop"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
             android:text="@string/stop" />
     </LinearLayout>
 

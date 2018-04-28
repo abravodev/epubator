@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -187,16 +186,6 @@ public class ConversionService extends Service {
     };
 
     private class ConversionTask extends AsyncTask<Void, String, Integer> {
-
-        @Override
-        protected void onPreExecute() {
-            publishProgress(R.string.heading);
-            publishProgress(R.string.pdf_extraction_library);
-        }
-
-        private void publishProgress(@StringRes int text){
-            publishProgress(getResources().getString(text));
-        }
 
         private void makeProgress(String message){
             publishProgress(message);

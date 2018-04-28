@@ -33,22 +33,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
+        style="@style/ButtonBarStyle" >
 
         <Button
+            style="@style/ButtonBarButtonStyle"
             android:id="@+id/prev"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
             android:text="@string/prev_page" />
 
         <Button
+            style="@style/ButtonBarButtonStyle"
             android:id="@+id/next"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
             android:text="@string/next_page" />
     </LinearLayout>
 
