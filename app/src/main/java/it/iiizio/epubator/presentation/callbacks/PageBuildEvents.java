@@ -1,8 +1,14 @@
-package it.iiizio.epubator.presentation.views.activities;
+package it.iiizio.epubator.presentation.callbacks;
 
 import android.graphics.Bitmap;
 
-public interface ConvertView {
+public interface PageBuildEvents {
+
+    void addPage(int page);
+
+    void pageFailure(int j);
+
+    void imageAdded(String imageName);
 
     void noTocFoundInThePdfFile();
 

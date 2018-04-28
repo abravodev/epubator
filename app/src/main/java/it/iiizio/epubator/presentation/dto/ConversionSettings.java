@@ -1,10 +1,11 @@
 package it.iiizio.epubator.presentation.dto;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import it.iiizio.epubator.domain.utils.FileHelper;
 
-public class ConversionSettings {
+public class ConversionSettings implements Serializable {
 
     public final String pdfFilename;
     public final String filename;
@@ -13,6 +14,7 @@ public class ConversionSettings {
     public final String tempFilename;
     public final String coverFile;
     public final String temporalPath;
+    public final ConversionPreferences preferences;
 
     private final String EPUB_EXT = " - ePUBator.epub";
     private final String OLD_EXT = " - ePUBator.old";
@@ -31,6 +33,7 @@ public class ConversionSettings {
         this.temporalPath = temporalPath;
         this.pdfFilename = pdfFilename;
         this.coverFile = coverFile;
+        this.preferences = preferences;
     }
 
     /**
@@ -52,5 +55,9 @@ public class ConversionSettings {
 
     public String getBookId(){
         return getTitle() + " - " + new Date().hashCode();
+    }
+
+    public ConversionPreferences getPreferences() {
+        return preferences;
     }
 }

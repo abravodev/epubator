@@ -1,6 +1,8 @@
 package it.iiizio.epubator.presentation.dto;
 
-public class ConversionPreferences {
+import java.io.Serializable;
+
+public class ConversionPreferences implements Serializable {
 
     public boolean includeImages;
     public boolean repeatedImages;

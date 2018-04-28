@@ -5,18 +5,18 @@ import java.util.List;
 
 import it.iiizio.epubator.domain.utils.HtmlHelper;
 import it.iiizio.epubator.domain.utils.PdfReadHelper;
-import it.iiizio.epubator.presentation.callbacks.PageBuild;
+import it.iiizio.epubator.presentation.callbacks.PageBuildEvents;
 
 public class PdfExtraction {
 
     private final List<String> pdfImages;
     private boolean extractionError;
     private final ConversionPreferences preferences;
-    private final PageBuild build;
+    private final PageBuildEvents build;
     private final int pages;
     private final int pagesPerFile;
 
-    public PdfExtraction(ConversionPreferences preferences, int pages, int pagesPerFile, PageBuild build) {
+    public PdfExtraction(ConversionPreferences preferences, int pages, int pagesPerFile, PageBuildEvents build) {
         this.preferences = preferences;
         this.build = build;
         this.pages = pages;

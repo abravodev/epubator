@@ -38,5 +38,6 @@
 		<activity android:name=".presentation.views.activities.VerifyActivity" />
 		<activity android:name=".presentation.views.activities.InfoActivity" />
 		<activity android:name=".presentation.views.activities.LicenseActivity" />
+		<service android:enabled="true" android:name=".infrastructure.services.ConversionService"/>
 	</application>
 </manifest>
