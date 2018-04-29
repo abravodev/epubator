@@ -20,6 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     android:layout_width="match_parent"
     android:layout_height="match_parent" xmlns:tools="http://schemas.android.com/tools" tools:ignore="NestedWeights">
 
+    <include layout="@layout/conversion_summary"/>
+
     <ScrollView
         android:id="@+id/scroll"
         android:layout_width="0dip"

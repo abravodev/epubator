@@ -44,6 +44,7 @@ import it.iiizio.epubator.presentation.dto.ConversionPreferences;
 import it.iiizio.epubator.presentation.dto.ConversionSettings;
 import it.iiizio.epubator.presentation.events.ConversionCanceledEvent;
 import it.iiizio.epubator.presentation.events.ConversionFinishedEvent;
+import it.iiizio.epubator.presentation.events.ConversionStatusChangedEvent;
 import it.iiizio.epubator.presentation.events.ProgressUpdateEvent;
 import it.iiizio.epubator.presentation.presenters.ConvertPresenter;
 import it.iiizio.epubator.presentation.presenters.ConvertPresenterImpl;
@@ -54,6 +55,9 @@ import it.iiizio.epubator.presentation.utils.PreferencesHelper;
 public class ConvertActivity extends AppCompatActivity {
 
 	//<editor-fold desc="Attributes">
+	private static TextView tv_sourceFilename;
+	private static TextView tv_epubFilename;
+	private static TextView tv_conversionStatus;
 	private static ScrollView sv_progress;
 	private static TextView tv_progress;
 	private static Button bt_ok;
@@ -62,8 +66,8 @@ public class ConvertActivity extends AppCompatActivity {
 	private static boolean conversionInProgress = false;
 	private static int result;
 
-	private ConversionPreferences preferences;
-	private ConversionSettings settings;
+	private static ConversionPreferences preferences;
+	private static ConversionSettings settings;
 	private ConvertPresenter presenter;
 	//</editor-fold>
 
@@ -79,11 +83,11 @@ public class ConvertActivity extends AppCompatActivity {
 		getPrefs();
 
 		if (conversionInProgress) {
-			updateProgressText("");
 			updateButtonStates();
 			return;
 		}
 
+		result = ConversionStatus.NOT_STARTED;
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
 			Toast.makeText(this, getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
@@ -110,6 +114,7 @@ public class ConvertActivity extends AppCompatActivity {
         super.onResume();
 		EventBus.getDefault().register(this);
         getPrefs();
+		setupConversionSummary(settings);
     }
 
 	@Override
@@ -141,6 +146,12 @@ public class ConvertActivity extends AppCompatActivity {
 		updateProgressText(event.getMessage());
 	}
 
+	@Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+	public void onConversionStatusChanged(ConversionStatusChangedEvent event){
+		result = event.getConversionStatus();
+		updateConversionStatus(result);
+	}
+
 	@Subscribe(threadMode = ThreadMode.MAIN)
 	public void onConversionFinished(ConversionFinishedEvent event){
 		conversionInProgress = false;
@@ -149,9 +160,15 @@ public class ConvertActivity extends AppCompatActivity {
 		if(event.actionRequested()){
 			handleConvertedFileAfterError();
 		}
+		updateConversionStatus(result);
 	}
 
 	//<editor-fold desc="Private methods">
+	private void updateConversionStatus(int status){
+		String textStatus = getResources().getStringArray(R.array.conversion_result_message)[status];
+		tv_conversionStatus.setText(textStatus);
+	}
+
 	/**
 	 * Ask user what to do with the converted file after there has been any error
 	 */
@@ -191,12 +208,23 @@ public class ConvertActivity extends AppCompatActivity {
 			return; // Service already started
 		}
 
-		result = ConversionStatus.SUCCESS;
+		result = ConversionStatus.IN_PROGRESS;
 		conversionInProgress = true;
 		updateButtonStates();
 		Intent conversionServiceIntent = new Intent(this, ConversionService.class);
 		conversionServiceIntent.putExtra(BundleKeys.CONVERSION_SETTINGS, settings);
 		startService(conversionServiceIntent);
+	}
+
+	private void setupConversionSummary(ConversionSettings settings){
+		tv_sourceFilename = (TextView) findViewById(R.id.source_filename);
+		tv_sourceFilename.setText(settings.pdfFilename);
+
+		tv_epubFilename = (TextView) findViewById(R.id.epub_filename);
+		tv_epubFilename.setText(settings.epubFilename);
+
+		tv_conversionStatus = (TextView) findViewById(R.id.conversion_status);
+		updateConversionStatus(result);
 	}
 
 	private void setupButtons() {
@@ -274,3 +302,4 @@ public class ConvertActivity extends AppCompatActivity {
 	}
 	//</editor-fold>
 }
+;

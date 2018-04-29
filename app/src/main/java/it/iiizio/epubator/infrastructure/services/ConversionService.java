@@ -30,6 +30,7 @@ import it.iiizio.epubator.presentation.dto.ConversionSettings;
 import it.iiizio.epubator.presentation.dto.PdfExtraction;
 import it.iiizio.epubator.presentation.events.ConversionCanceledEvent;
 import it.iiizio.epubator.presentation.events.ConversionFinishedEvent;
+import it.iiizio.epubator.presentation.events.ConversionStatusChangedEvent;
 import it.iiizio.epubator.presentation.events.ProgressUpdateEvent;
 import it.iiizio.epubator.presentation.utils.NotificationHelper;
 import it.iiizio.epubator.presentation.views.activities.ConvertActivity;
@@ -204,8 +205,9 @@ public class ConversionService extends Service {
             saveOldEPUB();
 
             try {
-                publishProgress(getResources().getString(R.string.load, settings.pdfFilename));
+                EventBus.getDefault().postSticky(new ConversionStatusChangedEvent(ConversionStatus.LOADING_FILE));
                 presenter.loadPdfFile(settings.pdfFilename);
+                EventBus.getDefault().postSticky(new ConversionStatusChangedEvent(ConversionStatus.IN_PROGRESS));
                 fillEpub(preferences.pagesPerFile);
                 return ConversionStatus.SUCCESS;
             } catch (ConversionException ex){
@@ -217,11 +219,8 @@ public class ConversionService extends Service {
 
         @Override
         protected void onPostExecute(Integer result) {
-            publishProgress("\n" + getResources().getStringArray(R.array.conversion_result_message)[result]);
-
             if(result == ConversionStatus.SUCCESS){
                 presenter.saveEpub(settings);
-                publishProgress(getResources().getString(R.string.epubfile, settings.epubFilename));
             } else if (result == ConversionStatus.EXTRACTION_ERROR) {
                 if (preferences.onError == DecissionOnConversionError.KEEP_ITEM) {
                     presenter.saveEpub(settings);

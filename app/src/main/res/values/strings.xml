@@ -117,6 +117,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="image_added">Add %s</string>
     <string name="close_file">Close file</string>
     <string-array name="conversion_result_message">
+        <item>Not started</item>
+        <item>Loading file</item>
+        <item>In progress</item>
         <item>Conversion completed</item>
         <item>PDF file not found</item>
         <item>Failed to read PDF file</item>
@@ -127,5 +130,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </string-array>
     <string name="cannot_choose_file">Cannot choose the file</string>
     <string name="file_not_found">File not found</string>
-
+    <string name="source_filename">Source filename</string>
+    <string name="epub_filename">Epub filename</string>
+    <string name="status">Status</string>
 </resources>
