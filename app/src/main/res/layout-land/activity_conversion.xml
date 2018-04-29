@@ -24,13 +24,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:id="@+id/scroll"
         android:layout_width="0dip"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:padding="@dimen/activity_padding">
+        android:layout_weight="1" >
 
         <TextView
             android:id="@+id/progress"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_padding"/>
     </ScrollView>
 
     <LinearLayout

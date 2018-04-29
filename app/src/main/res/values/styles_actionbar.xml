@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ActionBarStyle.NoTitle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="background">@android:color/transparent</item>
+        <item name="titleTextStyle">@style/ActionBar.NoTitle.TextStyle</item>
+    </style>
+
+    <style name="ActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="background">@color/dark_green</item>
+        <item name="titleTextStyle">@style/ActionBar.TextStyle</item>
+    </style>
+
+    <style name="ActionBar.NoTitle.TextStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@android:color/transparent</item>
+    </style>
+
+    <style name="ActionBar.TextStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="ActionBar.OverflowButtonStyle" parent="@style/Widget.AppCompat.Light.ActionButton.Overflow">
+        <item name="android:tint">@android:color/white</item>
+    </style>
+
+    <style name="ActionBar.NoTitle.OverflowButtonStyle" parent="@style/Widget.AppCompat.Light.ActionButton.Overflow">
+        <item name="android:tint">@color/dark_green</item>
+    </style>
+</resources>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ButtonBarStyle" parent="@style/Widget.AppCompat.ButtonBar">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+    </style>
+
+    <style name="ButtonBarStyle.Landscape" parent="@style/Widget.AppCompat.ButtonBar">
+        <item name="android:layout_width">120sp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_marginTop">6dp</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="ButtonBarButtonStyle" parent="@style/Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+</resources>

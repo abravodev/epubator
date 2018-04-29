@@ -2,33 +2,12 @@
 <resources>
     <style name="AppTheme" parent="@style/Theme.AppCompat.Light">
         <item name="actionBarStyle">@style/ActionBarStyle</item>
+        <item name="actionOverflowButtonStyle">@style/ActionBar.OverflowButtonStyle</item>
+        <item name="android:actionMenuTextColor">@android:color/white</item>
     </style>
 
-    <style name="ActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
-        <item name="background">@android:color/transparent</item>
-        <item name="titleTextStyle">@style/ActionBar.TextStyle</item>
+    <style name="AppTheme.MainView" parent="@style/AppTheme">
+        <item name="actionBarStyle">@style/ActionBarStyle.NoTitle</item>
+        <item name="actionOverflowButtonStyle">@style/ActionBar.NoTitle.OverflowButtonStyle</item>
     </style>
-
-    <style name="ActionBar.TextStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textColor">@color/dark_green</item>
-    </style>
-
-    <style name="ButtonBarStyle" parent="@style/Widget.AppCompat.ButtonBar">
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_width">match_parent</item>
-    </style>
-
-    <style name="ButtonBarStyle.Landscape" parent="@style/Widget.AppCompat.ButtonBar">
-        <item name="android:layout_width">120sp</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:layout_marginTop">6dp</item>
-        <item name="android:orientation">vertical</item>
-    </style>
-
-    <style name="ButtonBarButtonStyle" parent="@style/Widget.AppCompat.Button.Borderless.Colored">
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_weight">1</item>
-    </style>
-
 </resources>

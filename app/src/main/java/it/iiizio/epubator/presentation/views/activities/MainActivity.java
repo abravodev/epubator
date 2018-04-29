@@ -24,14 +24,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.File;
@@ -75,9 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.mainmenu, menu);
-		MenuItemCompat.setShowAsAction(menu.findItem(R.id.prefs), 0);
+		getMenuInflater().inflate(R.menu.mainmenu, menu);
 		return true;
 	}
 
@@ -113,14 +108,14 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void setupButtons() {
-		((Button) findViewById(R.id.convert)).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.convert).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				selectPdfFileFromSystem();
 				// TODO: Control when there are files in the queue for converting pdfs
 			}
 		});
-		((Button) findViewById(R.id.verify)).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.verify).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				selectEpubFileFromSystem(Actions.VERIFY);
