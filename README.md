@@ -1,9 +1,9 @@
-# Minimal offline PDF to ePUB converter for Android - ©2011 Ezio Querini
+# Minimal offline PDF to ePUB converter for Android
 
 ePUBator extract text from a PDF file and put it in a well formed (epubcheck compliant) ePUB file.
 
 ## What ePUBator does
-- ePUBator IS THINKED FOR BOOKS (NOT FOR EVERY TYPE OF PDF), BUT IF YOU NEED A BETTER RESULT TRY SOMETHING ELSE LIKE CALIBRE.
+- ePUBator is thinked for books (not for every type of pdf), but if you need a better result try something else like calibre.
 - ePUBator doesn't need internet connection (doesn't send your docs somewhere on the net, doesn't have ads).
 - ePUBator extracts text (no text from pictures or from raster PDF).
 - ePUBator tries to extract images (only png, jpg and gif) but puts them at the page's end.
@@ -16,11 +16,11 @@ ePUBator extract text from a PDF file and put it in a well formed (epubcheck com
 ## Known issues
 In the event of crash, unexpected stoppages or insufficient memory try setting Page per file to 1 and/or disable the extraction of images and try again (sometimes helps).
 
-I converted a lot of books (italians and some english) with ePUBator, but with someone the conversion can fail (raster PDF, columns, out of order chars).
+I converted a lot of books (italians and some english) with ePUBator, but with some of them the conversion can fail (raster PDF, columns, out of order chars).
 
 I never try with arabic or asian characters, right to left or vertical writing and I don't know if (and how) the iText library can manage those pdf. I'm sorry.
 
-On some books we can find wrong chars (e.g. �� instead of ��), it seems a iText's problem (another PDF library extract the same text correctly). I'm looking for a better one, free and Android compatible.
+On some books we can find wrong chars (e.g. the vowels with backticks in languages like the Italian), it seems a iText's problem (another PDF library extract the same text correctly). I'm looking for a better one, free and Android compatible.
 
 ## Permissions required
 - *READ_EXTERNAL_STORAGE* and *WRITE_EXTERNAL_STORAGE* for save the ePUB file
@@ -39,80 +39,3 @@ For comment / feedback / bug / suggestion / localization write to: iiizio AT use
 
 ## Download
 For sources / all apk files / donations go to sourceforge: https://sourceforge.net/p/epubator/home/Home/
-
-## History
-### v0.12  (2015-07-19)
-- Added cover image
-- Added save in Download
-- Added quick help
-- Added share ePUB
-- Updated iText lib and support library
-- Fixed some bugs
-
-### v0.11  (2013-04-07)
-- Added open with ePUBator
-- Added recent folder selector
-- Added dummy entry for first page
-- Added support library
-- Updated iText lib to 5.4.0
-- Some minor fix and improvements
-
-### v0.10  (2012-12-22)
-- Improved TOC extraction
-- Fixed close on rotate
-- Updated iText lib to 5.3.5
-
-### v0.9  (2012-09-26)
-- Fixed some bugs
-- Updated iText lib to 5.3.3
-
-### v0.8.1  (2012-07-24)
-- Fixed null string bug
-
-### v0.8  (2012-07-23)
-- Added TOC extraction
-- Fixed creator bug
-- Code optimization
-- Updated iText lib to 5.3.0
-
-### v0.7  (2012-05-21)
-- Fixed title bug (bad ePUB)
-- Updated iText lib to 5.2.1
-- Some Lint optimizations
-
-### v0.6  (2012-03-04)
-- Added images in preview
-- Added progress bar
-- Added some prefs
-- Improved file chooser
-- Some bug fix
-
-### v0.5  (2012-01-09)
-- Added images extraction
-- Added preferences
-- Improved memory management
-- Some little fix
-
-### v0.4  (2011-12-24)
-- Added frontpage
-- Added landscape layout
-- Added shows extraction failure in progress dialog
-- Fixed filechooser bug (sdcard not readable)
-- Fixed preview bug
-- Updated iText lib to 5.1.3
-
-### v0.3  (2011-11-24)
-- Added preview
-- Added notification
-- Added possibility to stop conversion
-- Enabled 'Move to SD'
-- Differentiate error and page lost marker
-- Code optimization
-
-### v0.2  (2011-11-08)
-- Added 'keep errored file' dialog
-- Added marker on error
-- Fixed a buffer overflow and some minor bugs
-
-### v0.1  (2011-11-01)
-- Initial release
