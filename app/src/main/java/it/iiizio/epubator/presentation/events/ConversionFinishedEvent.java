@@ -1,25 +1,31 @@
 package it.iiizio.epubator.presentation.events;
 
-public class ConversionFinishedEvent {
+import it.iiizio.epubator.presentation.dto.ConversionSettings;
 
-    private final int result;
+public class ConversionFinishedEvent extends ConversionStatusChangedEvent {
+
     private final boolean requestAction;
+    private final ConversionSettings settings;
 
-    public ConversionFinishedEvent(int result, boolean requestAction) {
-        this.result = result;
+    public ConversionFinishedEvent(int result, ConversionSettings settings, boolean requestAction) {
+        super(result);
         this.requestAction = requestAction;
+        this.settings = settings;
     }
 
-    public ConversionFinishedEvent(int result) {
-        this(result, false);
+    public ConversionFinishedEvent(int result, ConversionSettings settings) {
+        this(result, settings, false);
     }
-
 
     public int getResult() {
-        return result;
+        return getConversionStatus();
     }
 
     public boolean actionRequested(){
         return requestAction;
+    }
+
+    public ConversionSettings getSettings() {
+        return settings;
     }
 }

@@ -18,35 +18,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" xmlns:tools="http://schemas.android.com/tools" tools:ignore="NestedWeights">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools" tools:ignore="NestedWeights">
 
     <include layout="@layout/conversion_summary"/>
 
-    <ScrollView
-        android:id="@+id/scroll"
-        android:layout_width="0dip"
-        android:layout_height="match_parent"
-        android:layout_weight="1" >
-
-        <TextView
-            android:id="@+id/progress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/activity_padding"/>
-    </ScrollView>
-
     <LinearLayout
-        style="@style/ButtonBarStyle.Landscape" >
-        
-        <Button
-            style="@style/ButtonBarButtonStyle"
-            android:id="@+id/ok"
-            android:text="@string/ok" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ScrollView
+            android:id="@+id/scroll"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="1" >
 
-        <Button
-            style="@style/ButtonBarButtonStyle"
-            android:id="@+id/stop"
-            android:text="@string/stop" />
+            <TextView
+                android:id="@+id/progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/activity_padding"/>
+        </ScrollView>
+
+        <LinearLayout
+            style="@style/ButtonBarStyle.Landscape" >
+
+            <Button
+                style="@style/ButtonBarButtonStyle"
+                android:id="@+id/ok"
+                android:text="@string/ok" />
+
+            <Button
+                style="@style/ButtonBarButtonStyle"
+                android:id="@+id/stop"
+                android:text="@string/stop" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

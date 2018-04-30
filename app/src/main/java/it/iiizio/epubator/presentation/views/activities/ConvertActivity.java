@@ -63,10 +63,8 @@ public class ConvertActivity extends AppCompatActivity {
 	private static Button bt_ok;
 	private static Button bt_stopConversion;
 
-	private static boolean conversionInProgress = false;
 	private static int result;
 
-	private static ConversionPreferences preferences;
 	private static ConversionSettings settings;
 	private ConvertPresenter presenter;
 	//</editor-fold>
@@ -75,19 +73,24 @@ public class ConvertActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_conversion);
+
 		presenter = new ConvertPresenterImpl();
-		sv_progress = (ScrollView)findViewById(R.id.scroll);
-		tv_progress = (TextView) findViewById(R.id.progress);
-		setupButtons();
 
-		getPrefs();
+		setupElements();
 
-		if (conversionInProgress) {
+		ConversionPreferences preferences = getPreferences();
+
+		boolean startConversion = getIntent().getBooleanExtra(BundleKeys.START_CONVERSION, false);
+		if(startConversion){
+			updateResult(ConversionStatus.NOT_STARTED);
+			getIntent().removeExtra(BundleKeys.START_CONVERSION);
+		}
+
+		if (conversionInProgress() || conversionFinished()) {
 			updateButtonStates();
 			return;
 		}
 
-		result = ConversionStatus.NOT_STARTED;
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
 			Toast.makeText(this, getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
@@ -113,7 +116,7 @@ public class ConvertActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 		EventBus.getDefault().register(this);
-        getPrefs();
+        getPreferences();
 		setupConversionSummary(settings);
     }
 
@@ -135,8 +138,7 @@ public class ConvertActivity extends AppCompatActivity {
 		String conversionFinishedText = BundleHelper.getExtraStringOrDefault(intent.getExtras(), BundleKeys.CONVERSION_TEXT);
 		if(conversionFinishedText!=null){
 			updateProgressText(conversionFinishedText);
-			conversionInProgress = false;
-			updateButtonStates();
+			updateButtonStates(false);
 			return;
 		}
 	}
@@ -148,19 +150,18 @@ public class ConvertActivity extends AppCompatActivity {
 
 	@Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
 	public void onConversionStatusChanged(ConversionStatusChangedEvent event){
-		result = event.getConversionStatus();
+		updateResult(event.getConversionStatus());
 		updateConversionStatus(result);
+		updateButtonStates();
 	}
 
 	@Subscribe(threadMode = ThreadMode.MAIN)
 	public void onConversionFinished(ConversionFinishedEvent event){
-		conversionInProgress = false;
-		result = event.getResult();
+		updateResult(event.getResult());
 		updateButtonStates();
 		if(event.actionRequested()){
-			handleConvertedFileAfterError();
+			handleConvertedFileAfterError(event.getSettings());
 		}
-		updateConversionStatus(result);
 	}
 
 	//<editor-fold desc="Private methods">
@@ -172,19 +173,19 @@ public class ConvertActivity extends AppCompatActivity {
 	/**
 	 * Ask user what to do with the converted file after there has been any error
 	 */
-	private void handleConvertedFileAfterError(){
+	private void handleConvertedFileAfterError(final ConversionSettings settings){
 		new AlertDialog.Builder(ConvertActivity.this)
 			.setTitle(getResources().getString(R.string.extraction_error))
 			.setMessage(getResources().getString(R.string.keep_epub_file))
 			.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
-					keepEpub();
+					keepEpub(settings);
 					// TODO: Update the notification (remove action requested)
 				}
 			})
 			.setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
-					deleteTemporalFile();
+					deleteTemporalFile(settings);
 					// TODO: Update the notification (remove action requested)
 				}
 			})
@@ -208,8 +209,8 @@ public class ConvertActivity extends AppCompatActivity {
 			return; // Service already started
 		}
 
-		result = ConversionStatus.IN_PROGRESS;
-		conversionInProgress = true;
+		EventBus.getDefault().postSticky(new ProgressUpdateEvent());
+		updateResult(ConversionStatus.IN_PROGRESS);
 		updateButtonStates();
 		Intent conversionServiceIntent = new Intent(this, ConversionService.class);
 		conversionServiceIntent.putExtra(BundleKeys.CONVERSION_SETTINGS, settings);
@@ -227,32 +228,33 @@ public class ConvertActivity extends AppCompatActivity {
 		updateConversionStatus(result);
 	}
 
-	private void setupButtons() {
-		bt_ok = (Button)findViewById(R.id.ok);
-		bt_stopConversion = (Button)findViewById(R.id.stop);
+	private void setupElements() {
+		sv_progress = (ScrollView) findViewById(R.id.scroll);
+		tv_progress = (TextView) findViewById(R.id.progress);
+
+		bt_ok = (Button) findViewById(R.id.ok);
+		bt_stopConversion = (Button) findViewById(R.id.stop);
 
 		bt_ok.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				conversionInProgress = false;
 				finish();
 			}
 		});
 		bt_stopConversion.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				result = ConversionStatus.CONVERSION_STOPPED_BY_USER;
+				updateResult(ConversionStatus.CONVERSION_STOPPED_BY_USER);
 				EventBus.getDefault().post(new ConversionCanceledEvent(result));
-				conversionInProgress = false;
 				updateButtonStates();
 			}
 		});
 	}
 
-	private void getPrefs() {
+	private ConversionPreferences getPreferences() {
 		PreferencesHelper prefs = new PreferencesHelper(this);
 
-		preferences = new ConversionPreferences();
+		ConversionPreferences preferences = new ConversionPreferences();
 		preferences.includeImages = prefs.getBoolean(PreferencesKeys.ADD_EXTRACTED_IMAGES_FROM_PDF, true);
 		preferences.repeatedImages = prefs.getBoolean(PreferencesKeys.ADD_REPEATED_IMAGES);
 		preferences.pagesPerFile = prefs.getParsedString(PreferencesKeys.PAGES_PER_FILE, 5);
@@ -261,14 +263,20 @@ public class ConvertActivity extends AppCompatActivity {
 		preferences.tocFromPdf = prefs.getBoolean(PreferencesKeys.TRY_TO_EXTRACT_TOC_FROM_PDF, true);
 		preferences.showLogoOnCover = prefs.getBoolean(PreferencesKeys.HAVE_LOGO_ON_COVER, true);
 		preferences.saveOnDownloadDirectory = prefs.getBoolean(PreferencesKeys.SAVE_ALWAYS_ON_DOWNLOAD_DIRECTORY);
+
+		return preferences;
 	}
 
 	private void updateButtonStates() {
+		updateButtonStates(conversionInProgress());
+	}
+
+	private void updateButtonStates(boolean conversionInProgress) {
 		bt_ok.setEnabled(!conversionInProgress); // Ok button only enabled before or after conversion
 		bt_stopConversion.setEnabled(conversionInProgress); // Stop button only enabled during conversion
 	}
 
-	private void deleteTemporalFile() {
+	private void deleteTemporalFile(ConversionSettings settings) {
 		boolean exists = presenter.deleteTemporalFile(settings);
 		if (exists) {
 			updateProgressText(getResources().getString(R.string.kept_old_epub));
@@ -277,9 +285,9 @@ public class ConvertActivity extends AppCompatActivity {
 		}
 	}
 
-	private void keepEpub() {
+	private void keepEpub(ConversionSettings settings) {
 		updateProgressText("\n" + getResources().getStringArray(R.array.conversion_result_message)[ConversionStatus.SUCCESS] + "\n");
-		if (preferences.addMarkers) {
+		if (settings.getPreferences().addMarkers) {
 			String pageNumberString = getResources().getString(R.string.pagenumber, ">>\n");
 			updateProgressText(getResources().getString(R.string.errors_are_marked_with, "<<@") + pageNumberString);
 			updateProgressText(getResources().getString(R.string.lost_pages_are_marked_with, "<<#") + pageNumberString);
@@ -300,6 +308,23 @@ public class ConvertActivity extends AppCompatActivity {
 			}
 		});
 	}
+
+	private boolean conversionInProgress(){
+		if(result == ConversionStatus.IN_PROGRESS){
+			return true;
+		}
+		if(result == ConversionStatus.LOADING_FILE){
+			return true;
+		}
+		return false;
+	}
+
+	private boolean conversionFinished(){
+		return result == ConversionStatus.SUCCESS;
+	}
+
+	private void updateResult(int result){
+		this.result = result;
+	}
 	//</editor-fold>
 }
-;

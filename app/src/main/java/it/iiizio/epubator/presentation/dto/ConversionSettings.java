@@ -14,7 +14,7 @@ public class ConversionSettings implements Serializable {
     public final String tempFilename;
     public final String coverFile;
     public final String temporalPath;
-    public final ConversionPreferences preferences;
+    private final ConversionPreferences preferences;
 
     private final String EPUB_EXT = " - ePUBator.epub";
     private final String OLD_EXT = " - ePUBator.old";

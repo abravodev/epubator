@@ -219,6 +219,7 @@ public class ConversionService extends Service {
 
         @Override
         protected void onPostExecute(Integer result) {
+            EventBus.getDefault().postSticky(new ConversionStatusChangedEvent(result));
             if(result == ConversionStatus.SUCCESS){
                 presenter.saveEpub(settings);
             } else if (result == ConversionStatus.EXTRACTION_ERROR) {
@@ -228,13 +229,13 @@ public class ConversionService extends Service {
                     deleteTemporalFile();
                 } else {
                     // TODO: Update the notification, to request action when tapped
-                    EventBus.getDefault().post(new ConversionFinishedEvent(result, true));
+                    EventBus.getDefault().post(new ConversionFinishedEvent(result, settings, true));
                     return;
                 }
             } else {
                 deleteTemporalFile();
             }
-            EventBus.getDefault().post(new ConversionFinishedEvent(result));
+            EventBus.getDefault().post(new ConversionFinishedEvent(result, settings));
 			finishConversion(result);
         }
 

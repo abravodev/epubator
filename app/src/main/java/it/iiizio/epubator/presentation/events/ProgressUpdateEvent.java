@@ -8,6 +8,10 @@ public class ProgressUpdateEvent {
         this.message = message;
     }
 
+    public ProgressUpdateEvent() {
+        this.message = "";
+    }
+
     public String getMessage() {
         return message;
     }

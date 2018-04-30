@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
 		Intent convert = new Intent(MainActivity.this, ConvertActivity.class);
 		convert.putExtra(BundleKeys.FILENAME, filename);
 		convert.putExtra(BundleKeys.COVER, coverFile);
+		convert.putExtra(BundleKeys.START_CONVERSION, true);
 		startActivity(convert);
 	}
 
