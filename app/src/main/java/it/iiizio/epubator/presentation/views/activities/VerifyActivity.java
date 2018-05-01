@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package it.iiizio.epubator.presentation.views.activities;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -72,8 +71,7 @@ public class VerifyActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_verify);
 		presenter = new VerifyPresenterImpl();
 
-		setupWebView();
-		setupPageButtons();
+		setupElements();
 
 		// Initialize
 		fillPageList();
@@ -82,6 +80,11 @@ public class VerifyActivity extends AppCompatActivity {
 		}
 
 		changeHtmlFile(0);
+	}
+
+	private void setupElements() {
+		setupWebView();
+		setupPageButtons();
 	}
 
 	@Override
@@ -94,31 +97,25 @@ public class VerifyActivity extends AppCompatActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.index:
-				showDialog(0);
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
+		if(item.getItemId() == R.id.index){
+			openIndexDialog();
 		}
+		return true;
 	}
 
-	@Override
-	public Dialog onCreateDialog(int id) {
+	private void openIndexDialog(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(VerifyActivity.this);
 		builder.setTitle(R.string.index)
 			.setItems(chapters.toArray(new CharSequence[chapters.size()]), new DialogInterface.OnClickListener() {
-			// Move to selected chapter
-			public void onClick(DialogInterface dialog, int which) {
+					// Move to selected chapter
+					public void onClick(DialogInterface dialog, int which) {
 				String[] links = anchors.get(which).split("#");
-				if (links.length > 1)
-					anchor = links[1];
-				else
-					anchor = null;
+				anchor = links.length > 1 ? links[1] : null;
 				changeHtmlFile(htmlList.indexOf(links[0]) - htmlIndex + 1);
-			}
-		});
-		return builder.create();
+				}
+			})
+			.create()
+			.show();
 	}
 
 	@Override

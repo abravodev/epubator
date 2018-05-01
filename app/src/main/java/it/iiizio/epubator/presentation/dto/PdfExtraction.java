@@ -45,7 +45,7 @@ public class PdfExtraction {
     }
 
     public String buildPage(int pageIndex){
-        build.addPage(pageIndex);
+        build.pageAdded(pageIndex);
         StringBuilder pageText = new StringBuilder();
 
         int endPage = Math.min(pageIndex + pagesPerFile - 1, pages);

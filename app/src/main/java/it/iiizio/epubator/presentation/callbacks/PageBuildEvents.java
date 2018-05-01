@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 
 public interface PageBuildEvents {
 
-    void addPage(int page);
+    void pageAdded(int page);
 
     void pageFailure(int j);
 
