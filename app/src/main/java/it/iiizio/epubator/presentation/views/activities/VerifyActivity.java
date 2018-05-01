@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -46,8 +47,9 @@ import it.iiizio.epubator.presentation.utils.PreferencesHelper;
 
 public class VerifyActivity extends AppCompatActivity {
 
+	private static final int DEFAULT_FIRST_PAGE = 1;
 	private static ZipFile epubFile = null;
-	private static int currentPageIndex = 1;
+	private static int currentPageIndex = DEFAULT_FIRST_PAGE;
 	private Book book;
 	private String anchor;
 
@@ -134,7 +136,6 @@ public class VerifyActivity extends AppCompatActivity {
 	private void setupWebView() {
 		wv_verifyEpub = (WebView) findViewById(R.id.webview);
 		wv_verifyEpub.setBackgroundColor(0);
-		wv_verifyEpub.getSettings().setUseWideViewPort(true);
 		wv_verifyEpub.setWebViewClient(new WebViewClient() {
 			public void onPageFinished(final WebView view, final String url) {
 				// make it jump to the internal link
@@ -144,6 +145,13 @@ public class VerifyActivity extends AppCompatActivity {
 				}
 			}
 		});
+
+		WebSettings webSettings = wv_verifyEpub.getSettings();
+		webSettings.setJavaScriptEnabled(false);
+		webSettings.setUseWideViewPort(true);
+		webSettings.setLoadWithOverviewMode(true);
+		webSettings.setSupportZoom(true);
+		webSettings.setBuiltInZoomControls(true);
 	}
 
 	private void setupBook() {
@@ -189,7 +197,6 @@ public class VerifyActivity extends AppCompatActivity {
 	}
 
 	private void showPage(String htmlFile) {
-		wv_verifyEpub.getSettings().setJavaScriptEnabled(false);
 		wv_verifyEpub.clearView();
 
 		String htmlPage = null;
@@ -237,6 +244,7 @@ public class VerifyActivity extends AppCompatActivity {
 	}
 
 	private void exitEpubVerification() {
+		currentPageIndex = DEFAULT_FIRST_PAGE;
 		closeEpub();
 		removeFiles();
 		finish();

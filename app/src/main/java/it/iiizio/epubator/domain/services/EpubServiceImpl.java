@@ -85,10 +85,7 @@ public class EpubServiceImpl implements EpubService {
 
 	@Override
 	public String getHtmlPage(ZipFile epubFile, String htmlFile) throws IOException {
-		String htmlPage = getElement(epubFile, htmlFile);
-		return htmlPage
-			.replace("<body>", "<body bgcolor=\"Black\"><font color=\"White\">")
-			.replace("</body>", "</font></body>");
+		return getElement(epubFile, htmlFile);
 	}
 
 	private List<String> getPages(ZipFile epubFile) {

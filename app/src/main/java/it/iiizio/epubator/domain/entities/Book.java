@@ -36,10 +36,6 @@ public class Book {
         return links.length > 1 ? links[1] : null;
     }
 
-    public List<String> getPages() {
-        return pages;
-    }
-
     public int getPagesCount(){
         return pages.size();
     }
