@@ -12,7 +12,7 @@ public interface PageBuildEvents {
 
     void noTocFoundInThePdfFile();
 
-    void createdDummyToc();
+    void dummyTocCreated();
 
     void tocExtractedFromPdfFile();
 

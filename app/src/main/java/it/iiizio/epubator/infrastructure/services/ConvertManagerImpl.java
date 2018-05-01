@@ -17,6 +17,8 @@ import java.io.File;
 
 import it.iiizio.epubator.domain.constants.ConversionStatus;
 import it.iiizio.epubator.domain.constants.ZipFileConstants;
+import it.iiizio.epubator.domain.entities.Chapter;
+import it.iiizio.epubator.domain.entities.FrontCoverDetails;
 import it.iiizio.epubator.domain.exceptions.ConversionException;
 import it.iiizio.epubator.domain.utils.HtmlHelper;
 import it.iiizio.epubator.domain.utils.PdfReadHelper;
@@ -24,18 +26,23 @@ import it.iiizio.epubator.domain.utils.XMLParser;
 import it.iiizio.epubator.domain.utils.ZipWriter;
 import it.iiizio.epubator.presentation.callbacks.PageBuildEvents;
 import it.iiizio.epubator.presentation.dto.ConversionPreferences;
-import it.iiizio.epubator.presentation.dto.PdfExtraction;
 import it.iiizio.epubator.presentation.dto.ConversionSettings;
+import it.iiizio.epubator.presentation.dto.PdfExtraction;
 import it.iiizio.epubator.presentation.utils.BitmapHelper;
 
 public class ConvertManagerImpl implements ConvertManager {
 
+    //<editor-fold desc="Attributes">
     private final PageBuildEvents pageBuildEvents;
+    //</editor-fold>
 
-    public ConvertManagerImpl(PageBuildEvents view) {
-        this.pageBuildEvents = view;
+    //<editor-fold desc="Constructors">
+    public ConvertManagerImpl(PageBuildEvents buildEvents) {
+        this.pageBuildEvents = buildEvents;
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Public methods">
     @Override
     public void loadPdfFile(String pdfFilename) throws ConversionException {
         if (!(new File(pdfFilename).exists())) {
@@ -94,45 +101,20 @@ public class ConvertManagerImpl implements ConvertManager {
 
     @Override
     public void addFrontpageCover(String bookFilename, String coverImageFilename, boolean showLogoOnCover) throws ConversionException {
-        final int maxWidth = 300;
-        final int maxHeight = 410;
-        final int border = 10;
-        final int fontsize = 48;
+        FrontCoverDetails coverDetails = new FrontCoverDetails();
 
-        // Grey background
-        Bitmap bmp = Bitmap.createBitmap(maxWidth, maxHeight, Bitmap.Config.RGB_565);
-        Paint paint  = new Paint();
+        Bitmap bitmap = Bitmap.createBitmap(coverDetails.getWidth(), coverDetails.getHeight(), Bitmap.Config.RGB_565);
+        Paint paint = new Paint();
         paint.setColor(Color.LTGRAY);
-        Canvas coverImage = new Canvas(bmp);
-        coverImage.drawRect(0, 0, maxWidth, maxHeight, paint);
+        Canvas coverImage = new Canvas(bitmap);
+        coverImage.drawRect(0, 0, coverDetails.getWidth(), coverDetails.getHeight(), paint);
 
-        // Load image
-        Bitmap coverImageFile = null;
-        if (coverImageFilename != "") {
-            // Get dimensions
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(coverImageFilename, options);
-
-            // Get image
-            options.inSampleSize = BitmapHelper.calculateInSampleSize(options, maxWidth, maxHeight);
-            options.inJustDecodeBounds = false;
-            coverImageFile = BitmapFactory.decodeFile(coverImageFilename, options);
+        boolean coverImageAdded = addSelectedCoverImage(coverImageFilename, coverImage, coverDetails);
+        if(!coverImageAdded) {
+            addDefaultCover(bookFilename, showLogoOnCover, coverDetails, paint, coverImage);
         }
 
-        if (coverImageFile != null) {
-            coverImage.drawBitmap(coverImageFile, null , new Rect(0, 0, maxWidth, maxHeight), new Paint(Paint.FILTER_BITMAP_FLAG));
-            pageBuildEvents.coverWithImageCreated();
-        } else {
-            if (showLogoOnCover) {
-                addDefaultLogo(maxWidth, maxHeight, coverImage);
-            }
-
-            addTitleAsCover(bookFilename, maxWidth, border, fontsize, paint, coverImage);
-            pageBuildEvents.coverWithTitleCreated();
-        }
-
-        boolean error = saveBmpAsPng(bmp);
+        boolean error = saveBitmapAsPng(bitmap);
         if(error){
             throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
         }
@@ -182,6 +164,19 @@ public class ConvertManagerImpl implements ConvertManager {
         }
         return false;
     }
+    //</editor-fold>
+
+    //<editor-fold desc="Private methods">
+    private BitmapFactory.Options getBitmapOptions(String coverImageFilename, int maxWidth, int maxHeight) {
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(coverImageFilename, options);
+
+        // Get image
+        options.inSampleSize = BitmapHelper.calculateInSampleSize(options, maxWidth, maxHeight);
+        options.inJustDecodeBounds = false;
+        return options;
+    }
 
     private void addPage(int page, String text) throws ConversionException {
         String htmlText = HtmlHelper.getBasicHtml("page" + page, text.replaceAll("<br/>(?=[a-z])", "&nbsp;"));
@@ -191,7 +186,7 @@ public class ConvertManagerImpl implements ConvertManager {
         }
     }
 
-    private String buildToc(int pages, String tocId, String title, boolean tocFromPdf, int pagesPerFile) {
+    private String buildToc(int pages, String tocId, String bookTitle, boolean getTocFromPdf, int pagesPerFile) {
         StringBuilder toc = new StringBuilder();
         toc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         toc.append("<!DOCTYPE ncx PUBLIC \"-//NISO//DTD ncx 2005-1//EN\"\n");
@@ -204,7 +199,7 @@ public class ConvertManagerImpl implements ConvertManager {
         toc.append("        <meta name=\"dtb:maxPageNumber\" content=\"0\"/>\n");
         toc.append("    </head>\n");
         toc.append("    <docTitle>\n");
-        toc.append("        <text>" + title + "</text>\n");
+        toc.append("        <text>" + bookTitle + "</text>\n");
         toc.append("    </docTitle>\n");
         toc.append("    <navMap>\n");
         toc.append("        <navPoint id=\"navPoint-1\" playOrder=\"1\">\n");
@@ -216,84 +211,100 @@ public class ConvertManagerImpl implements ConvertManager {
 
         int playOrder = 2;
         boolean extractedToc = false;
-        if (tocFromPdf) {
-            // Try to extract toc from pdf
+        if (getTocFromPdf) {
             XMLParser parser = new XMLParser();
-            Document doc = parser.getDomElement(PdfReadHelper.getBookmarks());
-            if (doc != null) {
-                doc.normalize();
-                NodeList nl = doc.getElementsByTagName("Title");
-                if (nl != null) {
-                    int lastPage = Integer.MAX_VALUE;
-                    StringBuilder sb = new StringBuilder();
-                    // looping through all item nodes <item>
-                    for (int i = 0; i < nl.getLength(); i++) {
-                        Element e = (Element) nl.item(i);
-                        String action = parser.getValue(e, "Action");
-                        if (action.equals("GoTo")) {
-                            String chapter = parser.getElementValue(e).trim();
-                            try {
-                                int page = Integer.parseInt(parser.getValue(e, "Page").split(" ")[0]);
-
-                                // First entry not in page one, create a dummy one
-                                if ((lastPage == Integer.MAX_VALUE) && (page > 1))
-                                {
-                                    sb.append(title);
-                                    sb.append("\n");
-                                    lastPage = 1;
-                                }
-
-                                // Add entry in toc
-                                if (page > lastPage) {
-                                    String entry = buildXmlEntry(pagesPerFile, lastPage, playOrder, sb);
-                                    toc.append(entry);
-                                    playOrder += 1;
-
-                                    sb = new StringBuilder();
-                                }
-
-                                // Set next entry
-                                sb.append(chapter);
-                                sb.append("\n");
-                                lastPage = page;
-                            } catch (RuntimeException ex) {
-                                System.err.println("RuntimeException in xml extraction " + ex.getMessage());
-                            }
-                        }
-                        extractedToc = true;
-                    }
-
-                    // Add last entry
-                    if (sb.length() > 0) {
-                        String entry = buildXmlEntry(pagesPerFile, lastPage, playOrder, sb);
-                        toc.append(entry);
-                    }
-                }
+            NodeList nodes = getNodes(parser, PdfReadHelper.getBookmarks());
+            if (nodes != null) {
+                extractedToc = nodes.getLength()>0;
+                String tocFromPdf = buildTocFromPdf(nodes, parser, bookTitle, pagesPerFile, playOrder);
+                toc.append(tocFromPdf);
             }
         }
 
         if(extractedToc){
             pageBuildEvents.tocExtractedFromPdfFile();
         } else {
-            if(tocFromPdf) {
+            if(getTocFromPdf) {
                 pageBuildEvents.noTocFoundInThePdfFile();
             }
-            pageBuildEvents.createdDummyToc();
-
-            for(int i = 1; i <= pages; i += pagesPerFile) {
-                toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
-                toc.append("            <navLabel>\n");
-                toc.append("                <text>Page" + i + "</text>\n");
-                toc.append("            </navLabel>\n");
-                toc.append("            <content src=\"page" + i + ".html\"/>\n");
-                toc.append("        </navPoint>\n");
-                playOrder += 1;
-            }
+            String dummyToc = buildDummyToc(pages, pagesPerFile, playOrder);
+            toc.append(dummyToc);
+            pageBuildEvents.dummyTocCreated();
         }
 
         toc.append("    </navMap>\n");
         toc.append("</ncx>\n");
         return toc.toString();
+    }
+
+    private String buildTocFromPdf(NodeList nodes, XMLParser parser, String bookTitle, int pagesPerFile, int playOrder){
+        int lastPage = Integer.MAX_VALUE;
+        StringBuilder toc = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
+
+        // looping through all item nodes <item>
+        for (int i = 0; i < nodes.getLength(); i++) {
+            try {
+				Element chapterElement = (Element) nodes.item(i);
+				Chapter chapter = Chapter.make(parser, chapterElement);
+				if(chapter==null){
+					continue;
+				}
+
+				// First entry not in page one, create a dummy one
+                if ((lastPage == Integer.MAX_VALUE) && (chapter.getPageIndex() > 1)) {
+                    sb.append(bookTitle).append("\n");
+                    lastPage = 1;
+                }
+
+                // Add entry in toc
+                if (chapter.getPageIndex() > lastPage) {
+                    String entry = buildXmlEntry(pagesPerFile, lastPage, playOrder, sb);
+                    toc.append(entry);
+                    playOrder++;
+
+                    sb = new StringBuilder();
+                }
+
+                // Set next entry
+                sb.append(chapter.getTitle());
+                sb.append("\n");
+                lastPage = chapter.getPageIndex();
+            } catch (RuntimeException ex) {
+                System.err.println("RuntimeException in xml extraction " + ex.getMessage());
+            }
+
+        }
+
+        // Add last entry
+        if (sb.length() > 0) {
+            String entry = buildXmlEntry(pagesPerFile, lastPage, playOrder, sb);
+            toc.append(entry);
+        }
+
+        return toc.toString();
+    }
+
+    private String buildDummyToc(int pages, int pagesPerFile, int playOrder){
+        StringBuilder toc = new StringBuilder();
+        for(int i = 1; i <= pages; i += pagesPerFile) {
+            String entryText = String.format("Page %d", i);
+            String entryContentSource = String.format("page%d.html", i);
+            String entry = buildXmlEntry(playOrder, entryText, entryContentSource);
+            toc.append(entry);
+            playOrder++;
+        }
+        return toc.toString();
+    }
+
+    private NodeList getNodes(XMLParser parser, String bookmarks){
+        Document doc = parser.getDomElement(bookmarks);
+        if (doc == null) {
+            return null;
+        }
+
+        doc.normalize();
+        return doc.getElementsByTagName("Title");
     }
 
     private String buildContainer() {
@@ -354,36 +365,74 @@ public class ConvertManagerImpl implements ConvertManager {
     }
 
     private String buildXmlEntry(int pagesPerFile, int lastPage, int playOrder, StringBuilder sb){
-        StringBuilder toc  = new StringBuilder();
+        int pageFile = getPageFile(pagesPerFile, lastPage);
+        String contentSource = String.format("page%d.html#page%d", pageFile, lastPage);
+        return buildXmlEntry(playOrder, sb.toString(), contentSource);
+    }
 
-        int pageFile = pageFile(pagesPerFile, lastPage);
+    private String buildXmlEntry(int playOrder, String text, String contentSource){
+        StringBuilder toc = new StringBuilder();
+
         toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
         toc.append("            <navLabel>\n");
-        toc.append("                <text>" + sb.toString() + "                </text>\n");
+        toc.append("                <text>" + text + "                </text>\n");
         toc.append("            </navLabel>\n");
-        toc.append("            <content src=\"page" + pageFile + ".html#page" + lastPage + "\"/>\n");
+        toc.append("            <content src=\"" + contentSource + "\"/>\n");
         toc.append("        </navPoint>\n");
 
         return toc.toString();
     }
 
-    private int pageFile(int pagesPerFile, int lastPage){
+    private int getPageFile(int pagesPerFile, int lastPage){
         return ((lastPage - 1) / pagesPerFile) * pagesPerFile + 1;
     }
 
-    private void addDefaultLogo(int maxWidth, int maxHeight, Canvas coverImage) {
-        Bitmap coverImageFile = pageBuildEvents.getAppLogo();
-        coverImage.drawBitmap(coverImageFile, maxWidth - coverImageFile.getWidth(), maxHeight - coverImageFile.getHeight(), new Paint(Paint.FILTER_BITMAP_FLAG));
+    private boolean addSelectedCoverImage(String coverImageFilename, Canvas coverImage, FrontCoverDetails coverDetails){
+        if(coverImageFilename.equals("")){
+            return false;
+        }
+
+        final BitmapFactory.Options options = getBitmapOptions(coverImageFilename, coverDetails.getWidth(), coverDetails.getHeight());
+        Bitmap coverImageFile = BitmapFactory.decodeFile(coverImageFilename, options);
+
+        if(coverImageFile == null){
+            return false;
+        }
+
+        coverImage.drawBitmap(coverImageFile,
+                null,
+                new Rect(0, 0, coverDetails.getWidth(), coverDetails.getHeight()),
+                new Paint(Paint.FILTER_BITMAP_FLAG));
+        pageBuildEvents.coverWithImageCreated();
+
+        return true;
     }
 
-    private boolean saveBmpAsPng(Bitmap bmp) {
+    private void addDefaultCover(String bookFilename, boolean showLogoOnCover, FrontCoverDetails coverDetails, Paint paint, Canvas coverImage) {
+        if (showLogoOnCover) {
+            paintLogoOnTheCover(coverDetails, coverImage);
+        }
+
+        paintTitleOnTheCover(bookFilename, coverDetails, paint, coverImage);
+        pageBuildEvents.coverWithTitleCreated();
+    }
+
+    private void paintLogoOnTheCover(FrontCoverDetails coverDetails, Canvas coverImage) {
+        Bitmap coverImageFile = pageBuildEvents.getAppLogo();
+        coverImage.drawBitmap(coverImageFile,
+                coverDetails.getWidth() - coverImageFile.getWidth(),
+                coverDetails.getHeight()- coverImageFile.getHeight(),
+                new Paint(Paint.FILTER_BITMAP_FLAG));
+    }
+
+    private boolean saveBitmapAsPng(Bitmap bmp) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
         return ZipWriter.addImage(ZipFileConstants.FRONTPAGE_IMAGE, outputStream.toByteArray());
     }
 
-    private void addTitleAsCover(String bookFilename, int maxWidth, int border, int fontsize, Paint paint, Canvas coverImage) {
-        paint.setTextSize(fontsize);
+    private void paintTitleOnTheCover(String bookFilename, FrontCoverDetails coverDetails, Paint paint, Canvas coverImage) {
+        paint.setTextSize(coverDetails.getFontSize());
         paint.setColor(Color.BLACK);
         paint.setAntiAlias(true);
         paint.setStyle(Paint.Style.FILL);
@@ -391,30 +440,30 @@ public class ConvertManagerImpl implements ConvertManager {
         String[] words = getTitleWords(bookFilename);
 
         float newline = paint.getFontSpacing();
-        float x = border;
+        float x = coverDetails.getBorder();
         float y = newline;
 
-        for (String word : words) {
-            float len = paint.measureText(word + " ");
+        for (String word: words) {
+            float wordLength = paint.measureText(word + " ");
 
             // Line wrap
-            if ((x > border) && ((x + len) > maxWidth)) {
-                x = border;
+            if ((x > coverDetails.getBorder()) && ((x + wordLength) > coverDetails.getWidth())) {
+                x = coverDetails.getBorder();
                 y += newline;
             }
 
             // Word wrap
-            while ((x + len) > maxWidth) {
-                int maxChar = (int) (word.length() * (maxWidth - border - x) / paint.measureText(word));
+            while ((x + wordLength) > coverDetails.getWidth()) {
+                int maxChar = (int) (word.length() * (coverDetails.getWidth() - coverDetails.getBorder() - x) / paint.measureText(word));
                 coverImage.drawText(word.substring(0, maxChar), x, y, paint);
                 word = word.substring(maxChar);
-                len = paint.measureText(word + " ");
-                x = border;
+                wordLength = paint.measureText(word + " ");
+                x = coverDetails.getBorder();
                 y += newline;
             }
 
             coverImage.drawText(word, x, y, paint);
-            x += len;
+            x += wordLength;
         }
     }
 
@@ -422,5 +471,5 @@ public class ConvertManagerImpl implements ConvertManager {
         String title = bookFilename.replaceAll("_", " ");
         return title.split("\\s");
     }
-
+    //</editor-fold>
 }

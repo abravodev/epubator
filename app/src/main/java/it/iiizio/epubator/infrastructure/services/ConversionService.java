@@ -77,7 +77,6 @@ public class ConversionService extends Service implements PageBuildEvents {
 		conversionTask = new ConversionTask(settings);
         conversionTask.execute();
 
-
         startForeground(startId, makeStartNotification());
 
         return super.onStartCommand(intent, flags, startId);
@@ -116,7 +115,7 @@ public class ConversionService extends Service implements PageBuildEvents {
     }
 
     @Override
-    public void createdDummyToc() {
+    public void dummyTocCreated() {
         publishProgress(getResources().getString(R.string.create_dummy_toc));
     }
 
