@@ -38,12 +38,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         
         <Button
             style="@style/ButtonBarButtonStyle"
-            android:id="@+id/prev"
+            android:id="@+id/previous_page_button"
             android:text="@string/prev_page" />
 
         <Button
             style="@style/ButtonBarButtonStyle"
-            android:id="@+id/next"
+            android:id="@+id/next_page_button"
             android:text="@string/next_page" />
     </LinearLayout>
 

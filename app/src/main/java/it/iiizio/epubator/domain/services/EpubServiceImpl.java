@@ -32,7 +32,8 @@ public class EpubServiceImpl implements EpubService {
 
 	@Override
 	public Book getBook(ZipFile epubFile) throws IOException {
-		Book book = new Book();
+		List<String> pages = getPages(epubFile);
+		Book book = new Book(pages);
 
 		XMLParser parser = new XMLParser();
 		NodeList nodes = getNodes(epubFile, parser);
@@ -83,7 +84,14 @@ public class EpubServiceImpl implements EpubService {
 	}
 
 	@Override
-	public List<String> getPages(ZipFile epubFile) {
+	public String getHtmlPage(ZipFile epubFile, String htmlFile) throws IOException {
+		String htmlPage = getElement(epubFile, htmlFile);
+		return htmlPage
+			.replace("<body>", "<body bgcolor=\"Black\"><font color=\"White\">")
+			.replace("</body>", "</font></body>");
+	}
+
+	private List<String> getPages(ZipFile epubFile) {
 		List<String> pages = new ArrayList<>();
 		Enumeration<? extends ZipEntry> entries = epubFile.entries();
 		while(entries.hasMoreElements()){
@@ -97,13 +105,6 @@ public class EpubServiceImpl implements EpubService {
 		return pages;
 	}
 
-	@Override
-	public String getHtmlPage(ZipFile epubFile, String htmlFile) throws IOException {
-		String htmlPage = getElement(epubFile, htmlFile);
-		return htmlPage
-			.replace("<body>", "<body bgcolor=\"Black\"><font color=\"White\">")
-			.replace("</body>", "</font></body>");
-	}
 
 	private void saveImage(ZipFile epubFile, File imageDirectory, String imageName) throws IOException {
 		ZipEntry entry = epubFile.getEntry("OEBPS/" + imageName);

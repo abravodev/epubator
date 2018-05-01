@@ -20,14 +20,11 @@ package it.iiizio.epubator.presentation.views.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -35,8 +32,6 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.ZipFile;
 
 import it.iiizio.epubator.R;
@@ -52,34 +47,27 @@ import it.iiizio.epubator.presentation.utils.PreferencesHelper;
 public class VerifyActivity extends AppCompatActivity {
 
 	private static ZipFile epubFile = null;
-	private List<String> htmlList;
-	private static int htmlIndex = -1;
-	private List<String> chapters = new ArrayList<>();
-	private List<String> anchors = new ArrayList<>();
+	private static int currentPageIndex = 1;
+	private Book book;
+	private String anchor;
+
 	private WebView wv_verifyEpub;
 	private Button bt_previousPage;
 	private Button bt_nextPage;
-	private String anchor;
 
 	private VerifyPresenter presenter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_PROGRESS);
-		setProgressBarVisibility(true);
 		setContentView(R.layout.activity_verify);
+
 		presenter = new VerifyPresenterImpl();
 
 		setupElements();
+		setupBook();
 
-		// Initialize
-		fillPageList();
-		if (htmlIndex == -1) {
-			htmlIndex = 1;
-		}
-
-		changeHtmlFile(0);
+		gotoPage(currentPageIndex);
 	}
 
 	private void setupElements() {
@@ -89,9 +77,7 @@ public class VerifyActivity extends AppCompatActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.verifymenu, menu);
-		MenuItemCompat.setShowAsAction(menu.findItem(R.id.index), 1);
+		getMenuInflater().inflate(R.menu.verifymenu, menu);
 		return true;
 	}
 
@@ -106,13 +92,16 @@ public class VerifyActivity extends AppCompatActivity {
 	private void openIndexDialog(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(VerifyActivity.this);
 		builder.setTitle(R.string.index)
-			.setItems(chapters.toArray(new CharSequence[chapters.size()]), new DialogInterface.OnClickListener() {
-					// Move to selected chapter
+			.setItems(book.getChapters(), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
-				String[] links = anchors.get(which).split("#");
-				anchor = links.length > 1 ? links[1] : null;
-				changeHtmlFile(htmlList.indexOf(links[0]) - htmlIndex + 1);
-				}
+						int pageIndex = book.getPageIndex(which)+1;
+						anchor = book.getAnchor(which);
+						if(!validPage(pageIndex)){
+							// TODO: Show message (page not valid)
+							return;
+						}
+						gotoPage(pageIndex);
+					}
 			})
 			.create()
 			.show();
@@ -120,27 +109,26 @@ public class VerifyActivity extends AppCompatActivity {
 
 	@Override
 	public void onBackPressed() {
-		closeEpub();
-		exit();
+		exitEpubVerification();
 	}
 
 	private void setupPageButtons() {
-		bt_previousPage = (Button) findViewById(R.id.prev);
-		bt_nextPage = (Button) findViewById(R.id.next);
+		bt_previousPage = (Button) findViewById(R.id.previous_page_button);
+		bt_nextPage = (Button) findViewById(R.id.next_page_button);
 
-		bt_previousPage.setOnClickListener(new OnClickListener() {
+		OnClickListener pageListener = new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				changeHtmlFile(-1);
+				if(v.getId() == R.id.previous_page_button){
+					gotoPreviousPage();
+				} else {
+					gotoNextPage();
+				}
 			}
-		});
+		};
 
-		bt_nextPage.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				changeHtmlFile(+1);
-			}
-		});
+		bt_previousPage.setOnClickListener(pageListener);
+		bt_nextPage.setOnClickListener(pageListener);
 	}
 
 	private void setupWebView() {
@@ -158,60 +146,46 @@ public class VerifyActivity extends AppCompatActivity {
 		});
 	}
 
-	private void fillPageList() {
+	private void setupBook() {
 		String filename = BundleHelper.getExtraStringOrDefault(getIntent(), BundleKeys.FILENAME);
 
 		try {
 			epubFile = new ZipFile(filename);
-		} catch (Exception e) {
-			readError();
-			return;
-		}
-
-		htmlList = presenter.getPages(epubFile);
-
-		try {
-			Book book = presenter.getBook(epubFile);
-			chapters = book.getChapters();
-			anchors = book.getAnchors();
+			book = presenter.getBook(epubFile);
+			if(book.getPagesCount()==0){
+				throw new IOException("Book has no pages");
+			}
 		} catch (IOException e) {
-			readError();
+			exitEpubVerificationOnError();
 		}
 	}
 
-	private void changeHtmlFile(int diff) {
-		// No html file
-		int htlmFiles = htmlList.size();
-		if (htlmFiles == 0) {
-			closeEpub();
-			readError();
-			return;
+	private void gotoPreviousPage(){
+		if(book.hasPreviousPage(currentPageIndex)){
+			gotoPage(currentPageIndex -1);
 		}
+	}
 
-		// Move to prev/next file
-		htmlIndex += diff;
-
-		// Set buttons
-		if (htmlIndex <= 1) {
-			htmlIndex = 1;
-			bt_previousPage.setEnabled(false);
-		} else {
-			bt_previousPage.setEnabled(true);
+	private void gotoNextPage(){
+		if(book.hasNextPage(currentPageIndex)){
+			gotoPage(currentPageIndex +1);
 		}
-		if  (htmlIndex >= htlmFiles) {
-			htmlIndex = htlmFiles;
-			bt_nextPage.setEnabled(false);
-		} else {
-			bt_nextPage.setEnabled(true);
-		}
-		setProgress(htmlIndex*9999/htlmFiles);
+	}
 
-		// Set html file and position
-		String fileName = htmlList.get(htmlIndex - 1);
+	private void gotoPage(int pageIndex){
+		currentPageIndex = pageIndex;
+		bt_previousPage.setEnabled(book.hasPreviousPage(currentPageIndex));
+		bt_nextPage.setEnabled(book.hasNextPage(currentPageIndex));
+
+		String fileName = book.getPage(currentPageIndex);
 		if (anchor == null) {
-			anchor = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.lastIndexOf("."));
+			anchor = book.getAnchorFromPageName(currentPageIndex);
 		}
 		showPage(fileName);
+	}
+
+	private boolean validPage(int pageIndex){
+		return 1 <= pageIndex && pageIndex <= book.getPagesCount();
 	}
 
 	private void showPage(String htmlFile) {
@@ -222,7 +196,7 @@ public class VerifyActivity extends AppCompatActivity {
 		try {
 			htmlPage = presenter.getHtmlPage(epubFile, htmlFile);
 		} catch (IOException e) {
-			readError();
+			exitEpubVerificationOnError();
 		}
 
 		boolean showImages = showImages();
@@ -244,7 +218,6 @@ public class VerifyActivity extends AppCompatActivity {
 		}
 
 		if (!showImages) {
-			// Show page without images
 			wv_verifyEpub.loadDataWithBaseURL("app:html", htmlPage, "text/html", "utf-8", null);
 		}
 	}
@@ -258,13 +231,13 @@ public class VerifyActivity extends AppCompatActivity {
 		FileHelper.deleteFilesFromDirectory(directory);
 	}
 
-	private void readError() {
+	private void exitEpubVerificationOnError() {
 		Toast.makeText(getApplicationContext(), getResources().getString(R.string.cannot_read_file), Toast.LENGTH_SHORT).show();
-		exit();
+		exitEpubVerification();
 	}
 
-	private void exit() {
-		htmlIndex = -1;
+	private void exitEpubVerification() {
+		closeEpub();
 		removeFiles();
 		finish();
 	}
@@ -273,7 +246,7 @@ public class VerifyActivity extends AppCompatActivity {
 		try {
 			epubFile.close();
 		} catch (Exception e) {
-			readError();
+			// TODO: Show message (book could not be closed)
 		}
 	}
 }

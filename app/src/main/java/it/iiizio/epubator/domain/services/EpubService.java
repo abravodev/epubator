@@ -2,7 +2,6 @@ package it.iiizio.epubator.domain.services;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.zip.ZipFile;
 
 import it.iiizio.epubator.domain.entities.Book;
@@ -14,8 +13,6 @@ public interface EpubService {
 	void saveHtmlPage(File htmlFile, String htmlText) throws IOException;
 
 	void saveImages(ZipFile epubFile, String htmlPage, File imageDirectory);
-
-	List<String> getPages(ZipFile epubFile);
 
 	String getHtmlPage(ZipFile epubFile, String htmlFile) throws IOException;
 
