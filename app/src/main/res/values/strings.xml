@@ -19,17 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <resources>
 
     <!-- ePUBator -->
-    <string name="app_name">ePUBator</string>
+    <string name="app_name" translatable="false">ePUBator</string>
     <string name="convert_pdf">Convert PDF</string>
     <string name="verify_epub">Verify ePUB</string>
     <string name="conversion_in_progress">Conversion in progress</string>
-    <string name="wrongfile">ePUBator can only show you the preview of converted files</string>
-    <string name="quickstart_text">Tap on \"Convert PDF\", select a file and after a while you\'ll have the ePUB in the same folder or in Download folder.\n\nTap on \"Verify ePUB\" to check the result of conversion.\n\nBefore conversion you can set an image as cover in two ways:\n1) Put the image file (PNG or JPG) in the same folder and with the same name of PDF file.\n2) Enable \"Cover from gallery\" in \"Settings\" and choose the image right after selecting the PDF file.\nOtherwise ePUBator uses the PDF filename to generate the title in the frontpage, so if you dislike it you need to rename the PDF file before conversion.</string>
+    <string name="quickstart_text">Tap on Convert PDF, select a file and after a while you\'ll have the ePUB in the same folder or in Download folder.  Tap on Verify ePUB to check the result of conversion.  Before conversion you can set an image as cover in two ways: 1) Put the image file (PNG or JPG) in the same folder and with the same name of PDF file. 2) Enable Cover from gallery in Settings and choose the image right after selecting the PDF file. Otherwise ePUBator uses the PDF filename to generate the title in the frontpage, so if you dislike it you need to rename the PDF file before conversion.</string>
     
     <!-- Menu -->
     <string name="prefs">Settings</string>
-    <string name="open_epub">Open ePUB</string>
-    <string name="share_epub">Share ePUB</string>
     <string name="quickstart">Quick start</string>
     <string name="info">Information</string>
     <string name="license">License</string>
@@ -54,39 +51,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="discard_item">Discard</string>
     <string name="mark_title">Add marker</string>
     <string name="mark_summary">Mark errors and page lost</string>
-    <string name="notifi_title">Hide notification</string>
-    <string name="notifi_summary">Does Not send notification</string>
     <string name="pdftoc_title">TOC from PDF</string>
     <string name="pdftoc_summary">Try to extract the table of contents from PDF</string>
     <string name="pickapic_title">Cover from gallery</string>
     <string name="pickapic_summary">Choose an image or take the image with the same name of PDF file</string>
-    <string name="filechooser_group">File chooser</string>
-    <string name="all_files_title">Show all</string>
-    <string name="all_files_summary">Show all files</string>
-    <string name="detail_title">Hide detail</string>
-    <string name="detail_summary">Show only filenames</string>
-    <string name="verify_group">Verify</string>
-    <string name="show_images_title">Show images</string>
-    <string name="show_images_summary">Show images in Verify</string>
     <string name="logo_title">Logo on cover</string>
     <string name="logo_summary">Put ePUBator logo on cover</string>
     <string name="downloaddir_title">ePUB in Download</string>
     <string name="downloaddir_summary">Always save the ePUB file in the Download folder</string>
-    
-    <!-- FileChooser -->
-    <string name="path">Path: %s</string>
-    <string name="root">Root folder</string>
-    <string name="up">Upper folder</string>
-	<string name="folder">Folder</string>
-    <string name="recent_title">Recent folders</string>
-    <string name="recent_summary">Select one of previously visited folders</string>
-    <string name="back_title">Back</string>
-	<string name="back_summary">Go back to file chooser</string>
 
     <!-- Convert -->
     <string name="cannot_read_file">"Can't read ePUB file"</string>
-    <string name="heading">"ePUBator - ©2011 Ezio Querini\nMinimal offline PDF to ePUB converter for Android\n"</string>
-    <string name="pdf_extraction_library">"PDF extraction based on iText software library released under the AGPL license\n\n"</string>
     <string name="epub_was_deleted">ePUB file deleted</string>
     <string name="kept_old_epub">Kept old ePUB file</string>
     <string name="number_of_pages">Number of pages: %d\n</string>
@@ -99,7 +74,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="lost_pages_are_marked_with">Lost pages are marked with %s</string>
     <string name="errors_are_marked_with">Errors are marked with %s</string>
     <string name="pagenumber">PageNumber%s</string>
-    <string name="load">Loading: %s</string>
     <string name="epubfile">\nePUB file: %s</string>
     <string name="create_epub">Create ePUB file</string>
     <string name="mimetype">Add mimetype</string>

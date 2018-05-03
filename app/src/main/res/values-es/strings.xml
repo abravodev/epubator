@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="convert_pdf">Convertir PDF</string>
+    <string name="verify_epub">Verificar ePUB</string>
+    <string name="conversion_in_progress">Conversion en progreso</string>
+    <string name="quickstart_text">Pulsa en Convertir PDF, selecciona un archivo y después de un tiempo, tendrás el ePUB en la misma carpeta o en la carpeta de Descargas. Pulsa en verificar ePUB para comprobar el resultado de la conversión. Antes de la conversión, puedes configurar una imagen como la portada de dos formas: 1) Pon la imagen (PNG o JPG) en la misma carpeta y con el mismo nombre que el fichero PDF. 2) Habilita \"Portada de galería\" en Ajustes y elige la imagen después de seleccionar el PDF. De otro modo, ePUBator usa el nombre del fichero PDF para generar el título en la portada, de modo que si no te gusta el nombre, necesitas renombrar el archivo PDF antes de la conversión</string>
+    <string name="prefs">Ajustes</string>
+    <string name="quickstart">Inicio rápido</string>
+    <string name="info">Información</string>
+    <string name="license">Licencia</string>
+    <string name="my_apps">Mis apps</string>
+    <string name="prev_page">Página anterior</string>
+    <string name="next_page">Página siguiente</string>
+    <string name="index">Índice</string>
+    <string name="images_title">Incluir imágenes</string>
+    <string name="images_summary">Extraer imágenes del PDF</string>
+    <string name="repeated_title">Imágenes repetidas</string>
+    <string name="repeated_summary">Añadir cada imagen repetida</string>
+    <string name="page_title">Páginas por archivo</string>
+    <string name="page_summary">Número de páginas del PF por archivo</string>
+    <string name="error_title">ePUB con error</string>
+    <string name="error_summary">En caso de error en conversión</string>
+    <string name="keep_item">Mantener</string>
+    <string name="ask_item">Preguntar</string>
+    <string name="discard_item">Descartar</string>
+    <string name="mark_title">Añadir marcador</string>
+    <string name="mark_summary">Marcar errores y páginas perdidas</string>
+    <string name="pdftoc_title">TOC del PDF</string>
+    <string name="pdftoc_summary">Tratar de extraer la tabla de contenidos del PDF</string>
+    <string name="pickapic_title">Portada de la galería</string>
+    <string name="pickapic_summary">Elegir imagen o coger imagen con el mismo nombre que el PDF</string>
+    <string name="logo_title">Título en portada</string>
+    <string name="logo_summary">Poner logo de ePUBator en la portada</string>
+    <string name="downloaddir_title">ePUB en Descargas</string>
+    <string name="downloaddir_summary">Siempre salvar el ePUB en la carpeta de Descargas</string>
+    <string name="cannot_read_file">No se puede leer el archivo ePUB</string>
+    <string name="epub_was_deleted">ePUB eliminado</string>
+    <string name="kept_old_epub">Mantener antiguo ePUB</string>
+    <string name="number_of_pages">Número de páginas: %d\\n</string>
+    <string name="extraction_failure">Página %d: extracción fallida</string>
+    <string name="extraction_error">Error en la extracción: el texto puede estar incompleto</string>
+    <string name="keep_epub_file">¿Mantener el archivo ePUB?</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancelar</string>
+    <string name="stop">Parar</string>
+    <string name="lost_pages_are_marked_with">Las páginas perdidas son marcadas con %s</string>
+    <string name="errors_are_marked_with">Los errores son marcadores con %s</string>
+    <string name="pagenumber">NúmeroPágina%s</string>
+    <string name="epubfile">\\nArchivo ePUB: %s</string>
+    <string name="create_epub">Crear archivo ePUB</string>
+    <string name="mimetype">Añadir mimetype</string>
+    <string name="container">Añadir container.xml</string>
+    <string name="content">Añadir content.opf</string>
+    <string name="toc">Añadir toc.ncx</string>
+    <string name="toc_extracted_from_pdf">TOC extraído del PDF</string>
+    <string name="no_toc_found">El archivo PDF no tiene TOC</string>
+    <string name="create_dummy_toc">Crear TOC fake</string>
+    <string name="frontpage">Añadir frontpage.html</string>
+    <string name="frontpagepng">Añadir frontpage.png</string>
+    <string name="create_cover_with_image">Crear portada con imagen</string>
+    <string name="create_cover_with_title">Crear cover con título</string>
+    <string name="page_added">Añadir page%d.html</string>
+    <string name="image_added">Añadir %s</string>
+    <string name="close_file">Cerrar archivo</string>
+    <string name="cannot_choose_file">No se puede elegir el archivo</string>
+    <string name="file_not_found">Archivo no encontrado</string>
+    <string name="source_filename">Nombre de origen</string>
+    <string name="epub_filename">Nombre de ePUB</string>
+    <string name="status">Estado</string>
+    <string-array name="conversion_result_message">
+        <item>No empezada</item>
+        <item>Cargando archivo</item>
+        <item>En progreso</item>
+        <item>Conversion completada</item>
+        <item>Archivo PDF no encontrado</item>
+        <item>No se pudo leer el archivo PDF</item>
+        <item>No se pudo escribir el archivo ePUB</item>
+        <item>No se pudo extraer el texto</item>
+        <item>Conversion parada por el usuario</item>
+        <item>Error por falta de memoria</item>
+    </string-array>
+</resources>

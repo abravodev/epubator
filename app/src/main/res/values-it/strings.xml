@@ -19,17 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <resources>
 
     <!-- ePUBator -->
-    <string name="app_name">ePUBator</string>
     <string name="convert_pdf">Converti PDF</string>
     <string name="verify_epub">Verifica ePUB</string>
     <string name="conversion_in_progress">Conversione in corso</string>
-    <string name="wrongfile">ePUBator può mostrare l\'anteprima solo dei file che ha convertito</string>
     <string name="quickstart_text">Tocca \"Converti PDF\", seleziona un file e dopo un po\' avrai l\'ePUB nella stessa cartella o in Download.\n\nTocca \"Verifica ePUB\" per controllare il risultato della conversione.\n\nPrima della conversione puoi impostare un\'immagine come copertina in due modi:\n1) Metti l\'immagine (PNG or JPG) nella stessa cartella e con lo stesso nome del file PDF.\n2) Attiva \"Copertina dalla galleria\" in \"Preferenze\" e scegli l\'immagine subito dopo aver selezionato il file PDF.\nAltrimenti ePUBator usa il nome del PDF come titolo sulla copertina, quindi se non ti piace devi rinominare il PDF prima della conversione.</string>
     
     <!-- Menu -->
     <string name="prefs">Preferenze</string>
-    <string name="open_epub">Apri ePUB</string>
-    <string name="share_epub">Condividi ePUB</string>
     <string name="quickstart">Guida rapida</string>
     <string name="info">Informazioni</string>
     <string name="license">Licenza</string>
@@ -54,39 +50,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="discard_item">Elimina</string>
     <string name="mark_title">Aggiungi marker</string>
     <string name="mark_summary">Segnala errori e pagine mancanti</string>
-    <string name="notifi_title">Sopprimi notifiche</string>
-    <string name="notifi_summary">Non inviare le notifiche</string>
     <string name="pdftoc_title">Indice del PDF</string>
     <string name="pdftoc_summary">Prova ad estrarre l\'indice dal PDF</string>
     <string name="pickapic_title">Copertina dalla galleria</string>
     <string name="pickapic_summary">Scegli un\'immagine o utilizza quella con lo stesso nome del file PDF</string>
-    <string name="filechooser_group">Selettore dei file</string>
-    <string name="all_files_title">Mostra tutti</string>
-    <string name="all_files_summary">Mostra tutti i files</string>
-    <string name="detail_title">Nascondi dettagli</string>
-    <string name="detail_summary">Mostra solo i nomi dei file</string>
-    <string name="verify_group">Verifica</string>
-    <string name="show_images_title">Mostra immagini</string>
-    <string name="show_images_summary">"Mostra le immagini in Verifica"</string>
     <string name="logo_title">Logo sulla copertina</string>
     <string name="logo_summary">Metti il logo di ePUBator sulla copertina</string>
     <string name="downloaddir_title">ePUB in Download</string>
     <string name="downloaddir_summary">Salva sempre il file ePUB nella cartella Download</string>
-    
-    <!-- FileChooser -->
-    <string name="path">Percorso: %s</string>
-    <string name="root">Cartella principale</string>
-    <string name="up">Cartella superiore</string>
-	<string name="folder">Cartella</string>
-    <string name="recent_title">Cartelle recenti</string>
-    <string name="recent_summary">Seleziona una delle cartelle usate in precedenza</string>
-    <string name="back_title">Indietro</string>
-	<string name="back_summary">Ritorna al selettore dei files</string>
-	
+
     <!-- Convert -->
     <string name="cannot_read_file">Non posso leggere il file ePUB</string>
-    <string name="heading">"ePUBator - ©2011 Ezio Querini\nConvertitore da PDF a ePUB minimale per Android\n"</string>
-    <string name="pdf_extraction_library">"L'estrazione dal PDF è basata sulla libreria iText rilasciata sotto licenza AGPL\n\n"</string>
     <string name="epub_was_deleted">File ePUB rimosso</string>
     <string name="kept_old_epub">Mantenuto il vecchio file ePUB</string>
     <string name="number_of_pages">Numero di pagine: %d\n</string>
@@ -99,7 +73,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="lost_pages_are_marked_with">Le pagine mancanti sono indicate con %s</string>
     <string name="errors_are_marked_with">Gli errori sono indicati con %s</string>
     <string name="pagenumber">NumeroPagina%s</string>
-    <string name="load">Carico: %s</string>
     <string name="epubfile">\nFile ePUB: %s</string>
     <string name="create_epub">Creo il file ePUB</string>
     <string name="mimetype">Aggiungo mimetype</string>
@@ -116,18 +89,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="page_added">Aggiungo page%d.html</string>
     <string name="image_added">Aggiungo %s</string>
     <string name="close_file">Chiudo il file</string>
-    <string-array name="message">
-        <item>Non iniziato</item>
-        <item>Caricando file</item>
-        <item>In corso</item>
-        <item>Conversione completata</item>
-        <item>File PDF non trovato</item>
-        <item>Lettura del file PDF fallita</item>
-        <item>Scrittura del file ePUB fallita</item>
-        <item>Estrazione del testo fallita</item>
-        <item>Estrazione interrotta dal utente</item>
-        <item>Memoria insufficente</item>
-    </string-array>
 
     <string name="cannot_choose_file">Il file non pottere sere scegliere</string>
     <string name="file_not_found">File non trovato</string>
