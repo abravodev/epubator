@@ -3,8 +3,7 @@ package it.iiizio.epubator.infrastructure.services;
 import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -24,6 +23,8 @@ import it.iiizio.epubator.domain.constants.DecisionOnConversionError;
 import it.iiizio.epubator.domain.exceptions.ConversionException;
 import it.iiizio.epubator.domain.utils.FileHelper;
 import it.iiizio.epubator.domain.utils.PdfReadHelper;
+import it.iiizio.epubator.infrastructure.providers.ImageProvider;
+import it.iiizio.epubator.infrastructure.providers.ImageProviderImpl;
 import it.iiizio.epubator.presentation.callbacks.PageBuildEvents;
 import it.iiizio.epubator.presentation.dto.ConversionSettings;
 import it.iiizio.epubator.presentation.dto.PdfExtraction;
@@ -38,7 +39,7 @@ public class ConversionService extends Service implements PageBuildEvents {
 
     //<editor-fold desc="Attributes">
     private final StringBuilder progressSb;
-    private final ConvertManager presenter;
+    private ConvertManager presenter;
     private ConversionTask conversionTask;
     private String currentFile;
     //</editor-fold>
@@ -47,7 +48,6 @@ public class ConversionService extends Service implements PageBuildEvents {
     public ConversionService() {
         super();
         this.progressSb = new StringBuilder();
-        this.presenter = new ConvertManagerImpl(this);
     }
     //</editor-fold>
 
@@ -71,6 +71,9 @@ public class ConversionService extends Service implements PageBuildEvents {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+		ImageProvider imageProvider = new ImageProviderImpl(getApplicationContext());
+		this.presenter = new ConvertManagerImpl(this, imageProvider);
+
         Bundle extras = intent.getExtras();
 		ConversionSettings settings = (ConversionSettings) extras.getSerializable(BundleKeys.CONVERSION_SETTINGS);
         currentFile = settings.filename;
@@ -134,11 +137,11 @@ public class ConversionService extends Service implements PageBuildEvents {
         publishProgress(getResources().getString(R.string.create_cover_with_title));
     }
 
-    @Override
-    public Bitmap getAppLogo() {
-        return BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
-    }
-    //</editor-fold>
+	@Override
+	public String getLocaleLanguage() {
+		return Resources.getSystem().getConfiguration().locale.getLanguage();
+	}
+	//</editor-fold>
 
     //<editor-fold desc="Private methods">
     private void publishProgress(String message){

@@ -1,7 +1,5 @@
 package it.iiizio.epubator.presentation.callbacks;
 
-import android.graphics.Bitmap;
-
 public interface PageBuildEvents {
 
     void pageAdded(int page);
@@ -20,6 +18,5 @@ public interface PageBuildEvents {
 
     void coverWithTitleCreated();
 
-    Bitmap getAppLogo();
-
+    String getLocaleLanguage();
 }

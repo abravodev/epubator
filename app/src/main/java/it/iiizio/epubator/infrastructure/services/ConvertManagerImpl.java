@@ -1,18 +1,9 @@
 package it.iiizio.epubator.infrastructure.services;
 
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import it.iiizio.epubator.domain.constants.ConversionStatus;
@@ -24,21 +15,23 @@ import it.iiizio.epubator.domain.utils.HtmlHelper;
 import it.iiizio.epubator.domain.utils.PdfReadHelper;
 import it.iiizio.epubator.domain.utils.XMLParser;
 import it.iiizio.epubator.domain.utils.ZipWriter;
+import it.iiizio.epubator.infrastructure.providers.ImageProvider;
 import it.iiizio.epubator.presentation.callbacks.PageBuildEvents;
 import it.iiizio.epubator.presentation.dto.ConversionPreferences;
 import it.iiizio.epubator.presentation.dto.ConversionSettings;
 import it.iiizio.epubator.presentation.dto.PdfExtraction;
-import it.iiizio.epubator.presentation.utils.BitmapHelper;
 
 public class ConvertManagerImpl implements ConvertManager {
 
     //<editor-fold desc="Attributes">
     private final PageBuildEvents pageBuildEvents;
+    private final ImageProvider imageProvider;
     //</editor-fold>
 
     //<editor-fold desc="Constructors">
-    public ConvertManagerImpl(PageBuildEvents buildEvents) {
+    public ConvertManagerImpl(PageBuildEvents buildEvents, ImageProvider imageProvider) {
         this.pageBuildEvents = buildEvents;
+        this.imageProvider = imageProvider;
     }
     //</editor-fold>
 
@@ -103,20 +96,15 @@ public class ConvertManagerImpl implements ConvertManager {
     public void addFrontpageCover(String bookFilename, String coverImageFilename, boolean showLogoOnCover) throws ConversionException {
         FrontCoverDetails coverDetails = new FrontCoverDetails();
 
-        Bitmap bitmap = Bitmap.createBitmap(coverDetails.getWidth(), coverDetails.getHeight(), Bitmap.Config.RGB_565);
-        Paint paint = new Paint();
-        paint.setColor(Color.LTGRAY);
-        Canvas coverImage = new Canvas(bitmap);
-        coverImage.drawRect(0, 0, coverDetails.getWidth(), coverDetails.getHeight(), paint);
-
-        boolean coverImageAdded = addSelectedCoverImage(coverImageFilename, coverImage, coverDetails);
-        if(!coverImageAdded) {
-            addDefaultCover(bookFilename, showLogoOnCover, coverDetails, paint, coverImage);
-        }
-
-        boolean error = saveBitmapAsPng(bitmap);
-        if(error){
-            throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
+        byte[] coverImage = imageProvider.addSelectedCoverImage(coverImageFilename, coverDetails);
+        if(coverImage!=null){
+			pageBuildEvents.coverWithImageCreated();
+			saveBitmapAsPng(coverImage);
+		} else {
+			String[] titleWords = getTitleWords(bookFilename);
+			coverImage = imageProvider.addDefaultCover(titleWords, showLogoOnCover, coverDetails);
+			pageBuildEvents.coverWithTitleCreated();
+			saveBitmapAsPng(coverImage);
         }
     }
 
@@ -167,17 +155,6 @@ public class ConvertManagerImpl implements ConvertManager {
     //</editor-fold>
 
     //<editor-fold desc="Private methods">
-    private BitmapFactory.Options getBitmapOptions(String coverImageFilename, int maxWidth, int maxHeight) {
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(coverImageFilename, options);
-
-        // Get image
-        options.inSampleSize = BitmapHelper.calculateInSampleSize(options, maxWidth, maxHeight);
-        options.inJustDecodeBounds = false;
-        return options;
-    }
-
     private void addPage(int page, String text) throws ConversionException {
         String htmlText = HtmlHelper.getBasicHtml("page" + page, text.replaceAll("<br/>(?=[a-z])", "&nbsp;"));
         boolean error = ZipWriter.addText(ZipFileConstants.page(page), htmlText, false);
@@ -332,7 +309,7 @@ public class ConvertManagerImpl implements ConvertManager {
         content.append("        <dc:creator>" + (PdfReadHelper.getAuthor()).replaceAll("[<>]", "_") + "</dc:creator>\n");
         content.append("        <dc:creator opf:role=\"bkp\">ePUBator - Minimal offline PDF to ePUB converter for Android</dc:creator>\n");
         content.append("        <dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + id + "</dc:identifier>\n");
-        content.append("        <dc:language>" + Resources.getSystem().getConfiguration().locale.getLanguage() + "</dc:language>\n");
+        content.append("        <dc:language>" + pageBuildEvents.getLocaleLanguage() + "</dc:language>\n");
         content.append("    </metadata>\n");
         content.append("    <manifest>\n");
 
@@ -387,84 +364,11 @@ public class ConvertManagerImpl implements ConvertManager {
         return ((lastPage - 1) / pagesPerFile) * pagesPerFile + 1;
     }
 
-    private boolean addSelectedCoverImage(String coverImageFilename, Canvas coverImage, FrontCoverDetails coverDetails){
-        if(coverImageFilename.equals("")){
-            return false;
-        }
-
-        final BitmapFactory.Options options = getBitmapOptions(coverImageFilename, coverDetails.getWidth(), coverDetails.getHeight());
-        Bitmap coverImageFile = BitmapFactory.decodeFile(coverImageFilename, options);
-
-        if(coverImageFile == null){
-            return false;
-        }
-
-        coverImage.drawBitmap(coverImageFile,
-                null,
-                new Rect(0, 0, coverDetails.getWidth(), coverDetails.getHeight()),
-                new Paint(Paint.FILTER_BITMAP_FLAG));
-        pageBuildEvents.coverWithImageCreated();
-
-        return true;
-    }
-
-    private void addDefaultCover(String bookFilename, boolean showLogoOnCover, FrontCoverDetails coverDetails, Paint paint, Canvas coverImage) {
-        if (showLogoOnCover) {
-            paintLogoOnTheCover(coverDetails, coverImage);
-        }
-
-        paintTitleOnTheCover(bookFilename, coverDetails, paint, coverImage);
-        pageBuildEvents.coverWithTitleCreated();
-    }
-
-    private void paintLogoOnTheCover(FrontCoverDetails coverDetails, Canvas coverImage) {
-        Bitmap coverImageFile = pageBuildEvents.getAppLogo();
-        coverImage.drawBitmap(coverImageFile,
-                coverDetails.getWidth() - coverImageFile.getWidth(),
-                coverDetails.getHeight()- coverImageFile.getHeight(),
-                new Paint(Paint.FILTER_BITMAP_FLAG));
-    }
-
-    private boolean saveBitmapAsPng(Bitmap bmp) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-        return ZipWriter.addImage(ZipFileConstants.FRONTPAGE_IMAGE, outputStream.toByteArray());
-    }
-
-    private void paintTitleOnTheCover(String bookFilename, FrontCoverDetails coverDetails, Paint paint, Canvas coverImage) {
-        paint.setTextSize(coverDetails.getFontSize());
-        paint.setColor(Color.BLACK);
-        paint.setAntiAlias(true);
-        paint.setStyle(Paint.Style.FILL);
-
-        String[] words = getTitleWords(bookFilename);
-
-        float newline = paint.getFontSpacing();
-        float x = coverDetails.getBorder();
-        float y = newline;
-
-        for (String word: words) {
-            float wordLength = paint.measureText(word + " ");
-
-            // Line wrap
-            if ((x > coverDetails.getBorder()) && ((x + wordLength) > coverDetails.getWidth())) {
-                x = coverDetails.getBorder();
-                y += newline;
-            }
-
-            // Word wrap
-            while ((x + wordLength) > coverDetails.getWidth()) {
-                int maxChar = (int) (word.length() * (coverDetails.getWidth() - coverDetails.getBorder() - x) / paint.measureText(word));
-                coverImage.drawText(word.substring(0, maxChar), x, y, paint);
-                word = word.substring(maxChar);
-                wordLength = paint.measureText(word + " ");
-                x = coverDetails.getBorder();
-                y += newline;
-            }
-
-            coverImage.drawText(word, x, y, paint);
-            x += wordLength;
-        }
+    private void saveBitmapAsPng(byte[] outputStream) throws ConversionException {
+        boolean error = ZipWriter.addImage(ZipFileConstants.FRONTPAGE_IMAGE, outputStream);
+		if(error){
+			throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
+		}
     }
 
     private String[] getTitleWords(String bookFilename){
