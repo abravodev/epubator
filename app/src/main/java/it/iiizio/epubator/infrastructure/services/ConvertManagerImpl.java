@@ -7,6 +7,7 @@ import org.w3c.dom.NodeList;
 import java.io.File;
 
 import it.iiizio.epubator.domain.constants.ConversionStatus;
+import it.iiizio.epubator.domain.constants.FileTypes;
 import it.iiizio.epubator.domain.constants.ZipFileConstants;
 import it.iiizio.epubator.domain.entities.Chapter;
 import it.iiizio.epubator.domain.entities.FrontCoverDetails;
@@ -16,10 +17,10 @@ import it.iiizio.epubator.domain.utils.PdfReadHelper;
 import it.iiizio.epubator.domain.utils.XMLParser;
 import it.iiizio.epubator.domain.utils.ZipWriter;
 import it.iiizio.epubator.infrastructure.providers.ImageProvider;
-import it.iiizio.epubator.presentation.callbacks.PageBuildEvents;
-import it.iiizio.epubator.presentation.dto.ConversionPreferences;
-import it.iiizio.epubator.presentation.dto.ConversionSettings;
-import it.iiizio.epubator.presentation.dto.PdfExtraction;
+import it.iiizio.epubator.domain.callbacks.PageBuildEvents;
+import it.iiizio.epubator.domain.entities.ConversionPreferences;
+import it.iiizio.epubator.domain.entities.ConversionSettings;
+import it.iiizio.epubator.domain.entities.PdfExtraction;
 
 public class ConvertManagerImpl implements ConvertManager {
 
@@ -58,8 +59,7 @@ public class ConvertManagerImpl implements ConvertManager {
 
     @Override
     public void addMimeType() throws ConversionException {
-        String filetype = "application/epub+zip";
-        boolean error = ZipWriter.addText(ZipFileConstants.MIMETYPE, filetype, true);
+        boolean error = ZipWriter.addText(ZipFileConstants.MIMETYPE, FileTypes.EPUB, true);
         if(error){
             throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
         }
@@ -68,7 +68,7 @@ public class ConvertManagerImpl implements ConvertManager {
     @Override
     public void addContainer() throws ConversionException {
         String container = buildContainer();
-        boolean error = ZipWriter.addText("META-INF/container.xml", container, false);
+        boolean error = ZipWriter.addText(ZipFileConstants.CONTAINER, container);
         if(error){
            throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
         }
@@ -77,7 +77,7 @@ public class ConvertManagerImpl implements ConvertManager {
     @Override
     public void addToc(int pages, String tocId, String title, boolean tocFromPdf, int pagesPerFile) throws ConversionException {
         String toc = buildToc(pages, tocId, title, tocFromPdf, pagesPerFile);
-        boolean error = ZipWriter.addText("OEBPS/toc.ncx", toc, false);
+        boolean error = ZipWriter.addText(ZipFileConstants.TOC, toc);
         if(error){
             throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
         }
@@ -86,7 +86,7 @@ public class ConvertManagerImpl implements ConvertManager {
     @Override
     public void addFrontPage() throws ConversionException {
         String frontPage = buildFrontPage();
-        boolean error = ZipWriter.addText(ZipFileConstants.FRONTPAGE, frontPage, false);
+        boolean error = ZipWriter.addText(ZipFileConstants.FRONTPAGE, frontPage);
         if(error){
             throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
         }
@@ -123,7 +123,7 @@ public class ConvertManagerImpl implements ConvertManager {
     @Override
     public void addContent(int pages, String bookId, String title, Iterable<String> images, int pagesPerFile) throws ConversionException {
         String content = buildContent(pages, bookId, images, title, pagesPerFile);
-        boolean error = ZipWriter.addText(ZipFileConstants.CONTENT, content, false);
+        boolean error = ZipWriter.addText(ZipFileConstants.CONTENT, content);
         if(error){
             throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
         }
@@ -157,7 +157,7 @@ public class ConvertManagerImpl implements ConvertManager {
     //<editor-fold desc="Private methods">
     private void addPage(int page, String text) throws ConversionException {
         String htmlText = HtmlHelper.getBasicHtml("page" + page, text.replaceAll("<br/>(?=[a-z])", "&nbsp;"));
-        boolean error = ZipWriter.addText(ZipFileConstants.page(page), htmlText, false);
+        boolean error = ZipWriter.addText(ZipFileConstants.page(page), htmlText);
         if(error){
             throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
         }

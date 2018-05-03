@@ -36,6 +36,7 @@ import java.net.URISyntaxException;
 
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.constants.BundleKeys;
+import it.iiizio.epubator.domain.constants.FileTypes;
 import it.iiizio.epubator.domain.constants.PreferencesKeys;
 import it.iiizio.epubator.presentation.presenters.MainPresenter;
 import it.iiizio.epubator.presentation.presenters.MainPresenterImpl;
@@ -180,11 +181,11 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void selectPdfFileFromSystem(){
-		selectFileFromSystem("application/pdf", Actions.CONVERT);
+		selectFileFromSystem(FileTypes.PDF, Actions.CONVERT);
 	}
 
 	private void selectEpubFileFromSystem(int action){
-		selectFileFromSystem("application/epub+zip", action);
+		selectFileFromSystem(FileTypes.EPUB, action);
 	}
 
 	private void selectImageFileFromSystem(){

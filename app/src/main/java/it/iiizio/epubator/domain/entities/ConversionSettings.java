@@ -1,4 +1,4 @@
-package it.iiizio.epubator.presentation.dto;
+package it.iiizio.epubator.domain.entities;
 
 import java.io.Serializable;
 import java.util.Date;

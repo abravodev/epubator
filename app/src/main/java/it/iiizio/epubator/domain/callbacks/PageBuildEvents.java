@@ -1,4 +1,4 @@
-package it.iiizio.epubator.presentation.callbacks;
+package it.iiizio.epubator.domain.callbacks;
 
 public interface PageBuildEvents {
 

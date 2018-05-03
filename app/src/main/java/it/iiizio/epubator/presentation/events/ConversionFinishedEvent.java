@@ -1,6 +1,6 @@
 package it.iiizio.epubator.presentation.events;
 
-import it.iiizio.epubator.presentation.dto.ConversionSettings;
+import it.iiizio.epubator.domain.entities.ConversionSettings;
 
 public class ConversionFinishedEvent extends ConversionStatusChangedEvent {
 

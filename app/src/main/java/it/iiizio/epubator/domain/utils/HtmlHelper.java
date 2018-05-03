@@ -2,10 +2,14 @@ package it.iiizio.epubator.domain.utils;
 
 public class HtmlHelper {
 
-    //  stringToHTMLString found on the web, no license indicated
-    //  http://www.rgagnon.com/javadetails/java-0306.html
-    //	Author: S. Bayer.
-    public static String stringToHTMLString(String string) {
+	/**
+	 * stringToHTMLString found on the web, no license indicated
+	 * @see <a href="http://www.rgagnon.com/javadetails/java-0306.html"></a>
+	 * @author S. Bayer.
+	 * @param string
+	 * @return
+	 */
+	public static String stringToHTMLString(String string) {
         StringBuilder sb = new StringBuilder(); // changed StringBuffer to StringBuilder to prevent buffer overflow (iiizio)
         // true if last char was blank
         boolean lastWasBlankChar = false;

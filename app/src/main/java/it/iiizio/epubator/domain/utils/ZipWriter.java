@@ -40,6 +40,11 @@ public class ZipWriter {
 		return false;
 	}
 
+
+	public static boolean addText(String filename, String text){
+		return addText(filename, text, false);
+	}
+
 	public static boolean addText(String filename, String text, boolean store) {
 		CRC32 crc32 = new CRC32();
 		byte[] data = text.getBytes();

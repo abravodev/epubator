@@ -2,7 +2,7 @@ package it.iiizio.epubator.presentation.presenters;
 
 import java.io.File;
 
-import it.iiizio.epubator.presentation.dto.ConversionSettings;
+import it.iiizio.epubator.domain.entities.ConversionSettings;
 
 public class ConvertPresenterImpl implements ConvertPresenter {
 
