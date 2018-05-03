@@ -20,7 +20,7 @@ import java.io.File;
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.constants.BundleKeys;
 import it.iiizio.epubator.domain.constants.ConversionStatus;
-import it.iiizio.epubator.domain.constants.DecissionOnConversionError;
+import it.iiizio.epubator.domain.constants.DecisionOnConversionError;
 import it.iiizio.epubator.domain.exceptions.ConversionException;
 import it.iiizio.epubator.domain.utils.FileHelper;
 import it.iiizio.epubator.domain.utils.PdfReadHelper;
@@ -226,9 +226,9 @@ public class ConversionService extends Service implements PageBuildEvents {
             if(result == ConversionStatus.SUCCESS){
                 presenter.saveEpub(settings);
             } else if (result == ConversionStatus.EXTRACTION_ERROR) {
-                if (settings.getPreferences().onError == DecissionOnConversionError.KEEP_ITEM) {
+                if (settings.getPreferences().onError == DecisionOnConversionError.KEEP_ITEM) {
                     presenter.saveEpub(settings);
-                } else if (settings.getPreferences().onError == DecissionOnConversionError.DISCARD_ITEM){
+                } else if (settings.getPreferences().onError == DecisionOnConversionError.DISCARD_ITEM){
                     deleteTemporalFile();
                 } else {
                     // TODO: Update the notification, to request action when tapped

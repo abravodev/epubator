@@ -29,13 +29,11 @@ import it.iiizio.epubator.presentation.presenters.LicensePresenterImpl;
 
 public class LicenseActivity extends AppCompatActivity {
 
-	private LicensePresenter presenter;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info);
-		presenter = new LicensePresenterImpl();
+		LicensePresenter presenter = new LicensePresenterImpl();
 
 		// Get license from raw
 		TextView infoTv = (TextView)findViewById(R.id.tv_infoview);

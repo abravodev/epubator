@@ -37,7 +37,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.constants.BundleKeys;
 import it.iiizio.epubator.domain.constants.ConversionStatus;
-import it.iiizio.epubator.domain.constants.DecissionOnConversionError;
+import it.iiizio.epubator.domain.constants.DecisionOnConversionError;
 import it.iiizio.epubator.domain.constants.PreferencesKeys;
 import it.iiizio.epubator.infrastructure.services.ConversionService;
 import it.iiizio.epubator.presentation.dto.ConversionPreferences;
@@ -55,8 +55,6 @@ import it.iiizio.epubator.presentation.utils.PreferencesHelper;
 public class ConvertActivity extends AppCompatActivity {
 
 	//<editor-fold desc="Attributes">
-	private static TextView tv_sourceFilename;
-	private static TextView tv_epubFilename;
 	private static TextView tv_conversionStatus;
 	private static ScrollView sv_progress;
 	private static TextView tv_progress;
@@ -139,7 +137,6 @@ public class ConvertActivity extends AppCompatActivity {
 		if(conversionFinishedText!=null){
 			updateProgressText(conversionFinishedText);
 			updateButtonStates(false);
-			return;
 		}
 	}
 
@@ -218,10 +215,10 @@ public class ConvertActivity extends AppCompatActivity {
 	}
 
 	private void setupConversionSummary(ConversionSettings settings){
-		tv_sourceFilename = (TextView) findViewById(R.id.tv_source_filename);
+		TextView tv_sourceFilename = (TextView) findViewById(R.id.tv_source_filename);
 		tv_sourceFilename.setText(settings.pdfFilename);
 
-		tv_epubFilename = (TextView) findViewById(R.id.tv_epub_filename);
+		TextView tv_epubFilename = (TextView) findViewById(R.id.tv_epub_filename);
 		tv_epubFilename.setText(settings.epubFilename);
 
 		tv_conversionStatus = (TextView) findViewById(R.id.tv_conversion_status);
@@ -258,7 +255,7 @@ public class ConvertActivity extends AppCompatActivity {
 		preferences.includeImages = prefs.getBoolean(PreferencesKeys.ADD_EXTRACTED_IMAGES_FROM_PDF, true);
 		preferences.repeatedImages = prefs.getBoolean(PreferencesKeys.ADD_REPEATED_IMAGES);
 		preferences.pagesPerFile = prefs.getParsedString(PreferencesKeys.PAGES_PER_FILE, 5);
-		preferences.onError = prefs.getParsedString(PreferencesKeys.OPTION_WHEN_ERROR_IN_CONVERSION, DecissionOnConversionError.KEEP_ITEM);
+		preferences.onError = prefs.getParsedString(PreferencesKeys.OPTION_WHEN_ERROR_IN_CONVERSION, DecisionOnConversionError.KEEP_ITEM);
 		preferences.addMarkers = prefs.getBoolean(PreferencesKeys.MARK_ERRORS, true);
 		preferences.tocFromPdf = prefs.getBoolean(PreferencesKeys.TRY_TO_EXTRACT_TOC_FROM_PDF, true);
 		preferences.showLogoOnCover = prefs.getBoolean(PreferencesKeys.HAVE_LOGO_ON_COVER, true);
@@ -313,10 +310,7 @@ public class ConvertActivity extends AppCompatActivity {
 		if(result == ConversionStatus.IN_PROGRESS){
 			return true;
 		}
-		if(result == ConversionStatus.LOADING_FILE){
-			return true;
-		}
-		return false;
+		return result == ConversionStatus.LOADING_FILE;
 	}
 
 	private boolean conversionFinished(){
@@ -324,7 +318,7 @@ public class ConvertActivity extends AppCompatActivity {
 	}
 
 	private void updateResult(int result){
-		this.result = result;
+		ConvertActivity.result = result;
 	}
 	//</editor-fold>
 }

@@ -2,7 +2,7 @@ package it.iiizio.epubator.domain.exceptions;
 
 public class ConversionException extends Exception {
 
-    private int status;
+    private final int status;
 
     public ConversionException(int status) {
         super();

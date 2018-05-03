@@ -28,7 +28,7 @@ import it.iiizio.epubator.domain.utils.XMLParser;
 
 public class EpubServiceImpl implements EpubService {
 
-	private static final int BUFFERSIZE = 2048;
+	private static final int BUFFER_SIZE = 2048;
 
 	@Override
 	public Book getBook(ZipFile epubFile) throws IOException {
@@ -105,12 +105,12 @@ public class EpubServiceImpl implements EpubService {
 
 	private void saveImage(ZipFile epubFile, File imageDirectory, String imageName) throws IOException {
 		ZipEntry entry = epubFile.getEntry("OEBPS/" + imageName);
-		BufferedInputStream in = new BufferedInputStream(epubFile.getInputStream(entry), BUFFERSIZE);
+		BufferedInputStream in = new BufferedInputStream(epubFile.getInputStream(entry), BUFFER_SIZE);
 		FileOutputStream out = new FileOutputStream(new File(imageDirectory + "/" + imageName));
-		byte[] buffer = new byte[BUFFERSIZE];
+		byte[] buffer = new byte[BUFFER_SIZE];
 		int len;
-		BufferedOutputStream dest = new BufferedOutputStream(out, BUFFERSIZE);
-		while ((len = in.read(buffer, 0, BUFFERSIZE)) != -1) {
+		BufferedOutputStream dest = new BufferedOutputStream(out, BUFFER_SIZE);
+		while ((len = in.read(buffer, 0, BUFFER_SIZE)) != -1) {
 			dest.write(buffer, 0, len);
 		}
 		dest.flush();
@@ -135,7 +135,7 @@ public class EpubServiceImpl implements EpubService {
 	private String getElement(ZipFile epubFile, String elementKey) throws IOException {
 		StringBuilder textElement = new StringBuilder();
 		Reader inputStreamReader = new InputStreamReader(epubFile.getInputStream(epubFile.getEntry(elementKey)));
-		BufferedReader bufferedReader = new BufferedReader(inputStreamReader, BUFFERSIZE);
+		BufferedReader bufferedReader = new BufferedReader(inputStreamReader, BUFFER_SIZE);
 		String line;
 		while ((line = bufferedReader.readLine()) != null) {
 			textElement.append(line);

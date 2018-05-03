@@ -89,6 +89,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="page_added">Aggiungo page%d.html</string>
     <string name="image_added">Aggiungo %s</string>
     <string name="close_file">Chiudo il file</string>
+    <string-array name="conversion_result_message">
+        <item>Non iniziato</item>
+        <item>Caricando file</item>
+        <item>In corso</item>
+        <item>Conversione completata</item>
+        <item>File PDF non trovato</item>
+        <item>Lettura del file PDF fallita</item>
+        <item>Scrittura del file ePUB fallita</item>
+        <item>Estrazione del testo fallita</item>
+        <item>Estrazione interrotta dal utente</item>
+        <item>Memoria insufficiente</item>
+    </string-array>
 
     <string name="cannot_choose_file">Il file non pottere sere scegliere</string>
     <string name="file_not_found">File non trovato</string>

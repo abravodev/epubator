@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 	private static class Actions {
 		static final int CONVERT = 1;
 		static final int VERIFY = 2;
-		static final int PICKAPIC = 3;
+		static final int PICK_A_PIC = 3;
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 			switch (requestCode) {
 				case Actions.CONVERT: convertFile(getActualPath(result)); break;
 				case Actions.VERIFY: verifyFile(getActualPath(result)); break;
-				case Actions.PICKAPIC: getImageFromGallery(getActualPath(result)); break;
+				case Actions.PICK_A_PIC: getImageFromGallery(getActualPath(result)); break;
 				default: errorWhenChoosingFile(); break;
 			}
 		}
@@ -167,13 +167,13 @@ public class MainActivity extends AppCompatActivity {
 			.show();
 	}
 
-	private void selectFileFromSystem(String filetype, int action){
+	private void selectFileFromSystem(String fileType, int action){
 		File file = new File(getRecentFolder());
 		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-		intent.setDataAndType(Uri.fromFile(file), filetype);
+		intent.setDataAndType(Uri.fromFile(file), fileType);
 
 		try {
-			startActivityForResult(intent.createChooser(intent, "Select file"), action);
+			startActivityForResult(Intent.createChooser(intent, "Select file"), action);
 		} catch (ActivityNotFoundException e) {
 			// TODO: Handle rejection
 		}
@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void selectImageFileFromSystem(){
-		selectFileFromSystem("image/*", Actions.PICKAPIC);
+		selectFileFromSystem("image/*", Actions.PICK_A_PIC);
 	}
 
 	private String getActualPath(Intent result){

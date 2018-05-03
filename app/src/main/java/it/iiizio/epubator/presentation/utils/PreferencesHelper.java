@@ -55,7 +55,7 @@ public class PreferencesHelper {
     }
 
     public int getParsedString(String key, String defaultValue){
-        return getParsedString(key, String.valueOf(defaultValue));
+        return getParsedString(key, Integer.parseInt(defaultValue));
     }
 
     public int getParsedString(String key){

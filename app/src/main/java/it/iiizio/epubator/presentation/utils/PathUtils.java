@@ -60,6 +60,11 @@ public class PathUtils {
                     return cursor.getString(column_index);
                 }
             } catch (Exception e) {
+                System.err.println(e.getMessage());
+            } finally {
+                if(cursor!=null){
+					cursor.close();
+				}
             }
         } else if ("file".equalsIgnoreCase(uri.getScheme())) {
             return uri.getPath();
