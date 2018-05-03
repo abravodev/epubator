@@ -27,22 +27,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:layout_weight="1" >
 
         <WebView
-            android:id="@+id/webview"
+            android:id="@+id/wv_verify_epub"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent" >
+
+        </WebView>
     </LinearLayout>
 
-    <LinearLayout
-        style="@style/ButtonBarStyle" >
+    <ProgressBar
+        android:id="@+id/pb_verify_epub"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout style="@style/ButtonBarStyle">
 
         <Button
+            android:id="@+id/bt_previous_page"
             style="@style/ButtonBarButtonStyle"
-            android:id="@+id/previous_page_button"
             android:text="@string/prev_page" />
 
         <Button
+            android:id="@+id/bt_next_page"
             style="@style/ButtonBarButtonStyle"
-            android:id="@+id/next_page_button"
             android:text="@string/next_page" />
     </LinearLayout>
 

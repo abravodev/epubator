@@ -27,24 +27,24 @@ public class PermissionHelper {
         return isPending(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
-    public static void showPermissionRequest(Activity activity, String permission){
+    public static void showPermissionRequest(Activity activity, String permission, int requestCode){
         if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-            ActivityCompat.requestPermissions(activity, new String[]{ permission },23);
+            ActivityCompat.requestPermissions(activity, new String[]{ permission },requestCode);
         }
     }
 
-    public static void showWritePermissionRequest(Activity activity){
-        showPermissionRequest(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    public static void showWritePermissionRequest(Activity activity, int requestCode){
+        showPermissionRequest(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, requestCode);
     }
 
-    public static void checkPermission(Activity activity, String permission){
+    public static void checkPermission(Activity activity, String permission, int requestCode){
         if (writePermissionIsPending(activity)) {
-            showPermissionRequest(activity, permission);
+            showPermissionRequest(activity, permission, requestCode);
         }
     }
 
-    public static void checkWritePermission(Activity activity){
-        checkPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    public static void checkWritePermission(Activity activity, int requestCode){
+        checkPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, requestCode);
     }
 
 }

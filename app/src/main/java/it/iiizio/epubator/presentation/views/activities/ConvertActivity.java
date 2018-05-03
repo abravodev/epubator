@@ -218,22 +218,22 @@ public class ConvertActivity extends AppCompatActivity {
 	}
 
 	private void setupConversionSummary(ConversionSettings settings){
-		tv_sourceFilename = (TextView) findViewById(R.id.source_filename);
+		tv_sourceFilename = (TextView) findViewById(R.id.tv_source_filename);
 		tv_sourceFilename.setText(settings.pdfFilename);
 
-		tv_epubFilename = (TextView) findViewById(R.id.epub_filename);
+		tv_epubFilename = (TextView) findViewById(R.id.tv_epub_filename);
 		tv_epubFilename.setText(settings.epubFilename);
 
-		tv_conversionStatus = (TextView) findViewById(R.id.conversion_status);
+		tv_conversionStatus = (TextView) findViewById(R.id.tv_conversion_status);
 		updateConversionStatus(result);
 	}
 
 	private void setupElements() {
-		sv_progress = (ScrollView) findViewById(R.id.scroll);
-		tv_progress = (TextView) findViewById(R.id.progress);
+		sv_progress = (ScrollView) findViewById(R.id.sv_conversion_view);
+		tv_progress = (TextView) findViewById(R.id.tv_conversion_progress);
 
-		bt_ok = (Button) findViewById(R.id.ok);
-		bt_stopConversion = (Button) findViewById(R.id.stop);
+		bt_ok = (Button) findViewById(R.id.bt_ok);
+		bt_stopConversion = (Button) findViewById(R.id.bt_stop_conversion);
 
 		bt_ok.setOnClickListener(new OnClickListener() {
 			@Override

@@ -45,6 +45,7 @@ import it.iiizio.epubator.presentation.utils.PreferencesHelper;
 
 public class MainActivity extends AppCompatActivity {
 
+	private static final int REQUEST_PERMISSION_CODE = 23;
 	private String filename = "";
 	private String coverFile = "";
 	private PreferencesHelper viewPreferencesHelper;
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_main);
 		presenter = new MainPresenterImpl();
 
-		PermissionHelper.checkWritePermission(this); // TODO: Only check before requesting it
+		PermissionHelper.checkWritePermission(this, REQUEST_PERMISSION_CODE); // TODO: Only check before requesting it
 		setupButtons();
 		viewPreferencesHelper = PreferencesHelper.getViewPreferences(this);
 		sharedPreferencesHelper = PreferencesHelper.getAppPreferences(this);
@@ -108,14 +109,14 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void setupButtons() {
-		findViewById(R.id.convert).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.bt_convert_pdf).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				selectPdfFileFromSystem();
 				// TODO: Control when there are files in the queue for converting pdfs
 			}
 		});
-		findViewById(R.id.verify).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.bt_verify_epub).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				selectEpubFileFromSystem(Actions.VERIFY);

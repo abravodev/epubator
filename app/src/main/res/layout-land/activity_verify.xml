@@ -21,29 +21,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     android:layout_height="match_parent" 
     android:baselineAligned="false" xmlns:tools="http://schemas.android.com/tools" tools:ignore="NestedWeights">
 
-    <LinearLayout
-        android:layout_width="0dip"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical" >
+        android:layout_weight="1">
 
         <WebView
-            android:id="@+id/webview"
+            android:id="@+id/wv_verify_epub"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_above="@id/pb_verify_epub"/>
+
+        <ProgressBar
+            android:id="@+id/pb_verify_epub"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
 
     <LinearLayout
         style="@style/ButtonBarStyle.Landscape">
         
         <Button
             style="@style/ButtonBarButtonStyle"
-            android:id="@+id/previous_page_button"
+            android:id="@+id/bt_previous_page"
             android:text="@string/prev_page" />
 
         <Button
             style="@style/ButtonBarButtonStyle"
-            android:id="@+id/next_page_button"
+            android:id="@+id/bt_next_page"
             android:text="@string/next_page" />
     </LinearLayout>
 

@@ -29,6 +29,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.File;
@@ -47,6 +48,7 @@ import it.iiizio.epubator.presentation.utils.PreferencesHelper;
 
 public class VerifyActivity extends AppCompatActivity {
 
+	//<editor-fold desc="Attributes">
 	private static final int DEFAULT_FIRST_PAGE = 1;
 	private static ZipFile epubFile = null;
 	private static int currentPageIndex = DEFAULT_FIRST_PAGE;
@@ -54,10 +56,12 @@ public class VerifyActivity extends AppCompatActivity {
 	private String anchor;
 
 	private WebView wv_verifyEpub;
+	private ProgressBar pb_verify_epub;
 	private Button bt_previousPage;
 	private Button bt_nextPage;
 
 	private VerifyPresenter presenter;
+	//</editor-fold>
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,11 +74,6 @@ public class VerifyActivity extends AppCompatActivity {
 		setupBook();
 
 		gotoPage(currentPageIndex);
-	}
-
-	private void setupElements() {
-		setupWebView();
-		setupPageButtons();
 	}
 
 	@Override
@@ -91,10 +90,35 @@ public class VerifyActivity extends AppCompatActivity {
 		return true;
 	}
 
+	@Override
+	public void onBackPressed() {
+		exitEpubVerification();
+	}
+
+
+	private void setupElements() {
+		setupWebView();
+		setupProgressBar();
+		setupPageButtons();
+	}
+
+	private void setupProgressBar() {
+		pb_verify_epub = (ProgressBar) findViewById(R.id.pb_verify_epub);
+	}
+
+	private void updateProgressBar(int currentValue, int maxValue){
+		pb_verify_epub.setMax(maxValue);
+		updateProgressBar(currentValue);
+	}
+
+	private void updateProgressBar(int currentValue){
+		pb_verify_epub.setProgress(currentValue);
+	}
+
 	private void openIndexDialog(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(VerifyActivity.this);
 		builder.setTitle(R.string.index)
-			.setItems(book.getChapters(), new DialogInterface.OnClickListener() {
+				.setItems(book.getChapters(), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						int pageIndex = book.getPageIndex(which)+1;
 						anchor = book.getAnchor(which);
@@ -104,24 +128,19 @@ public class VerifyActivity extends AppCompatActivity {
 						}
 						gotoPage(pageIndex);
 					}
-			})
-			.create()
-			.show();
-	}
-
-	@Override
-	public void onBackPressed() {
-		exitEpubVerification();
+				})
+				.create()
+				.show();
 	}
 
 	private void setupPageButtons() {
-		bt_previousPage = (Button) findViewById(R.id.previous_page_button);
-		bt_nextPage = (Button) findViewById(R.id.next_page_button);
+		bt_previousPage = (Button) findViewById(R.id.bt_previous_page);
+		bt_nextPage = (Button) findViewById(R.id.bt_next_page);
 
 		OnClickListener pageListener = new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(v.getId() == R.id.previous_page_button){
+				if(v.getId() == R.id.bt_previous_page){
 					gotoPreviousPage();
 				} else {
 					gotoNextPage();
@@ -134,7 +153,7 @@ public class VerifyActivity extends AppCompatActivity {
 	}
 
 	private void setupWebView() {
-		wv_verifyEpub = (WebView) findViewById(R.id.webview);
+		wv_verifyEpub = (WebView) findViewById(R.id.wv_verify_epub);
 		wv_verifyEpub.setBackgroundColor(0);
 		wv_verifyEpub.setWebViewClient(new WebViewClient() {
 			public void onPageFinished(final WebView view, final String url) {
@@ -163,6 +182,7 @@ public class VerifyActivity extends AppCompatActivity {
 			if(book.getPagesCount()==0){
 				throw new IOException("Book has no pages");
 			}
+			updateProgressBar(1, book.getPagesCount());
 		} catch (IOException e) {
 			exitEpubVerificationOnError();
 		}
@@ -184,6 +204,7 @@ public class VerifyActivity extends AppCompatActivity {
 		currentPageIndex = pageIndex;
 		bt_previousPage.setEnabled(book.hasPreviousPage(currentPageIndex));
 		bt_nextPage.setEnabled(book.hasNextPage(currentPageIndex));
+		updateProgressBar(pageIndex);
 
 		String fileName = book.getPage(currentPageIndex);
 		if (anchor == null) {

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/infoview"
+        android:id="@+id/tv_infoview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/activity_padding"/>

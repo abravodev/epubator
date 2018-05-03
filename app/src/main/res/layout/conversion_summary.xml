@@ -19,7 +19,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/source_filename"/>
+            android:id="@+id/tv_source_filename"/>
     </LinearLayout>
 
     <LinearLayout
@@ -34,7 +34,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/epub_filename"/>
+            android:id="@+id/tv_epub_filename"/>
     </LinearLayout>
 
     <LinearLayout
@@ -49,6 +49,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/conversion_status"/>
+            android:id="@+id/tv_conversion_status"/>
     </LinearLayout>
 </LinearLayout>

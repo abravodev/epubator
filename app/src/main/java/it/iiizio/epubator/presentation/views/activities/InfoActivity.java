@@ -41,7 +41,7 @@ public class InfoActivity extends AppCompatActivity {
 	}
 
 	private void setupTextInfo(){
-		TextView infoTv = (TextView)findViewById(R.id.infoview);
+		TextView infoTv = (TextView)findViewById(R.id.tv_infoview);
 		infoTv.setTextSize(18);
 		InputStream is = this.getResources().openRawResource(R.raw.info);
 		String info = presenter.getInfo(is);

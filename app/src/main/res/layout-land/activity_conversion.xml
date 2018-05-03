@@ -28,13 +28,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <ScrollView
-            android:id="@+id/scroll"
+            android:id="@+id/sv_conversion_view"
             android:layout_width="0dip"
             android:layout_height="match_parent"
             android:layout_weight="1" >
 
             <TextView
-                android:id="@+id/progress"
+                android:id="@+id/tv_conversion_progress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/activity_padding"/>
@@ -45,12 +45,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
             <Button
                 style="@style/ButtonBarButtonStyle"
-                android:id="@+id/ok"
+                android:id="@+id/bt_ok"
                 android:text="@string/ok" />
 
             <Button
                 style="@style/ButtonBarButtonStyle"
-                android:id="@+id/stop"
+                android:id="@+id/bt_stop_conversion"
                 android:text="@string/stop" />
         </LinearLayout>
     </LinearLayout>

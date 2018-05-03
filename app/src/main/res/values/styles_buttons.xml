@@ -8,7 +8,6 @@
     <style name="ButtonBarStyle.Landscape" parent="@style/Widget.AppCompat.ButtonBar">
         <item name="android:layout_width">120sp</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:layout_marginTop">6dp</item>
         <item name="android:orientation">vertical</item>
     </style>
 

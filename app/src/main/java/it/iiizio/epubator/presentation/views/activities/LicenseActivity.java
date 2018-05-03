@@ -38,7 +38,7 @@ public class LicenseActivity extends AppCompatActivity {
 		presenter = new LicensePresenterImpl();
 
 		// Get license from raw
-		TextView infoTv = (TextView)findViewById(R.id.infoview);
+		TextView infoTv = (TextView)findViewById(R.id.tv_infoview);
 		infoTv.setTextSize(18);
 		InputStream is = this.getResources().openRawResource(R.raw.license);
 		String licenseInfo = presenter.getLicenseInfo(is);
