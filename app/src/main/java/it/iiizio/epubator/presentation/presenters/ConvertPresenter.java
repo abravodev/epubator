@@ -8,4 +8,6 @@ public interface ConvertPresenter {
 
     void saveEpub(ConversionSettings settings);
 
+	ConversionSettings getConversionSettings(String pdfFilename, String coverImage);
+
 }

@@ -23,7 +23,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,38 +36,40 @@ import java.net.URISyntaxException;
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.constants.BundleKeys;
 import it.iiizio.epubator.domain.constants.FileTypes;
-import it.iiizio.epubator.domain.constants.PreferencesKeys;
+import it.iiizio.epubator.infrastructure.providers.SharedPreferenceProviderImpl;
+import it.iiizio.epubator.infrastructure.providers.StorageProviderImpl;
+import it.iiizio.epubator.infrastructure.providers.ViewPreferenceProviderImpl;
 import it.iiizio.epubator.presentation.presenters.MainPresenter;
 import it.iiizio.epubator.presentation.presenters.MainPresenterImpl;
 import it.iiizio.epubator.presentation.utils.PathUtils;
 import it.iiizio.epubator.presentation.utils.PermissionHelper;
-import it.iiizio.epubator.presentation.utils.PreferencesHelper;
 
 public class MainActivity extends AppCompatActivity {
 
+	//<editor-fold desc="Attributes">
 	private static final int REQUEST_PERMISSION_CODE = 23;
 	private String filename = "";
 	private String coverFile = "";
-	private PreferencesHelper viewPreferencesHelper;
-	private PreferencesHelper sharedPreferencesHelper;
 	private MainPresenter presenter;
+	//</editor-fold>
 
+	//<editor-fold desc="Inner class">
 	private static class Actions {
 		static final int CONVERT = 1;
 		static final int VERIFY = 2;
 		static final int PICK_A_PIC = 3;
 	}
+	//</editor-fold>
 
+	//<editor-fold desc="Methods">
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		presenter = new MainPresenterImpl();
+		presenter = buildPresenter();
 
 		PermissionHelper.checkWritePermission(this, REQUEST_PERMISSION_CODE); // TODO: Only check before requesting it
 		setupButtons();
-		viewPreferencesHelper = PreferencesHelper.getViewPreferences(this);
-		sharedPreferencesHelper = PreferencesHelper.getAppPreferences(this);
 		showInitialDialog();
 	}
 
@@ -102,9 +103,15 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
+	private MainPresenter buildPresenter(){
+		return new MainPresenterImpl(new ViewPreferenceProviderImpl(this),
+			new SharedPreferenceProviderImpl(this),
+			new StorageProviderImpl(this));
+	}
+
 	// Show quick start on first time
 	private void showInitialDialog(){
-		if (viewPreferencesHelper.getBoolean(PreferencesKeys.FIRST_TIME_APP, true)) {
+		if (presenter.showInitialDialog()) {
 			showQuickStartDialog();
 		}
 	}
@@ -161,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
 			.setMessage(getResources().getString(R.string.quickstart_text))
 			.setNeutralButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
-					viewPreferencesHelper.save(PreferencesKeys.FIRST_TIME_APP, false);
+					presenter.initialDialogRead();
 				}
 			})
 			.create()
@@ -169,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void selectFileFromSystem(String fileType, int action){
-		File file = new File(getRecentFolder());
+		File file = new File(presenter.getRecentFolder());
 		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 		intent.setDataAndType(Uri.fromFile(file), fileType);
 
@@ -211,13 +218,12 @@ public class MainActivity extends AppCompatActivity {
 
 	private void convertFile(String chosenFile){
 		filename = chosenFile;
-		updateRecentFolder(chosenFile);
+		presenter.updateRecentFolder(chosenFile);
 		setCoverImage();
 	}
 
 	private void setCoverImage() {
-		boolean userPrefersToUsePicture = sharedPreferencesHelper.getBoolean(PreferencesKeys.CHOOSE_PICTURE);
-		if (userPrefersToUsePicture) {
+		if (presenter.userPrefersToUsePicture()) {
             coverFile = "";
             selectImageFileFromSystem();
             return;
@@ -228,16 +234,8 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void verifyFile(String chosenFile){
-		updateRecentFolder(chosenFile);
+		presenter.updateRecentFolder(chosenFile);
 		gotoVerifyView(chosenFile);
 	}
-
-	private String getRecentFolder(){
-		return sharedPreferencesHelper.getString(PreferencesKeys.PATH, Environment.getExternalStorageDirectory().getPath());
-	}
-
-	private void updateRecentFolder(String filename) {
-		String path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
-		viewPreferencesHelper.save(PreferencesKeys.PATH, path);
-	}
+	//</editor-fold>
 }

@@ -23,7 +23,7 @@ public class ImageProviderImpl implements ImageProvider {
 
 	@Override
 	public byte[] addSelectedCoverImage(String coverImageFilename, FrontCoverDetails coverDetails) {
-		if(coverImageFilename.equals("")){
+		if(coverImageFilename==null){
 			return null;
 		}
 

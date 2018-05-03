@@ -38,13 +38,12 @@ import java.util.zip.ZipFile;
 
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.constants.BundleKeys;
-import it.iiizio.epubator.domain.constants.PreferencesKeys;
 import it.iiizio.epubator.domain.entities.Book;
+import it.iiizio.epubator.domain.services.EpubServiceImpl;
 import it.iiizio.epubator.domain.utils.FileHelper;
+import it.iiizio.epubator.infrastructure.providers.SharedPreferenceProviderImpl;
 import it.iiizio.epubator.presentation.presenters.VerifyPresenter;
 import it.iiizio.epubator.presentation.presenters.VerifyPresenterImpl;
-import it.iiizio.epubator.presentation.utils.BundleHelper;
-import it.iiizio.epubator.presentation.utils.PreferencesHelper;
 
 public class VerifyActivity extends AppCompatActivity {
 
@@ -68,7 +67,7 @@ public class VerifyActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_verify);
 
-		presenter = new VerifyPresenterImpl();
+		presenter = new VerifyPresenterImpl(new EpubServiceImpl(), new SharedPreferenceProviderImpl(this));
 
 		setupElements();
 		setupBook();
@@ -174,7 +173,7 @@ public class VerifyActivity extends AppCompatActivity {
 	}
 
 	private void setupBook() {
-		String filename = BundleHelper.getExtraStringOrDefault(getIntent(), BundleKeys.FILENAME);
+		String filename = getIntent().getStringExtra(BundleKeys.FILENAME);
 
 		try {
 			epubFile = new ZipFile(filename);
@@ -227,7 +226,7 @@ public class VerifyActivity extends AppCompatActivity {
 			exitEpubVerificationOnError();
 		}
 
-		boolean showImages = showImages();
+		boolean showImages = presenter.showImages();
 		if(showImages) {
 			removeFiles();
 
@@ -248,10 +247,6 @@ public class VerifyActivity extends AppCompatActivity {
 		if (!showImages) {
 			wv_verifyEpub.loadDataWithBaseURL("app:html", htmlPage, "text/html", "utf-8", null);
 		}
-	}
-
-	private boolean showImages(){
-		return new PreferencesHelper(this).getBoolean(PreferencesKeys.SHOW_IMAGES_ON_VERIFY, true);
 	}
 
 	private void removeFiles() {

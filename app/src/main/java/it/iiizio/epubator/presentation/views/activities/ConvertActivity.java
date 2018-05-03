@@ -21,7 +21,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,20 +36,17 @@ import org.greenrobot.eventbus.ThreadMode;
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.constants.BundleKeys;
 import it.iiizio.epubator.domain.constants.ConversionStatus;
-import it.iiizio.epubator.domain.constants.DecisionOnConversionError;
-import it.iiizio.epubator.domain.constants.PreferencesKeys;
-import it.iiizio.epubator.infrastructure.services.ConversionService;
-import it.iiizio.epubator.domain.entities.ConversionPreferences;
 import it.iiizio.epubator.domain.entities.ConversionSettings;
+import it.iiizio.epubator.infrastructure.providers.SharedPreferenceProviderImpl;
+import it.iiizio.epubator.infrastructure.providers.StorageProviderImpl;
+import it.iiizio.epubator.infrastructure.services.ConversionService;
 import it.iiizio.epubator.presentation.events.ConversionCanceledEvent;
 import it.iiizio.epubator.presentation.events.ConversionFinishedEvent;
 import it.iiizio.epubator.presentation.events.ConversionStatusChangedEvent;
 import it.iiizio.epubator.presentation.events.ProgressUpdateEvent;
 import it.iiizio.epubator.presentation.presenters.ConvertPresenter;
 import it.iiizio.epubator.presentation.presenters.ConvertPresenterImpl;
-import it.iiizio.epubator.presentation.utils.BundleHelper;
 import it.iiizio.epubator.presentation.utils.ContextHelper;
-import it.iiizio.epubator.presentation.utils.PreferencesHelper;
 
 public class ConvertActivity extends AppCompatActivity {
 
@@ -72,11 +68,9 @@ public class ConvertActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_conversion);
 
-		presenter = new ConvertPresenterImpl();
+		presenter = new ConvertPresenterImpl(new SharedPreferenceProviderImpl(this), new StorageProviderImpl(this));
 
 		setupElements();
-
-		ConversionPreferences preferences = getPreferences();
 
 		boolean startConversion = getIntent().getBooleanExtra(BundleKeys.START_CONVERSION, false);
 		if(startConversion){
@@ -96,16 +90,15 @@ public class ConvertActivity extends AppCompatActivity {
 			return;
 		}
 
-		String pdfFilename = BundleHelper.getExtraStringOrDefault(extras, BundleKeys.FILENAME);
+		String pdfFilename = getIntent().getStringExtra(BundleKeys.FILENAME);
 		if(pdfFilename==null){
 			Toast.makeText(this, getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
 			finish();
 			return;
 		}
 
-		String coverFile = BundleHelper.getExtraStringOrEmpty(extras, BundleKeys.COVER);
-		String temporalPath = getExternalCacheDir() + "/";
-		settings = new ConversionSettings(preferences, pdfFilename, temporalPath, getDownloadDirectory(), coverFile);
+		String coverFile = getIntent().getStringExtra(BundleKeys.COVER);
+		settings = presenter.getConversionSettings(pdfFilename, coverFile);
 		startConversion(settings);
 		updateButtonStates();
 	}
@@ -114,7 +107,6 @@ public class ConvertActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 		EventBus.getDefault().register(this);
-        getPreferences();
 		setupConversionSummary(settings);
     }
 
@@ -133,7 +125,7 @@ public class ConvertActivity extends AppCompatActivity {
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
 
-		String conversionFinishedText = BundleHelper.getExtraStringOrDefault(intent.getExtras(), BundleKeys.CONVERSION_TEXT);
+		String conversionFinishedText = intent.getStringExtra(BundleKeys.CONVERSION_TEXT);
 		if(conversionFinishedText!=null){
 			updateProgressText(conversionFinishedText);
 			updateButtonStates(false);
@@ -197,10 +189,6 @@ public class ConvertActivity extends AppCompatActivity {
 			.show();
 	}
 
-	private String getDownloadDirectory(){
-		return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/";
-	}
-
 	private void startConversion(ConversionSettings settings){
 		if(ContextHelper.isServiceRunning(this, ConversionService.class)) {
 			return; // Service already started
@@ -246,22 +234,6 @@ public class ConvertActivity extends AppCompatActivity {
 				updateButtonStates();
 			}
 		});
-	}
-
-	private ConversionPreferences getPreferences() {
-		PreferencesHelper prefs = new PreferencesHelper(this);
-
-		ConversionPreferences preferences = new ConversionPreferences();
-		preferences.includeImages = prefs.getBoolean(PreferencesKeys.ADD_EXTRACTED_IMAGES_FROM_PDF, true);
-		preferences.repeatedImages = prefs.getBoolean(PreferencesKeys.ADD_REPEATED_IMAGES);
-		preferences.pagesPerFile = prefs.getParsedString(PreferencesKeys.PAGES_PER_FILE, 5);
-		preferences.onError = prefs.getParsedString(PreferencesKeys.OPTION_WHEN_ERROR_IN_CONVERSION, DecisionOnConversionError.KEEP_ITEM);
-		preferences.addMarkers = prefs.getBoolean(PreferencesKeys.MARK_ERRORS, true);
-		preferences.tocFromPdf = prefs.getBoolean(PreferencesKeys.TRY_TO_EXTRACT_TOC_FROM_PDF, true);
-		preferences.showLogoOnCover = prefs.getBoolean(PreferencesKeys.HAVE_LOGO_ON_COVER, true);
-		preferences.saveOnDownloadDirectory = prefs.getBoolean(PreferencesKeys.SAVE_ALWAYS_ON_DOWNLOAD_DIRECTORY);
-
-		return preferences;
 	}
 
 	private void updateButtonStates() {
