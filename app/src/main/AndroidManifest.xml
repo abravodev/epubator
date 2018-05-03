@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="it.iiizio.epubator"
-    android:versionCode="13"
-    android:versionName="0.12"
     android:installLocation="auto">
 
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -13,7 +11,7 @@
 		android:theme="@style/AppTheme"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:allowBackup="true" >
+        android:allowBackup="true">
         <activity
             android:label="@string/app_name"
 			android:theme="@style/AppTheme.MainView"
@@ -36,7 +34,7 @@
 			</intent-filter>
 			</activity>
 		<activity android:name=".presentation.views.activities.ConvertActivity" android:launchMode="singleTop" />
-		<activity android:name=".presentation.views.activities.PrefsActivity" />
+		<activity android:name=".presentation.views.activities.PreferencesActivity" />
 		<activity android:name=".presentation.views.activities.VerifyActivity" />
 		<activity android:name=".presentation.views.activities.InfoActivity" />
 		<activity android:name=".presentation.views.activities.LicenseActivity" />

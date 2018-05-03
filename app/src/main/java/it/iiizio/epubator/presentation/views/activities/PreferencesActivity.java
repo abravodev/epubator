@@ -22,12 +22,11 @@ import android.preference.PreferenceActivity;
 
 import it.iiizio.epubator.R;
 
-public class PrefsActivity extends PreferenceActivity {
+public class PreferencesActivity extends PreferenceActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		addPreferencesFromResource(R.xml.prefs);
 	}
 }

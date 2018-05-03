@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void gotoPreferences() {
-		startActivity(new Intent(MainActivity.this, PrefsActivity.class));
+		startActivity(new Intent(MainActivity.this, PreferencesActivity.class));
 	}
 
 	private void gotoStore() {

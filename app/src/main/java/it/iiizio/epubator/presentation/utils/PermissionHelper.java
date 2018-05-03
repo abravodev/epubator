@@ -11,12 +11,12 @@ public class PermissionHelper {
 
     public static boolean isPending(Context context, String permission){
         return ContextCompat.checkSelfPermission(context, permission)
-                != PackageManager.PERMISSION_GRANTED;
+			!= PackageManager.PERMISSION_GRANTED;
     }
 
     public static boolean isGranted(Context context, String permission){
         return ContextCompat.checkSelfPermission(context, permission)
-                == PackageManager.PERMISSION_GRANTED;
+			== PackageManager.PERMISSION_GRANTED;
     }
 
     public static boolean writePermissionIsGranted(Context context){
@@ -38,7 +38,7 @@ public class PermissionHelper {
     }
 
     public static void checkPermission(Activity activity, String permission, int requestCode){
-        if (writePermissionIsPending(activity)) {
+        if (isPending(activity, permission)) {
             showPermissionRequest(activity, permission, requestCode);
         }
     }

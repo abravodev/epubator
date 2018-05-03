@@ -8,6 +8,8 @@ android {
         applicationId "it.iiizio.epubator"
         minSdkVersion 16
         targetSdkVersion 25
+        versionCode 13
+        versionName "0.12"
     }
 
     buildTypes {
@@ -21,7 +23,7 @@ android {
 dependencies {
     compile 'com.itextpdf:itext-pdfa:5.5.10'
     compile 'com.itextpdf:itextg:5.5.9'
-    compile 'com.android.support:support-v4:25.3.0'
-    compile 'com.android.support:appcompat-v7:25.3.0'
+    compile 'com.android.support:support-v4:25.4.0'
+    compile 'com.android.support:appcompat-v7:25.4.0'
     compile 'org.greenrobot:eventbus:3.1.1'
 }
