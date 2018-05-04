@@ -100,6 +100,11 @@ public class MainActivity extends AppCompatActivity {
 				case Actions.PICK_A_PIC: getImageFromGallery(getActualPath(result)); break;
 				default: errorWhenChoosingFile(); break;
 			}
+		} else if (resultCode == RESULT_CANCELED){
+			switch (requestCode){
+				case Actions.PICK_A_PIC:
+					Toast.makeText(this, R.string.image_must_be_picked_from_gallery, Toast.LENGTH_LONG).show(); break;
+			}
 		}
 	}
 

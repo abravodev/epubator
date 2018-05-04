@@ -107,4 +107,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="source_filename">Source filename</string>
     <string name="epub_filename">Epub filename</string>
     <string name="status">Status</string>
+    <string name="image_must_be_picked_from_gallery">An image must be picked from gallery. If you don\'t want to, you can go to Settings and disable the option</string>
 </resources>

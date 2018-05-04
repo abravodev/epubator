@@ -83,13 +83,6 @@ public class ConvertActivity extends AppCompatActivity {
 			return;
 		}
 
-		Bundle extras = getIntent().getExtras();
-		if (extras == null) {
-			Toast.makeText(this, getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
-			finish();
-			return;
-		}
-
 		String pdfFilename = getIntent().getStringExtra(BundleKeys.FILENAME);
 		if(pdfFilename==null){
 			Toast.makeText(this, getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
