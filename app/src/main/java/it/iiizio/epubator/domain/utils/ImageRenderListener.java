@@ -8,32 +8,44 @@ import com.itextpdf.text.pdf.parser.TextRenderInfo;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import it.iiizio.epubator.domain.callbacks.ImageRenderedCallback;
+
 public class ImageRenderListener implements RenderListener {
 
+	private final ImageRenderedCallback imageRenderedCallback;
+
+	private final class ImageTypes {
+		private static final String PNG = "png";
+		private static final String GIF = "gif";
+		private static final String JPG = "jpg";
+	}
+
+	public ImageRenderListener(ImageRenderedCallback imageRenderedCallback) {
+		this.imageRenderedCallback = imageRenderedCallback;
+	}
+
+	@Override
 	public void renderImage(ImageRenderInfo renderInfo) {
 		try {
-			// Get image
+
 			PdfImageObject image = renderInfo.getImage();
-			if (image != null) {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				baos.write(image.getImageAsBytes());
-				baos.flush();
-				baos.close();
+			if(image == null){
+				return;
+			}
 
-				// Check image type
-				String imageType = image.getFileType();
-				if (imageType == "png" || imageType == "gif" || imageType == "jpg") {
-					if (imageType == "jpg") {
-						imageType = "jpeg";
-					}
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			baos.write(image.getImageAsBytes());
+			baos.flush();
+			baos.close();
 
-					// Save to ePUB
-					String imageName = String.format("image%s.%s", renderInfo.getRef().getNumber(), imageType);
-					if (!ZipWriter.addImage("OEBPS/" + imageName, baos.toByteArray())) {
-						PdfReadHelper.addImage(imageName);
-					}
+			String imageType = image.getFileType();
+			if (isValidImage(image)) {
+				if (imageType == "jpg") {
+					imageType = "jpeg";
 				}
 
+				String imageName = String.format("image%s.%s", renderInfo.getRef().getNumber(), imageType);
+				imageRenderedCallback.imageRendered(imageName, baos.toByteArray());
 			}
 		} catch (IOException e) {
 			System.err.println("Failed to extract image (ImageRenderListener) " + e.getMessage());
@@ -44,12 +56,22 @@ public class ImageRenderListener implements RenderListener {
 		}
 	}
 
+	private boolean isValidImage(PdfImageObject image){
+		String imageType = image.getFileType();
+		return imageType.equalsIgnoreCase(ImageTypes.PNG)
+			|| imageType.equalsIgnoreCase(ImageTypes.GIF)
+			|| imageType.equalsIgnoreCase(ImageTypes.JPG);
+	}
+
+	@Override
 	public void renderText(TextRenderInfo renderInfo) {
 	}
 
+	@Override
 	public void beginTextBlock() {
 	}
 
+	@Override
 	public void endTextBlock() {
 	}
 }

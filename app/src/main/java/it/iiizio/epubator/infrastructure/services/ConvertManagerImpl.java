@@ -15,8 +15,8 @@ import it.iiizio.epubator.domain.entities.ConversionSettings;
 import it.iiizio.epubator.domain.entities.FrontCoverDetails;
 import it.iiizio.epubator.domain.entities.PdfExtraction;
 import it.iiizio.epubator.domain.exceptions.ConversionException;
+import it.iiizio.epubator.domain.services.PdfReaderService;
 import it.iiizio.epubator.domain.utils.HtmlHelper;
-import it.iiizio.epubator.domain.utils.PdfReadHelper;
 import it.iiizio.epubator.domain.utils.PdfXmlParser;
 import it.iiizio.epubator.domain.utils.ZipWriter;
 import it.iiizio.epubator.infrastructure.providers.ImageProvider;
@@ -26,23 +26,25 @@ public class ConvertManagerImpl implements ConvertManager {
     //<editor-fold desc="Attributes">
     private final PageBuildEvents pageBuildEvents;
     private final ImageProvider imageProvider;
+    private final PdfReaderService pdfReader;
     //</editor-fold>
 
     //<editor-fold desc="Constructors">
-    public ConvertManagerImpl(PageBuildEvents buildEvents, ImageProvider imageProvider) {
+    public ConvertManagerImpl(PageBuildEvents buildEvents, ImageProvider imageProvider, PdfReaderService pdfReader) {
         this.pageBuildEvents = buildEvents;
         this.imageProvider = imageProvider;
+        this.pdfReader = pdfReader;
     }
     //</editor-fold>
 
-    //<editor-fold desc="Public methods">
+	//<editor-fold desc="Public methods">
     @Override
     public void loadPdfFile(String pdfFilename) throws ConversionException {
         if (!(new File(pdfFilename).exists())) {
             throw new ConversionException(ConversionStatus.FILE_NOT_FOUND);
         }
 
-        boolean error = PdfReadHelper.open(pdfFilename);
+        boolean error = pdfReader.open(pdfFilename);
         if (error) {
             throw new ConversionException(ConversionStatus.CANNOT_READ_PDF);
         }
@@ -55,6 +57,11 @@ public class ConvertManagerImpl implements ConvertManager {
             throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
         }
     }
+
+	@Override
+	public int getBookPages() {
+		return pdfReader.getPages();
+	}
 
     @Override
     public void addMimeType() throws ConversionException {
@@ -74,8 +81,8 @@ public class ConvertManagerImpl implements ConvertManager {
     }
 
     @Override
-    public void addToc(int pages, String tocId, String title, boolean tocFromPdf, int pagesPerFile) throws ConversionException {
-        String toc = buildToc(pages, tocId, title, tocFromPdf, pagesPerFile);
+    public void addToc(String tocId, String title, boolean tocFromPdf, int pagesPerFile) throws ConversionException {
+        String toc = buildToc(tocId, title, tocFromPdf, pagesPerFile);
         boolean error = ZipWriter.addText(ZipFileConstants.TOC, toc);
         if(error){
             throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
@@ -108,10 +115,11 @@ public class ConvertManagerImpl implements ConvertManager {
     }
 
     @Override
-    public PdfExtraction addPages(ConversionPreferences preferences, int pages, int pagesPerFile) throws ConversionException {
-        PdfExtraction extraction = new PdfExtraction(preferences, pages, pagesPerFile, pageBuildEvents);
+    public PdfExtraction addPages(ConversionPreferences preferences) throws ConversionException {
+    	PdfExtraction extraction = new PdfExtraction(preferences, pageBuildEvents, pdfReader);
 
-        for(int i = 1; i <= pages; i += pagesPerFile) {
+		int pages = extraction.getPages();
+		for(int i = 1; i <= pages; i += preferences.pagesPerFile) {
             String pageText = extraction.buildPage(i);
             addPage(i, pageText);
         }
@@ -120,8 +128,8 @@ public class ConvertManagerImpl implements ConvertManager {
     }
 
     @Override
-    public void addContent(int pages, String bookId, String title, Iterable<String> images, int pagesPerFile) throws ConversionException {
-        String content = buildContent(pages, bookId, images, title, pagesPerFile);
+    public void addContent(String bookId, String title, Iterable<String> images, int pagesPerFile) throws ConversionException {
+        String content = buildContent(bookId, images, title, pagesPerFile);
         boolean error = ZipWriter.addText(ZipFileConstants.CONTENT, content);
         if(error){
             throw new ConversionException(ConversionStatus.CANNOT_WRITE_EPUB);
@@ -162,7 +170,7 @@ public class ConvertManagerImpl implements ConvertManager {
         }
     }
 
-    private String buildToc(int pages, String tocId, String bookTitle, boolean getTocFromPdf, int pagesPerFile) {
+    private String buildToc(String tocId, String bookTitle, boolean getTocFromPdf, int pagesPerFile) {
         StringBuilder toc = new StringBuilder();
         toc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         toc.append("<!DOCTYPE ncx PUBLIC \"-//NISO//DTD ncx 2005-1//EN\"\n");
@@ -189,7 +197,7 @@ public class ConvertManagerImpl implements ConvertManager {
         boolean extractedToc = false;
         if (getTocFromPdf) {
             PdfXmlParser parser = new PdfXmlParser();
-            NodeList nodes = parser.getDocumentTitles(PdfReadHelper.getBookmarks());
+            NodeList nodes = parser.getDocumentTitles(pdfReader.getBookmarks());
             if (nodes != null) {
                 extractedToc = nodes.getLength()>0;
                 String tocFromPdf = buildTocFromPdf(nodes, parser, bookTitle, pagesPerFile, playOrder);
@@ -203,7 +211,7 @@ public class ConvertManagerImpl implements ConvertManager {
             if(getTocFromPdf) {
                 pageBuildEvents.noTocFoundInThePdfFile();
             }
-            String dummyToc = buildDummyToc(pages, pagesPerFile, playOrder);
+            String dummyToc = buildDummyToc(pagesPerFile, playOrder);
             toc.append(dummyToc);
             pageBuildEvents.dummyTocCreated();
         }
@@ -249,7 +257,6 @@ public class ConvertManagerImpl implements ConvertManager {
             } catch (RuntimeException ex) {
                 System.err.println("RuntimeException in xml extraction " + ex.getMessage());
             }
-
         }
 
         // Add last entry
@@ -261,7 +268,8 @@ public class ConvertManagerImpl implements ConvertManager {
         return toc.toString();
     }
 
-    private String buildDummyToc(int pages, int pagesPerFile, int playOrder){
+    private String buildDummyToc(int pagesPerFile, int playOrder){
+		int pages = getBookPages();
         StringBuilder toc = new StringBuilder();
         for(int i = 1; i <= pages; i += pagesPerFile) {
             String entryText = String.format("Page %d", i);
@@ -288,14 +296,17 @@ public class ConvertManagerImpl implements ConvertManager {
         return HtmlHelper.getBasicHtml("Frontpage", "<div><img width=\"100%\" alt=\"cover\" src=\"frontpage.png\" /></div>");
     }
 
-    private String buildContent(int pages, String id, Iterable<String> images, String title, int pagesPerFile) {
+    private String buildContent(String id, Iterable<String> images, String title, int pagesPerFile) {
         StringBuilder content = new StringBuilder();
 
+		int pages = getBookPages();
+
+        String author = (pdfReader.getAuthor()).replaceAll("[<>]", "_");
         content.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         content.append("<package xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"BookID\" version=\"2.0\">\n");
         content.append("    <metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:opf=\"http://www.idpf.org/2007/opf\">\n");
         content.append("        <dc:title>" + title + "</dc:title>\n");
-        content.append("        <dc:creator>" + (PdfReadHelper.getAuthor()).replaceAll("[<>]", "_") + "</dc:creator>\n");
+        content.append("        <dc:creator>" + author + "</dc:creator>\n");
         content.append("        <dc:creator opf:role=\"bkp\">ePUBator - Minimal offline PDF to ePUB converter for Android</dc:creator>\n");
         content.append("        <dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + id + "</dc:identifier>\n");
         content.append("        <dc:language>" + pageBuildEvents.getLocaleLanguage() + "</dc:language>\n");

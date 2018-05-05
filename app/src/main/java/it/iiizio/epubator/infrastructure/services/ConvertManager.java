@@ -7,6 +7,8 @@ import it.iiizio.epubator.domain.entities.PdfExtraction;
 
 public interface ConvertManager {
 
+    int getBookPages();
+
     void loadPdfFile(String pdfFilename) throws ConversionException;
 
     void openFile(String tempFilename) throws ConversionException;
@@ -15,15 +17,15 @@ public interface ConvertManager {
 
     void addContainer() throws ConversionException;
 
-    void addToc(int pages, String tocId, String title, boolean tocFromPdf, int pagesPerFile) throws ConversionException;
+    void addToc(String tocId, String title, boolean tocFromPdf, int pagesPerFile) throws ConversionException;
 
     void addFrontPage() throws ConversionException;
 
     void addFrontpageCover(String bookFilename, String coverImageFilename, boolean showLogoOnCover) throws ConversionException;
 
-    PdfExtraction addPages(ConversionPreferences preferences, int pages, int pagesPerFile) throws ConversionException;
+    PdfExtraction addPages(ConversionPreferences preferences) throws ConversionException;
 
-    void addContent(int pages, String id, String title, Iterable<String> images, int pagesPerFile) throws ConversionException;
+    void addContent(String id, String title, Iterable<String> images, int pagesPerFile) throws ConversionException;
 
     void closeFile(String tempFilename) throws ConversionException;
 

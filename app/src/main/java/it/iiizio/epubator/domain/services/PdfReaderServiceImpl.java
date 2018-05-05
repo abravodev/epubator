@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.iiizio.epubator.domain.utils;
+package it.iiizio.epubator.domain.services;
 
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.SimpleBookmark;
@@ -28,39 +28,46 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class PdfReadHelper {
+import it.iiizio.epubator.domain.callbacks.ImageRenderedCallback;
+import it.iiizio.epubator.domain.utils.ImageRenderListener;
 
-	private static PdfReader reader;
-	private static HashMap<String, String> info;
-	private static List<String> imageList;
+public class PdfReaderServiceImpl implements PdfReaderService {
 
-	public static boolean open(String filename) {
+	//<editor-fold desc="Attributes">
+	private final List<String> imageList;
+	private PdfReader pdfReader;
+	private HashMap<String, String> info;
+	//</editor-fold>
+
+	//<editor-fold desc="Constructors">
+	public PdfReaderServiceImpl() {
+		this.imageList = new ArrayList<>();
+	}
+	//</editor-fold>
+
+	//<editor-fold desc="Methods">
+	@Override
+	public boolean open(String filename) {
 		try {
-			reader = new PdfReader(filename);
-			info = reader.getInfo();
-		} catch(Exception e) {
-			return true;
+			pdfReader = new com.itextpdf.text.pdf.PdfReader(filename);
+			info = pdfReader.getInfo();
 		} catch(OutOfMemoryError e) {
 			return true;
 		} catch(NoClassDefFoundError e) {
+			return true;
+		} catch(Exception e) {
 			return true;
 		}
 		return false;
 	}
 
-	public static int getPages() {
-		return reader.getNumberOfPages();
+	@Override
+	public int getPages() {
+		return pdfReader.getNumberOfPages();
 	}
 
-	public static String getTitle() {
-		String title = info.get("Title");
-		if (title != null) {
-			return title;
-		}
-		return "";
-	}
-
-	public static String getAuthor() {
+	@Override
+	public String getAuthor() {
 		String author = info.get("Author");
 		if (author != null) {
 			return author;
@@ -68,9 +75,10 @@ public class PdfReadHelper {
 		return "";
 	}
 
-	public static String getPageText(int page) {
+	@Override
+	public String getPageText(int page) {
 		try {
-			return PdfTextExtractor.getTextFromPage(reader, page) + "\n";
+			return PdfTextExtractor.getTextFromPage(pdfReader, page) + "\n";
 		} catch(Exception e) {
 			System.err.println("Failed to extract text " + e.getMessage());
 			return "";
@@ -80,11 +88,10 @@ public class PdfReadHelper {
 		}
 	}
 
-	// Extract images
-	public static List<String> getPageImages(int page) {
-		imageList = new ArrayList<>();
-		PdfReaderContentParser parser = new PdfReaderContentParser(reader);
-		ImageRenderListener listener = new ImageRenderListener();
+	@Override
+	public List<String> getPageImages(int page, ImageRenderedCallback imageRenderer) {
+		PdfReaderContentParser parser = new PdfReaderContentParser(pdfReader);
+		ImageRenderListener listener = new ImageRenderListener(imageRenderer);
 		try {
 			parser.processContent(page, listener);
 		} catch (IOException e) {
@@ -97,10 +104,11 @@ public class PdfReadHelper {
 		return imageList;
 	}
 
-	public static String getBookmarks() {
+	@Override
+	public String getBookmarks() {
 		List<HashMap<String, Object>> list;
 		try {
-			list = SimpleBookmark.getBookmark(reader);
+			list = SimpleBookmark.getBookmark(pdfReader);
 		} catch (ClassCastException e) {
 			return "";
 		}
@@ -117,8 +125,10 @@ public class PdfReadHelper {
 		return outputStream.toString();
 	}
 
-	public static void addImage(String image){
+	@Override
+	public void addImage(String image){
 		imageList.add(image);
 	}
+	//</editor-fold>
 }
 

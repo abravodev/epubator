@@ -3,30 +3,32 @@ package it.iiizio.epubator.domain.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.iiizio.epubator.domain.utils.HtmlHelper;
-import it.iiizio.epubator.domain.utils.PdfReadHelper;
+import it.iiizio.epubator.domain.callbacks.ImageRenderedCallback;
 import it.iiizio.epubator.domain.callbacks.PageBuildEvents;
+import it.iiizio.epubator.domain.services.PdfReaderService;
+import it.iiizio.epubator.domain.utils.HtmlHelper;
+import it.iiizio.epubator.domain.utils.ZipWriter;
 
 public class PdfExtraction {
 
     //<editor-fold desc="Attributes">
-	private final String REGEX_ANY_ERROR = ".*\\p{Cntrl}.*";
-	private final String REGEX_AN_ERROR = "\\p{Cntrl}+";
-    private final List<String> pdfImages;
-    private boolean extractionError;
-    private final ConversionPreferences preferences;
-    private final PageBuildEvents build;
-    private final int pages;
-    private final int pagesPerFile;
-    //</editor-fold>
+	private static final String REGEX_ANY_ERROR = ".*\\p{Cntrl}.*";
+	private static final String REGEX_AN_ERROR = "\\p{Cntrl}+";
+	private final PdfReaderService pdfReader;
+	private final ConversionPreferences preferences;
+	private final PageBuildEvents buildEvents;
+	private final List<String> pdfImages;
+	private final int pages;
+	private boolean extractionError;
+	//</editor-fold>
 
 	//<editor-fold desc="Constructors">
-	public PdfExtraction(ConversionPreferences preferences, int pages, int pagesPerFile, PageBuildEvents build) {
+	public PdfExtraction(ConversionPreferences preferences, PageBuildEvents buildEvents, PdfReaderService pdfReader) {
         this.preferences = preferences;
-        this.build = build;
-        this.pages = pages;
-        this.pagesPerFile = pagesPerFile;
-        pdfImages = new ArrayList<>();
+        this.buildEvents = buildEvents;
+		this.pdfReader = pdfReader;
+		this.pages = pdfReader.getPages();
+		this.pdfImages = new ArrayList<>();
     }
 	//</editor-fold>
 
@@ -36,10 +38,10 @@ public class PdfExtraction {
 	}
 
 	public String buildPage(int pageIndex){
-		build.pageAdded(pageIndex);
+		buildEvents.pageAdded(pageIndex);
 		StringBuilder pageText = new StringBuilder();
 
-		int endPage = Math.min(pageIndex + pagesPerFile - 1, pages);
+		int endPage = Math.min(pageIndex + preferences.pagesPerFile - 1, pages);
 
 		for (int j = pageIndex; j <= endPage; j++) {
 			String singlePageText = buildSinglePage(j);
@@ -47,6 +49,10 @@ public class PdfExtraction {
 		}
 
 		return pageText.toString();
+	}
+
+	public int getPages(){
+		return pages;
 	}
 
 	private String buildSinglePage(int pageIndex) {
@@ -57,9 +63,9 @@ public class PdfExtraction {
 		pageText.append("  <a id=\"page" + pageIndex + "\"/>\n");
 
 		// extract text
-		String page = HtmlHelper.stringToHTMLString(PdfReadHelper.getPageText(pageIndex));
+		String page = HtmlHelper.stringToHTMLString(pdfReader.getPageText(pageIndex));
 		if (page.length() == 0) {
-			build.pageFailure(pageIndex);
+			buildEvents.pageFailure(pageIndex);
 			hasExtractionError(true);
 			if (preferences.addMarkers) {
 				pageText.append(pageErrorMarker(pageIndex));
@@ -88,13 +94,22 @@ public class PdfExtraction {
 	private String addImages(int pageIndex){
 		StringBuilder pageText = new StringBuilder();
 
-		List<String> imageList = PdfReadHelper.getPageImages(pageIndex);
+		ImageRenderedCallback imageRenderedCallback = new ImageRenderedCallback() {
+			@Override
+			public void imageRendered(String imageName, byte[] image) {
+				if (!ZipWriter.addImage("OEBPS/" + imageName, image)) {
+					pdfReader.addImage(imageName);
+				}
+			}
+		};
+
+		List<String> imageList = pdfReader.getPageImages(pageIndex, imageRenderedCallback);
 		for (String imageName: imageList){
 			String imageTag = "\n<img alt=\"" + imageName + "\" src=\"" + imageName + "\" /><br/>";
 
 			if (imageNotAddedYet(imageName)) {
 				addImage(imageName);
-				build.imageAdded(imageName);
+				buildEvents.imageAdded(imageName);
 				pageText.append(imageTag);
 			} else if (preferences.repeatedImages) {
 				pageText.append(imageTag);

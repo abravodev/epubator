@@ -17,17 +17,17 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.File;
 
 import it.iiizio.epubator.R;
+import it.iiizio.epubator.domain.callbacks.PageBuildEvents;
 import it.iiizio.epubator.domain.constants.BundleKeys;
 import it.iiizio.epubator.domain.constants.ConversionStatus;
 import it.iiizio.epubator.domain.constants.DecisionOnConversionError;
-import it.iiizio.epubator.domain.exceptions.ConversionException;
-import it.iiizio.epubator.domain.utils.FileHelper;
-import it.iiizio.epubator.domain.utils.PdfReadHelper;
-import it.iiizio.epubator.infrastructure.providers.ImageProvider;
-import it.iiizio.epubator.infrastructure.providers.ImageProviderImpl;
-import it.iiizio.epubator.domain.callbacks.PageBuildEvents;
 import it.iiizio.epubator.domain.entities.ConversionSettings;
 import it.iiizio.epubator.domain.entities.PdfExtraction;
+import it.iiizio.epubator.domain.exceptions.ConversionException;
+import it.iiizio.epubator.domain.services.PdfReaderServiceImpl;
+import it.iiizio.epubator.domain.utils.FileHelper;
+import it.iiizio.epubator.infrastructure.providers.ImageProvider;
+import it.iiizio.epubator.infrastructure.providers.ImageProviderImpl;
 import it.iiizio.epubator.presentation.events.ConversionCanceledEvent;
 import it.iiizio.epubator.presentation.events.ConversionFinishedEvent;
 import it.iiizio.epubator.presentation.events.ConversionStatusChangedEvent;
@@ -64,7 +64,7 @@ public class ConversionService extends Service implements PageBuildEvents {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 		ImageProvider imageProvider = new ImageProviderImpl(getApplicationContext());
-		this.presenter = new ConvertManagerImpl(this, imageProvider);
+		this.presenter = new ConvertManagerImpl(this, imageProvider, new PdfReaderServiceImpl());
 
         Bundle extras = intent.getExtras();
 		ConversionSettings settings = (ConversionSettings) extras.getSerializable(BundleKeys.CONVERSION_SETTINGS);
@@ -256,7 +256,7 @@ public class ConversionService extends Service implements PageBuildEvents {
         }
 
         private void fillEpub(int pagesPerFile) throws ConversionException, OutOfMemoryError {
-            int pages = PdfReadHelper.getPages();
+            int pages = presenter.getBookPages();
             publishProgress(getResources().getString(R.string.number_of_pages, pages));
 
             publishProgress(getResources().getString(R.string.create_epub));
@@ -272,7 +272,7 @@ public class ConversionService extends Service implements PageBuildEvents {
             String bookId = settings.getBookId();
 
             publishProgress(getResources().getString(R.string.toc));
-            presenter.addToc(pages, bookId, title, settings.getPreferences().tocFromPdf, pagesPerFile);
+            presenter.addToc(bookId, title, settings.getPreferences().tocFromPdf, pagesPerFile);
 
             publishProgress(getResources().getString(R.string.frontpage));
             presenter.addFrontPage();
@@ -280,10 +280,10 @@ public class ConversionService extends Service implements PageBuildEvents {
             publishProgress(getResources().getString(R.string.frontpagepng));
             presenter.addFrontpageCover(settings.filename, settings.coverFile, settings.getPreferences().showLogoOnCover);
 
-            PdfExtraction extraction = presenter.addPages(settings.getPreferences(), pages, pagesPerFile);
+            PdfExtraction extraction = presenter.addPages(settings.getPreferences());
 
             publishProgress(getResources().getString(R.string.content));
-            presenter.addContent(pages, bookId, title, extraction.getPdfImages(), pagesPerFile);
+            presenter.addContent(bookId, title, extraction.getPdfImages(), pagesPerFile);
 
             publishProgress(getResources().getString(R.string.close_file));
             presenter.closeFile(settings.tempFilename);
