@@ -5,7 +5,7 @@ import it.iiizio.epubator.domain.entities.ConversionPreferences;
 import it.iiizio.epubator.domain.entities.ConversionSettings;
 import it.iiizio.epubator.domain.entities.PdfExtraction;
 
-public interface ConvertManager {
+public interface ConversionManager {
 
     int getBookPages();
 

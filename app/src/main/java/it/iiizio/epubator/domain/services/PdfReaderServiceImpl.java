@@ -49,7 +49,7 @@ public class PdfReaderServiceImpl implements PdfReaderService {
 	@Override
 	public boolean open(String filename) {
 		try {
-			pdfReader = new com.itextpdf.text.pdf.PdfReader(filename);
+			pdfReader = new PdfReader(filename);
 			info = pdfReader.getInfo();
 		} catch(OutOfMemoryError e) {
 			return true;

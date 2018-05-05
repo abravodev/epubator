@@ -101,7 +101,6 @@ public class EpubServiceImpl implements EpubService {
 		return pages;
 	}
 
-
 	private void saveImage(ZipFile epubFile, File imageDirectory, String imageName) throws IOException {
 		ZipEntry entry = epubFile.getEntry("OEBPS/" + imageName);
 		InputStream inputStream = epubFile.getInputStream(entry);

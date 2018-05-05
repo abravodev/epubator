@@ -26,6 +26,7 @@ import it.iiizio.epubator.domain.entities.PdfExtraction;
 import it.iiizio.epubator.domain.exceptions.ConversionException;
 import it.iiizio.epubator.domain.services.PdfReaderServiceImpl;
 import it.iiizio.epubator.domain.utils.FileHelper;
+import it.iiizio.epubator.domain.services.ZipWriterServiceImpl;
 import it.iiizio.epubator.infrastructure.providers.ImageProvider;
 import it.iiizio.epubator.infrastructure.providers.ImageProviderImpl;
 import it.iiizio.epubator.presentation.events.ConversionCanceledEvent;
@@ -38,7 +39,7 @@ import it.iiizio.epubator.presentation.views.activities.ConvertActivity;
 public class ConversionService extends Service implements PageBuildEvents {
 
     //<editor-fold desc="Attributes">
-    private ConvertManager presenter;
+    private ConversionManager manager;
     private ConversionTask conversionTask;
     private String currentFile;
     //</editor-fold>
@@ -63,8 +64,7 @@ public class ConversionService extends Service implements PageBuildEvents {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-		ImageProvider imageProvider = new ImageProviderImpl(getApplicationContext());
-		this.presenter = new ConvertManagerImpl(this, imageProvider, new PdfReaderServiceImpl());
+		this.manager = makeManager();
 
         Bundle extras = intent.getExtras();
 		ConversionSettings settings = (ConversionSettings) extras.getSerializable(BundleKeys.CONVERSION_SETTINGS);
@@ -138,6 +138,11 @@ public class ConversionService extends Service implements PageBuildEvents {
 	//</editor-fold>
 
     //<editor-fold desc="Private methods">
+    private ConversionManager makeManager(){
+		ImageProvider imageProvider = new ImageProviderImpl(getApplicationContext());
+		return new ConversionManagerImpl(this, imageProvider, new PdfReaderServiceImpl(), new ZipWriterServiceImpl());
+	}
+
     private void publishProgress(String message){
         if(conversionTask!=null){
             conversionTask.makeProgress(message);
@@ -212,7 +217,7 @@ public class ConversionService extends Service implements PageBuildEvents {
 
             try {
                 EventBus.getDefault().postSticky(new ConversionStatusChangedEvent(ConversionStatus.LOADING_FILE));
-                presenter.loadPdfFile(settings.pdfFilename);
+                manager.loadPdfFile(settings.pdfFilename);
                 EventBus.getDefault().postSticky(new ConversionStatusChangedEvent(ConversionStatus.IN_PROGRESS));
                 fillEpub(settings.getPreferences().pagesPerFile);
                 return ConversionStatus.SUCCESS;
@@ -227,10 +232,10 @@ public class ConversionService extends Service implements PageBuildEvents {
         protected void onPostExecute(Integer result) {
             EventBus.getDefault().postSticky(new ConversionStatusChangedEvent(result));
             if(result == ConversionStatus.SUCCESS){
-                presenter.saveEpub(settings);
+                manager.saveEpub(settings);
             } else if (result == ConversionStatus.EXTRACTION_ERROR) {
                 if (settings.getPreferences().onError == DecisionOnConversionError.KEEP_ITEM) {
-                    presenter.saveEpub(settings);
+                    manager.saveEpub(settings);
                 } else if (settings.getPreferences().onError == DecisionOnConversionError.DISCARD_ITEM){
                     deleteTemporalFile();
                 } else {
@@ -256,37 +261,37 @@ public class ConversionService extends Service implements PageBuildEvents {
         }
 
         private void fillEpub(int pagesPerFile) throws ConversionException, OutOfMemoryError {
-            int pages = presenter.getBookPages();
+            int pages = manager.getBookPages();
             publishProgress(getResources().getString(R.string.number_of_pages, pages));
 
             publishProgress(getResources().getString(R.string.create_epub));
-            presenter.openFile(settings.tempFilename);
+            manager.openFile(settings.tempFilename);
 
             publishProgress(getResources().getString(R.string.mimetype));
-            presenter.addMimeType();
+            manager.addMimeType();
 
             publishProgress(getResources().getString(R.string.container));
-            presenter.addContainer();
+            manager.addContainer();
 
             String title = settings.getTitle();
             String bookId = settings.getBookId();
 
             publishProgress(getResources().getString(R.string.toc));
-            presenter.addToc(bookId, title, settings.getPreferences().tocFromPdf, pagesPerFile);
+            manager.addToc(bookId, title, settings.getPreferences().tocFromPdf, pagesPerFile);
 
             publishProgress(getResources().getString(R.string.frontpage));
-            presenter.addFrontPage();
+            manager.addFrontPage();
 
             publishProgress(getResources().getString(R.string.frontpagepng));
-            presenter.addFrontpageCover(settings.filename, settings.coverFile, settings.getPreferences().showLogoOnCover);
+            manager.addFrontpageCover(settings.filename, settings.coverFile, settings.getPreferences().showLogoOnCover);
 
-            PdfExtraction extraction = presenter.addPages(settings.getPreferences());
+            PdfExtraction extraction = manager.addPages(settings.getPreferences());
 
             publishProgress(getResources().getString(R.string.content));
-            presenter.addContent(bookId, title, extraction.getPdfImages(), pagesPerFile);
+            manager.addContent(bookId, title, extraction.getPdfImages(), pagesPerFile);
 
             publishProgress(getResources().getString(R.string.close_file));
-            presenter.closeFile(settings.tempFilename);
+            manager.closeFile(settings.tempFilename);
 
             if (extraction.hadExtractionError()) {
                 throw new ConversionException(ConversionStatus.EXTRACTION_ERROR);
@@ -294,7 +299,7 @@ public class ConversionService extends Service implements PageBuildEvents {
         }
 
         private void deleteTemporalFile() {
-            boolean exists = presenter.deleteTemporalFile(settings);
+            boolean exists = manager.deleteTemporalFile(settings);
             if (exists) {
                 publishProgress(getResources().getString(R.string.kept_old_epub));
             } else {

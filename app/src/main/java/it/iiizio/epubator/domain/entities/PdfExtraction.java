@@ -7,7 +7,7 @@ import it.iiizio.epubator.domain.callbacks.ImageRenderedCallback;
 import it.iiizio.epubator.domain.callbacks.PageBuildEvents;
 import it.iiizio.epubator.domain.services.PdfReaderService;
 import it.iiizio.epubator.domain.utils.HtmlHelper;
-import it.iiizio.epubator.domain.utils.ZipWriter;
+import it.iiizio.epubator.domain.services.ZipWriterService;
 
 public class PdfExtraction {
 
@@ -15,19 +15,20 @@ public class PdfExtraction {
 	private static final String REGEX_ANY_ERROR = ".*\\p{Cntrl}.*";
 	private static final String REGEX_AN_ERROR = "\\p{Cntrl}+";
 	private final PdfReaderService pdfReader;
+	private final ZipWriterService zipWriter;
 	private final ConversionPreferences preferences;
 	private final PageBuildEvents buildEvents;
 	private final List<String> pdfImages;
-	private final int pages;
 	private boolean extractionError;
 	//</editor-fold>
 
 	//<editor-fold desc="Constructors">
-	public PdfExtraction(ConversionPreferences preferences, PageBuildEvents buildEvents, PdfReaderService pdfReader) {
+	public PdfExtraction(ConversionPreferences preferences, PageBuildEvents buildEvents,
+			 PdfReaderService pdfReader, ZipWriterService zipWriter) {
         this.preferences = preferences;
         this.buildEvents = buildEvents;
 		this.pdfReader = pdfReader;
-		this.pages = pdfReader.getPages();
+		this.zipWriter = zipWriter;
 		this.pdfImages = new ArrayList<>();
     }
 	//</editor-fold>
@@ -38,10 +39,9 @@ public class PdfExtraction {
 	}
 
 	public String buildPage(int pageIndex){
-		buildEvents.pageAdded(pageIndex);
 		StringBuilder pageText = new StringBuilder();
 
-		int endPage = Math.min(pageIndex + preferences.pagesPerFile - 1, pages);
+		int endPage = Math.min(pageIndex + preferences.pagesPerFile - 1, getPages());
 
 		for (int j = pageIndex; j <= endPage; j++) {
 			String singlePageText = buildSinglePage(j);
@@ -52,7 +52,7 @@ public class PdfExtraction {
 	}
 
 	public int getPages(){
-		return pages;
+		return pdfReader.getPages();
 	}
 
 	private String buildSinglePage(int pageIndex) {
@@ -97,7 +97,7 @@ public class PdfExtraction {
 		ImageRenderedCallback imageRenderedCallback = new ImageRenderedCallback() {
 			@Override
 			public void imageRendered(String imageName, byte[] image) {
-				if (!ZipWriter.addImage("OEBPS/" + imageName, image)) {
+				if (!zipWriter.addImage("OEBPS/" + imageName, image)) {
 					pdfReader.addImage(imageName);
 				}
 			}

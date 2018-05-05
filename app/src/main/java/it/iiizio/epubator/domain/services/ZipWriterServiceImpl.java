@@ -15,35 +15,39 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.iiizio.epubator.domain.utils;
+package it.iiizio.epubator.domain.services;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
-public class ZipWriter {
+public class ZipWriterServiceImpl implements ZipWriterService  {
 
-	private static ZipOutputStream zipOut = null;
+	private ZipOutputStream zipOut;
 
-	public static boolean create(String filename) {
+	@Override
+	public boolean create(String filename) {
 		try {
 			zipOut = new ZipOutputStream(new FileOutputStream(new File(filename)));
 		}
-		catch (Exception e) {
+		catch (FileNotFoundException e) {
 			System.err.println("Failed to open zip file" + e.getMessage());
 			return true;
 		}
 		return false;
 	}
 
-	public static boolean addText(String filename, String text){
+	@Override
+	public boolean addText(String filename, String text){
 		return addText(filename, text, false);
 	}
 
-	public static boolean addText(String filename, String text, boolean store) {
+	@Override
+	public boolean addText(String filename, String text, boolean store) {
 		CRC32 crc32 = new CRC32();
 		byte[] data = text.getBytes();
 
@@ -69,7 +73,8 @@ public class ZipWriter {
 		return false;
 	}
 
-	public static boolean addImage(String filename, byte[] image) {
+	@Override
+	public boolean addImage(String filename, byte[] image) {
 		try {
 			ZipEntry zipEntry = new ZipEntry(filename);
 			zipOut.setMethod(ZipOutputStream.DEFLATED);
@@ -86,7 +91,8 @@ public class ZipWriter {
 		return false;
 	}
 
-	public static boolean close() {
+	@Override
+	public boolean close() {
 		try {
 			zipOut.flush();
 			zipOut.close();
