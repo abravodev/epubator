@@ -2,7 +2,7 @@ package it.iiizio.epubator.domain.entities;
 
 import org.w3c.dom.Element;
 
-import it.iiizio.epubator.domain.utils.XMLParser;
+import it.iiizio.epubator.domain.utils.PdfXmlParser;
 
 public class Chapter {
 
@@ -14,16 +14,14 @@ public class Chapter {
 		this.pageIndex = pageIndex;
 	}
 
-	public static Chapter make(XMLParser parser, Element chapterElement){
-		String action = parser.getValue(chapterElement, "Action");
-		if(!action.equals("GoTo")){
+	public static Chapter make(PdfXmlParser parser, Element chapterElement){
+		if(!parser.hasGoToAction(chapterElement)){
 			return null;
 		}
 
-		String chapterTitle = parser.getElementValue(chapterElement).trim();
-		String chapterPage = parser.getValue(chapterElement, "Page").split(" ")[0];
-		int pageIndex = Integer.parseInt(chapterPage);
-		return new Chapter(chapterTitle, pageIndex);
+		String chapterTitle = parser.getChapterTitle(chapterElement);
+		int chapterPage = parser.getChapterPage(chapterElement);
+		return new Chapter(chapterTitle, chapterPage);
 	}
 
 	public String getTitle() {

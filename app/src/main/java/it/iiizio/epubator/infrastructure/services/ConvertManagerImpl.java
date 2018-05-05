@@ -1,26 +1,25 @@
 package it.iiizio.epubator.infrastructure.services;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.io.File;
 
+import it.iiizio.epubator.domain.callbacks.PageBuildEvents;
 import it.iiizio.epubator.domain.constants.ConversionStatus;
 import it.iiizio.epubator.domain.constants.FileTypes;
 import it.iiizio.epubator.domain.constants.ZipFileConstants;
 import it.iiizio.epubator.domain.entities.Chapter;
+import it.iiizio.epubator.domain.entities.ConversionPreferences;
+import it.iiizio.epubator.domain.entities.ConversionSettings;
 import it.iiizio.epubator.domain.entities.FrontCoverDetails;
+import it.iiizio.epubator.domain.entities.PdfExtraction;
 import it.iiizio.epubator.domain.exceptions.ConversionException;
 import it.iiizio.epubator.domain.utils.HtmlHelper;
 import it.iiizio.epubator.domain.utils.PdfReadHelper;
-import it.iiizio.epubator.domain.utils.XMLParser;
+import it.iiizio.epubator.domain.utils.PdfXmlParser;
 import it.iiizio.epubator.domain.utils.ZipWriter;
 import it.iiizio.epubator.infrastructure.providers.ImageProvider;
-import it.iiizio.epubator.domain.callbacks.PageBuildEvents;
-import it.iiizio.epubator.domain.entities.ConversionPreferences;
-import it.iiizio.epubator.domain.entities.ConversionSettings;
-import it.iiizio.epubator.domain.entities.PdfExtraction;
 
 public class ConvertManagerImpl implements ConvertManager {
 
@@ -189,8 +188,8 @@ public class ConvertManagerImpl implements ConvertManager {
         int playOrder = 2;
         boolean extractedToc = false;
         if (getTocFromPdf) {
-            XMLParser parser = new XMLParser();
-            NodeList nodes = getNodes(parser, PdfReadHelper.getBookmarks());
+            PdfXmlParser parser = new PdfXmlParser();
+            NodeList nodes = parser.getDocumentTitles(PdfReadHelper.getBookmarks());
             if (nodes != null) {
                 extractedToc = nodes.getLength()>0;
                 String tocFromPdf = buildTocFromPdf(nodes, parser, bookTitle, pagesPerFile, playOrder);
@@ -214,7 +213,7 @@ public class ConvertManagerImpl implements ConvertManager {
         return toc.toString();
     }
 
-    private String buildTocFromPdf(NodeList nodes, XMLParser parser, String bookTitle, int pagesPerFile, int playOrder){
+    private String buildTocFromPdf(NodeList nodes, PdfXmlParser parser, String bookTitle, int pagesPerFile, int playOrder){
         int lastPage = Integer.MAX_VALUE;
         StringBuilder toc = new StringBuilder();
         StringBuilder sb = new StringBuilder();
@@ -272,16 +271,6 @@ public class ConvertManagerImpl implements ConvertManager {
             playOrder++;
         }
         return toc.toString();
-    }
-
-    private NodeList getNodes(XMLParser parser, String bookmarks){
-        Document doc = parser.getDomElement(bookmarks);
-        if (doc == null) {
-            return null;
-        }
-
-        doc.normalize();
-        return doc.getElementsByTagName("Title");
     }
 
     private String buildContainer() {

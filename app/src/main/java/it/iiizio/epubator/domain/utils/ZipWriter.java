@@ -28,7 +28,6 @@ public class ZipWriter {
 
 	private static ZipOutputStream zipOut = null;
 
-	// Create file
 	public static boolean create(String filename) {
 		try {
 			zipOut = new ZipOutputStream(new FileOutputStream(new File(filename)));
@@ -39,7 +38,6 @@ public class ZipWriter {
 		}
 		return false;
 	}
-
 
 	public static boolean addText(String filename, String text){
 		return addText(filename, text, false);

@@ -1,6 +1,5 @@
 package it.iiizio.epubator.domain.services;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xmlpull.v1.XmlPullParser;
@@ -14,6 +13,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
@@ -24,7 +24,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import it.iiizio.epubator.domain.entities.Book;
-import it.iiizio.epubator.domain.utils.XMLParser;
+import it.iiizio.epubator.domain.utils.PdfXmlParser;
 
 public class EpubServiceImpl implements EpubService {
 
@@ -35,7 +35,7 @@ public class EpubServiceImpl implements EpubService {
 		List<String> pages = getPages(epubFile);
 		Book book = new Book(pages);
 
-		XMLParser parser = new XMLParser();
+		PdfXmlParser parser = new PdfXmlParser();
 		NodeList nodes = getNodes(epubFile, parser);
 		if (nodes != null) {
 			// looping through all item nodes <item>
@@ -43,8 +43,7 @@ public class EpubServiceImpl implements EpubService {
 				Element chapterElement = (Element) nodes.item(i);
 				String chapterTitle = chapterElement.getTextContent().trim();
 				book.addChapter(chapterTitle);
-				Element anchorElement = (Element) chapterElement.getChildNodes().item(3);
-				String anchor = parser.getValue(anchorElement, "src");
+				String anchor = parser.getAnchor(chapterElement);
 				book.addAnchor("OEBPS/" + anchor);
 			}
 		}
@@ -105,27 +104,28 @@ public class EpubServiceImpl implements EpubService {
 
 	private void saveImage(ZipFile epubFile, File imageDirectory, String imageName) throws IOException {
 		ZipEntry entry = epubFile.getEntry("OEBPS/" + imageName);
-		BufferedInputStream in = new BufferedInputStream(epubFile.getInputStream(entry), BUFFER_SIZE);
-		FileOutputStream out = new FileOutputStream(new File(imageDirectory + "/" + imageName));
+		InputStream inputStream = epubFile.getInputStream(entry);
+		File outputFile = new File(imageDirectory + "/" + imageName);
+		saveFile(inputStream, outputFile);
+	}
+
+	private void saveFile(InputStream entry, File outputFile) throws IOException {
+		BufferedInputStream inputStream = new BufferedInputStream(entry, BUFFER_SIZE);
+		FileOutputStream outputStream = new FileOutputStream(outputFile);
 		byte[] buffer = new byte[BUFFER_SIZE];
 		int len;
-		BufferedOutputStream dest = new BufferedOutputStream(out, BUFFER_SIZE);
-		while ((len = in.read(buffer, 0, BUFFER_SIZE)) != -1) {
+		BufferedOutputStream dest = new BufferedOutputStream(outputStream, BUFFER_SIZE);
+		while ((len = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
 			dest.write(buffer, 0, len);
 		}
 		dest.flush();
 		dest.close();
-		in.close();
+		inputStream.close();
 	}
 
-	private NodeList getNodes(ZipFile epubFile, XMLParser parser) throws IOException {
+	private NodeList getNodes(ZipFile epubFile, PdfXmlParser parser) throws IOException {
 		String toc = getTOC(epubFile);
-		Document doc = parser.getDomElement(toc);
-		if(doc == null){
-			return null;
-		}
-		doc.normalize();
-		return doc.getElementsByTagName("navPoint");
+		return parser.getNavigationPoints(toc);
 	}
 
 	private String getTOC(ZipFile epubFile) throws IOException {

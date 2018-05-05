@@ -20,6 +20,7 @@ package it.iiizio.epubator.domain.utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -33,14 +34,13 @@ import javax.xml.parsers.ParserConfigurationException;
 public class XMLParser {
 
 	public Document getDomElement(String xml){
-		Document doc = null;
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		try {
-			DocumentBuilder db = dbf.newDocumentBuilder();
+			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 
-			InputSource is = new InputSource();
-			is.setCharacterStream(new StringReader(xml));
-			doc = db.parse(is); 
+			InputSource inputSource = new InputSource();
+			inputSource.setCharacterStream(new StringReader(xml));
+			return documentBuilder.parse(inputSource);
 		} catch (ParserConfigurationException e) {
 			System.err.println("Error: " + e.getMessage());
 			return null;
@@ -51,23 +51,25 @@ public class XMLParser {
 			System.err.println("Error: " + e.getMessage());
 			return null;
 		}
-
-		return doc;
 	}
 
 	public String getValue(Element item, String str) {
 		return item.getAttribute(str);
 	}
 
-	public final String getElementValue( Node elem ) {
-		Node child;
-		if( elem != null && elem.hasChildNodes()){
-			for( child = elem.getFirstChild(); child != null; child = child.getNextSibling() ){
-				if( child.getNodeType() == Node.TEXT_NODE  ){
-					return child.getNodeValue();
-				}
+	public final String getElementValue(Node elem) {
+		if(elem == null){
+			return "";
+		}
+
+		NodeList childNodes = elem.getChildNodes();
+			for(int i=0; i<childNodes.getLength(); i++){
+			Node child = childNodes.item(i);
+			if(child.getNodeType() == Node.TEXT_NODE){
+				return child.getNodeValue();
 			}
 		}
+
 		return "";
 	}	
 }

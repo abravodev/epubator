@@ -38,17 +38,9 @@ import it.iiizio.epubator.presentation.views.activities.ConvertActivity;
 public class ConversionService extends Service implements PageBuildEvents {
 
     //<editor-fold desc="Attributes">
-    private final StringBuilder progressSb;
     private ConvertManager presenter;
     private ConversionTask conversionTask;
     private String currentFile;
-    //</editor-fold>
-
-    //<editor-fold desc="Constructors">
-    public ConversionService() {
-        super();
-        this.progressSb = new StringBuilder();
-    }
     //</editor-fold>
 
     //<editor-fold desc="Methods">
@@ -87,10 +79,12 @@ public class ConversionService extends Service implements PageBuildEvents {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onConversionCanceled(ConversionCanceledEvent event){
+    	String progress = event.getProgress();
         if(conversionTask!=null){
-            conversionTask.cancel(true);
+			progress = conversionTask.getProgress();
+			conversionTask.cancel(true);
         }
-		finishConversion(event.getResult());
+		finishConversion(event.getResult(), progress);
     }
     //</editor-fold>
 
@@ -154,18 +148,18 @@ public class ConversionService extends Service implements PageBuildEvents {
         return makeNotification(getResources().getString(R.string.conversion_in_progress), true);
     }
 
-    private void finishConversion(int result){
+    private void finishConversion(int result, String progress){
 		stopForeground(false);
-		sendFinishNotification(result);
+		sendFinishNotification(result, progress);
 		stopSelf();
 	}
 
-    private void sendFinishNotification(int result){
+    private void sendFinishNotification(int result, String progress){
     	String resultMessage = getResources().getStringArray(R.array.conversion_result_message)[result];
 		Intent openConvertActivityIntent = new Intent(this, ConvertActivity.class)
 				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
 						| Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		openConvertActivityIntent.putExtra(BundleKeys.CONVERSION_TEXT, progressSb.toString());
+		openConvertActivityIntent.putExtra(BundleKeys.CONVERSION_TEXT, progress);
         Notification notification = makeNotification(resultMessage, false, openConvertActivityIntent);
         notification.defaults |= Notification.DEFAULT_VIBRATE;
 		NotificationHelper.sendNotification(this, R.string.app_name, notification);
@@ -188,21 +182,27 @@ public class ConversionService extends Service implements PageBuildEvents {
     //<editor-fold desc="Inner classes">
     private class ConversionTask extends AsyncTask<Void, String, Integer> {
 
+        private final StringBuilder progressSb;
     	private final ConversionSettings settings;
 
 		private ConversionTask(ConversionSettings settings) {
 			this.settings = settings;
+			this.progressSb = new StringBuilder();
 		}
 
 		private void makeProgress(String message){
             publishProgress(message);
         }
 
+        private String getProgress(){
+			return progressSb.toString();
+		}
+
         @Override
         protected void onProgressUpdate(String... messageArray) {
             String message = TextUtils.join("\n", messageArray) + "\n";
             progressSb.append(message);
-            EventBus.getDefault().postSticky(new ProgressUpdateEvent(progressSb.toString()));
+            EventBus.getDefault().postSticky(new ProgressUpdateEvent(getProgress()));
         }
 
         @Override
@@ -242,7 +242,7 @@ public class ConversionService extends Service implements PageBuildEvents {
                 deleteTemporalFile();
             }
             EventBus.getDefault().post(new ConversionFinishedEvent(result, settings));
-			finishConversion(result);
+			finishConversion(result, getProgress());
         }
 
         private void saveOldEPUB() {
