@@ -128,7 +128,7 @@ public class VerifyActivity extends AppCompatActivity {
 					public void onClick(DialogInterface dialog, int which) {
 						int pageIndex = book.getPageIndex(which)+1;
 						anchor = book.getAnchor(which);
-						if(!validPage(pageIndex)){
+						if(!book.isValidPage(pageIndex)){
 							// TODO: Show message (page not valid)
 							return;
 						}
@@ -217,10 +217,6 @@ public class VerifyActivity extends AppCompatActivity {
 			anchor = book.getAnchorFromPageName(currentPageIndex);
 		}
 		showPage(fileName);
-	}
-
-	private boolean validPage(int pageIndex){
-		return 1 <= pageIndex && pageIndex <= book.getPagesCount();
 	}
 
 	private void showPage(String htmlFile) {

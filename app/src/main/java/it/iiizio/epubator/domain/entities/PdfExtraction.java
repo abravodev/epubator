@@ -5,6 +5,7 @@ import java.util.List;
 
 import it.iiizio.epubator.domain.callbacks.ImageRenderedCallback;
 import it.iiizio.epubator.domain.callbacks.PageBuildEvents;
+import it.iiizio.epubator.domain.constants.ZipFileConstants;
 import it.iiizio.epubator.domain.services.PdfReaderService;
 import it.iiizio.epubator.domain.utils.HtmlHelper;
 import it.iiizio.epubator.domain.services.ZipWriterService;
@@ -97,7 +98,7 @@ public class PdfExtraction {
 		ImageRenderedCallback imageRenderedCallback = new ImageRenderedCallback() {
 			@Override
 			public void imageRendered(String imageName, byte[] image) {
-				if (!zipWriter.addImage("OEBPS/" + imageName, image)) {
+				if (!zipWriter.addImage(ZipFileConstants.image(imageName), image)) {
 					pdfReader.addImage(imageName);
 				}
 			}

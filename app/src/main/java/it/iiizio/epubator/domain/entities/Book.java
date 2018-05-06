@@ -27,10 +27,6 @@ public class Book {
         return chapters.toArray(new CharSequence[chapters.size()]);
     }
 
-    public String[] getAnchorLinks(int index){
-        return anchors.get(index).split("#");
-    }
-
     public String getAnchor(int anchorIndex){
         String[] links = getAnchorLinks(anchorIndex);
         return links.length > 1 ? links[1] : null;
@@ -60,5 +56,13 @@ public class Book {
 	public String getAnchorFromPageName(int pageIndex){
 		String fileName = getPage(pageIndex);
 		return fileName.substring(fileName.lastIndexOf("/") + 1, fileName.lastIndexOf("."));
+	}
+
+	public boolean isValidPage(int page){
+		return 1 <= page && page <= getPagesCount();
+	}
+
+	private String[] getAnchorLinks(int index){
+		return anchors.get(index).split("#");
 	}
 }

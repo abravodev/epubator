@@ -27,14 +27,13 @@ import java.util.zip.ZipOutputStream;
 
 public class ZipWriterServiceImpl implements ZipWriterService  {
 
-	private ZipOutputStream zipOut;
+	private ZipOutputStream zipOutputStream;
 
 	@Override
 	public boolean create(String filename) {
 		try {
-			zipOut = new ZipOutputStream(new FileOutputStream(new File(filename)));
-		}
-		catch (FileNotFoundException e) {
+			zipOutputStream = new ZipOutputStream(new FileOutputStream(new File(filename)));
+		} catch (FileNotFoundException e) {
 			System.err.println("Failed to open zip file" + e.getMessage());
 			return true;
 		}
@@ -53,20 +52,19 @@ public class ZipWriterServiceImpl implements ZipWriterService  {
 
 		try {
 			ZipEntry zipEntry = new ZipEntry(filename);
-			zipOut.setMethod(ZipOutputStream.DEFLATED);
+			zipOutputStream.setMethod(ZipOutputStream.DEFLATED);
 			if (store) {
-				zipOut.setMethod(ZipOutputStream.STORED);
+				zipOutputStream.setMethod(ZipOutputStream.STORED);
 				zipEntry.setSize((long) data.length);
 				crc32.reset();
 				crc32.update(data);
 				zipEntry.setCrc(crc32.getValue());
 			}
 
-			zipOut.putNextEntry(zipEntry);
-			zipOut.write(data);
-			zipOut.closeEntry();
-		}
-		catch (Exception e) {
+			zipOutputStream.putNextEntry(zipEntry);
+			zipOutputStream.write(data);
+			zipOutputStream.closeEntry();
+		} catch (Exception e) {
 			System.err.println("Failed to add textfile to zip" + e.getMessage());
 			return true;
 		}
@@ -77,15 +75,13 @@ public class ZipWriterServiceImpl implements ZipWriterService  {
 	public boolean addImage(String filename, byte[] image) {
 		try {
 			ZipEntry zipEntry = new ZipEntry(filename);
-			zipOut.setMethod(ZipOutputStream.DEFLATED);
-			zipOut.putNextEntry(zipEntry);
-			zipOut.write(image);
-			zipOut.closeEntry();
-		}
-		catch (ZipException e) {
+			zipOutputStream.setMethod(ZipOutputStream.DEFLATED);
+			zipOutputStream.putNextEntry(zipEntry);
+			zipOutputStream.write(image);
+			zipOutputStream.closeEntry();
+		} catch (ZipException e) {
 			return !e.getMessage().startsWith("Entry already exists");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			return true;
 		}
 		return false;
@@ -94,10 +90,9 @@ public class ZipWriterServiceImpl implements ZipWriterService  {
 	@Override
 	public boolean close() {
 		try {
-			zipOut.flush();
-			zipOut.close();
-		}
-		catch (Exception e) {
+			zipOutputStream.flush();
+			zipOutputStream.close();
+		} catch (Exception e) {
 			System.err.println("Failed to close zip file" + e.getMessage());
 			return true;
 		}

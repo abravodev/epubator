@@ -36,7 +36,6 @@ public class PdfReaderServiceImpl implements PdfReaderService {
 	//<editor-fold desc="Attributes">
 	private final List<String> imageList;
 	private PdfReader pdfReader;
-	private HashMap<String, String> info;
 	//</editor-fold>
 
 	//<editor-fold desc="Constructors">
@@ -50,12 +49,9 @@ public class PdfReaderServiceImpl implements PdfReaderService {
 	public boolean open(String filename) {
 		try {
 			pdfReader = new PdfReader(filename);
-			info = pdfReader.getInfo();
+		} catch(IOException e) {
+			return true;
 		} catch(OutOfMemoryError e) {
-			return true;
-		} catch(NoClassDefFoundError e) {
-			return true;
-		} catch(Exception e) {
 			return true;
 		}
 		return false;
@@ -68,7 +64,7 @@ public class PdfReaderServiceImpl implements PdfReaderService {
 
 	@Override
 	public String getAuthor() {
-		String author = info.get("Author");
+		String author = pdfReader.getInfo().get("Author");
 		if (author != null) {
 			return author;
 		}
@@ -79,7 +75,7 @@ public class PdfReaderServiceImpl implements PdfReaderService {
 	public String getPageText(int page) {
 		try {
 			return PdfTextExtractor.getTextFromPage(pdfReader, page) + "\n";
-		} catch(Exception e) {
+		} catch(IOException e) {
 			System.err.println("Failed to extract text " + e.getMessage());
 			return "";
 		} catch (OutOfMemoryError e) {

@@ -50,7 +50,6 @@ public class ConversionService extends Service implements PageBuildEvents {
     public void onCreate() {
         super.onCreate();
         EventBus.getDefault().register(this);
-
     }
 
     @Override

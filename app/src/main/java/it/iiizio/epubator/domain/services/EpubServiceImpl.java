@@ -2,19 +2,16 @@ package it.iiizio.epubator.domain.services;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import it.iiizio.epubator.domain.constants.ZipFileConstants;
 import it.iiizio.epubator.domain.entities.Book;
 import it.iiizio.epubator.domain.utils.PdfXmlParser;
 import it.iiizio.epubator.infrastructure.providers.StorageProvider;
@@ -23,13 +20,13 @@ public class EpubServiceImpl implements EpubService {
 
 	//<editor-fold desc="Attributes">
 	private final StorageProvider storageProvider;
-	private final PdfXmlParser parser;
+	private final PdfXmlParser pdfParser;
 	//</editor-fold>
 
 	//<editor-fold desc="Constructors">
 	public EpubServiceImpl(StorageProvider storageProvider, PdfXmlParser parser) {
 		this.storageProvider = storageProvider;
-		this.parser = parser;
+		this.pdfParser = parser;
 	}
 	//</editor-fold>
 
@@ -45,8 +42,8 @@ public class EpubServiceImpl implements EpubService {
 				Element chapterElement = (Element) nodes.item(i);
 				String chapterTitle = chapterElement.getTextContent().trim();
 				book.addChapter(chapterTitle);
-				String anchor = parser.getAnchor(chapterElement);
-				book.addAnchor("OEBPS/" + anchor);
+				String anchor = pdfParser.getAnchor(chapterElement);
+				book.addAnchor(ZipFileConstants.anchor(anchor));
 			}
 		}
 
@@ -60,24 +57,9 @@ public class EpubServiceImpl implements EpubService {
 
 	@Override
 	public void saveImages(ZipFile epubFile, String htmlPage, String imageDirectory) {
-		try {
-			XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
-			XmlPullParser parser = parserFactory.newPullParser();
-
-			parser.setInput(new StringReader(htmlPage.replaceAll("&nbsp;", "")));
-			int eventType = parser.getEventType();
-
-			while (eventType != XmlPullParser.END_DOCUMENT) {
-				if(eventType == XmlPullParser.START_TAG && "img".equals(parser.getName())) {
-					String imageName = parser.getAttributeValue(null, "src");
-					saveImage(epubFile, imageDirectory, imageName);
-				}
-				eventType = parser.next();
-			}
-		} catch (XmlPullParserException e) {
-			System.err.println("XmlPullParserException in image preview");
-		} catch (IOException e) {
-			System.err.println("IOException in image preview");
+		List<String> images = pdfParser.extractImages(htmlPage);
+		for (String image: images){
+			saveImage(epubFile, imageDirectory, image);
 		}
 	}
 
@@ -100,23 +82,33 @@ public class EpubServiceImpl implements EpubService {
 		return pages;
 	}
 
-	private void saveImage(ZipFile epubFile, String imageDirectory, String imageName) throws IOException {
-		ZipEntry entry = epubFile.getEntry("OEBPS/" + imageName);
-		storageProvider.save(epubFile.getInputStream(entry), imageDirectory, imageName);
+	private void saveImage(ZipFile epubFile, String imageDirectory, String imageName) {
+		try {
+			InputStream entry = getEntry(epubFile, ZipFileConstants.image(imageName));
+			storageProvider.save(entry, imageDirectory, imageName);
+		} catch (IOException e) {
+			String errorMessage = String.format("Failed to fetch image '%s'", imageName);
+			System.err.println(errorMessage);
+		}
 	}
 
 	private NodeList getNodes(ZipFile epubFile) throws IOException {
 		String toc = getTOC(epubFile);
-		return parser.getNavigationPoints(toc);
+		return pdfParser.getNavigationPoints(toc);
 	}
 
 	private String getTOC(ZipFile epubFile) throws IOException {
-		return getElement(epubFile, "OEBPS/toc.ncx");
+		return getElement(epubFile, ZipFileConstants.TOC);
 	}
 
 	private String getElement(ZipFile epubFile, String elementKey) throws IOException {
-		InputStream inputStream = epubFile.getInputStream(epubFile.getEntry(elementKey));
+		InputStream inputStream = getEntry(epubFile, elementKey);
 		return storageProvider.read(inputStream);
+	}
+
+	private InputStream getEntry(ZipFile zipFile, String entryName) throws IOException {
+		ZipEntry entry = zipFile.getEntry(entryName);
+		return zipFile.getInputStream(entry);
 	}
 	//</editor-fold>
 }
