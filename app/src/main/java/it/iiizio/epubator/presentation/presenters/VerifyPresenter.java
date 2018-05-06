@@ -1,6 +1,5 @@
 package it.iiizio.epubator.presentation.presenters;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.zip.ZipFile;
 
@@ -12,9 +11,13 @@ public interface VerifyPresenter {
 
     String getHtmlPage(ZipFile epubFile, String htmlFile) throws IOException;
 
-    void saveImages(ZipFile epubFile, String htmlPage, File imageDirectory);
+    void saveImages(ZipFile epubFile, String htmlPage);
 
-    void saveHtmlPage(File htmlFile, String htmlText) throws IOException;
+    void saveHtmlPage(String htmlText) throws IOException;
+
+    String getHtmlPageFilename();
 
     boolean showImages();
+
+    void removeFilesFromTemporalDirectory();
 }

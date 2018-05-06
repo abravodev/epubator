@@ -14,8 +14,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.File;
-
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.callbacks.PageBuildEvents;
 import it.iiizio.epubator.domain.constants.BundleKeys;
@@ -26,7 +24,6 @@ import it.iiizio.epubator.domain.entities.PdfExtraction;
 import it.iiizio.epubator.domain.exceptions.ConversionException;
 import it.iiizio.epubator.domain.services.PdfReaderServiceImpl;
 import it.iiizio.epubator.domain.services.ZipWriterServiceImpl;
-import it.iiizio.epubator.domain.utils.FileHelper;
 import it.iiizio.epubator.infrastructure.providers.ImageProvider;
 import it.iiizio.epubator.infrastructure.providers.ImageProviderImpl;
 import it.iiizio.epubator.infrastructure.providers.StorageProvider;
@@ -257,12 +254,12 @@ public class ConversionService extends Service implements PageBuildEvents {
 
         private void saveOldEPUB() {
             if (storageProvider.exists(settings.epubFilename)) {
-                new File(settings.epubFilename).renameTo(new File(settings.oldFilename));
+                storageProvider.rename(settings.epubFilename, settings.oldFilename);
             }
         }
 
         private void removeCacheFiles() {
-            FileHelper.deleteFilesFromDirectory(new File(settings.temporalPath));
+		    storageProvider.removeAllFromDirectory(settings.temporalPath);
         }
 
         private void fillEpub(int pagesPerFile) throws ConversionException, OutOfMemoryError {

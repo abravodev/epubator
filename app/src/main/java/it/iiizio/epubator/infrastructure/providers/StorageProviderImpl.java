@@ -32,4 +32,38 @@ public class StorageProviderImpl implements StorageProvider {
 	public boolean exists(String filename) {
 		return new File(filename).exists();
 	}
+
+	@Override
+	public boolean rename(String oldFilename, String newFilename) {
+		return new File(oldFilename).renameTo(new File(newFilename));
+	}
+
+	@Override
+	public boolean remove(String filename) {
+		return new File(filename).delete();
+	}
+
+	@Override
+	public void removeAllFromDirectory(String directoryPath) {
+		File directory = new File(directoryPath);
+		if (!directory.isDirectory()) {
+			return;
+		}
+		File[] files = directory.listFiles();
+		if(files != null) {
+			for(File f : files) {
+				f.delete();
+			}
+		}
+	}
+
+	@Override
+	public String getFileDirectory() {
+		return context.getFilesDir().getAbsolutePath();
+	}
+
+	@Override
+	public String getFile(String directory, String filename) {
+		return new File(directory, filename).getAbsolutePath();
+	}
 }

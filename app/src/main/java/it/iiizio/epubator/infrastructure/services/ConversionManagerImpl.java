@@ -3,8 +3,6 @@ package it.iiizio.epubator.infrastructure.services;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import java.io.File;
-
 import it.iiizio.epubator.domain.callbacks.PageBuildEvents;
 import it.iiizio.epubator.domain.constants.ConversionStatus;
 import it.iiizio.epubator.domain.constants.FileTypes;
@@ -16,9 +14,9 @@ import it.iiizio.epubator.domain.entities.FrontCoverDetails;
 import it.iiizio.epubator.domain.entities.PdfExtraction;
 import it.iiizio.epubator.domain.exceptions.ConversionException;
 import it.iiizio.epubator.domain.services.PdfReaderService;
+import it.iiizio.epubator.domain.services.ZipWriterService;
 import it.iiizio.epubator.domain.utils.HtmlHelper;
 import it.iiizio.epubator.domain.utils.PdfXmlParser;
-import it.iiizio.epubator.domain.services.ZipWriterService;
 import it.iiizio.epubator.infrastructure.providers.ImageProvider;
 import it.iiizio.epubator.infrastructure.providers.StorageProvider;
 
@@ -153,16 +151,15 @@ public class ConversionManagerImpl implements ConversionManager {
 
     @Override
     public void saveEpub(ConversionSettings settings) {
-        new File(settings.tempFilename).renameTo(new File(settings.epubFilename));
-        new File(settings.oldFilename).delete();
+        storageProvider.rename(settings.tempFilename, settings.epubFilename);
+        storageProvider.remove(settings.oldFilename);
     }
 
     @Override
     public boolean deleteTemporalFile(ConversionSettings settings) {
-        new File(settings.tempFilename).delete();
+        storageProvider.remove(settings.tempFilename);
         if (storageProvider.exists(settings.oldFilename)) {
-            new File(settings.oldFilename).renameTo(new File(settings.epubFilename));
-            return true;
+            return storageProvider.rename(settings.oldFilename, settings.epubFilename);
         }
         return false;
     }

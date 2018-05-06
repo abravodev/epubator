@@ -9,4 +9,14 @@ public interface StorageProvider {
 	String getDownloadDirectory();
 
 	boolean exists(String filename);
+
+	boolean rename(String oldName, String newName);
+
+	boolean remove(String filename);
+
+	void removeAllFromDirectory(String directoryPath);
+
+	String getFileDirectory();
+
+	String getFile(String directory, String filename);
 }

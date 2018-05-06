@@ -1,7 +1,5 @@
 package it.iiizio.epubator.presentation.presenters;
 
-import java.io.File;
-
 import it.iiizio.epubator.domain.constants.DecisionOnConversionError;
 import it.iiizio.epubator.domain.constants.PreferencesKeys;
 import it.iiizio.epubator.domain.entities.ConversionPreferences;
@@ -10,9 +8,9 @@ import it.iiizio.epubator.infrastructure.providers.PreferenceProvider;
 import it.iiizio.epubator.infrastructure.providers.StorageProvider;
 
 public class ConvertPresenterImpl implements ConvertPresenter {
-
-    private final PreferenceProvider preferenceProvider;
-    private final StorageProvider storageProvider;
+	
+	private final PreferenceProvider preferenceProvider;
+	private final StorageProvider storageProvider;
 
 	public ConvertPresenterImpl(PreferenceProvider preferenceProvider, StorageProvider storageProvider) {
 		this.preferenceProvider = preferenceProvider;
@@ -21,18 +19,17 @@ public class ConvertPresenterImpl implements ConvertPresenter {
 
 	@Override
     public boolean deleteTemporalFile(ConversionSettings settings) {
-        new File(settings.tempFilename).delete();
+		storageProvider.remove(settings.tempFilename);
         if (storageProvider.exists(settings.oldFilename)) {
-            new File(settings.oldFilename).renameTo(new File(settings.epubFilename));
-            return true;
+        	return storageProvider.rename(settings.oldFilename, settings.epubFilename);
         }
         return false;
     }
 
     @Override
     public void saveEpub(ConversionSettings settings) {
-        new File(settings.tempFilename).renameTo(new File(settings.epubFilename));
-        new File(settings.oldFilename).delete();
+		storageProvider.rename(settings.tempFilename, settings.epubFilename);
+		storageProvider.remove(settings.oldFilename);
     }
 
 	@Override
@@ -57,5 +54,4 @@ public class ConvertPresenterImpl implements ConvertPresenter {
 
 		return preferences;
 	}
-
 }

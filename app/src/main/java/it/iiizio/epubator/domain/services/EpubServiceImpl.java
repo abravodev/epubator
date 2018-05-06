@@ -52,7 +52,7 @@ public class EpubServiceImpl implements EpubService {
 	}
 
 	@Override
-	public void saveHtmlPage(File htmlFile, String htmlText) throws IOException {
+	public void saveHtmlPage(String htmlFile, String htmlText) throws IOException {
 		FileWriter writer = new FileWriter(htmlFile);
 		writer.append(htmlText);
 		writer.flush();
@@ -60,7 +60,7 @@ public class EpubServiceImpl implements EpubService {
 	}
 
 	@Override
-	public void saveImages(ZipFile epubFile, String htmlPage, File imageDirectory) {
+	public void saveImages(ZipFile epubFile, String htmlPage, String imageDirectory) {
 		try {
 			XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
 			XmlPullParser parser = parserFactory.newPullParser();
@@ -101,7 +101,7 @@ public class EpubServiceImpl implements EpubService {
 		return pages;
 	}
 
-	private void saveImage(ZipFile epubFile, File imageDirectory, String imageName) throws IOException {
+	private void saveImage(ZipFile epubFile, String imageDirectory, String imageName) throws IOException {
 		ZipEntry entry = epubFile.getEntry("OEBPS/" + imageName);
 		InputStream inputStream = epubFile.getInputStream(entry);
 		File outputFile = new File(imageDirectory + "/" + imageName);

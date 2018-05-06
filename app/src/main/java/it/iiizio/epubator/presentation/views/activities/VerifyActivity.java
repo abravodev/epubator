@@ -32,7 +32,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.zip.ZipFile;
 
@@ -40,8 +39,8 @@ import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.constants.BundleKeys;
 import it.iiizio.epubator.domain.entities.Book;
 import it.iiizio.epubator.domain.services.EpubServiceImpl;
-import it.iiizio.epubator.domain.utils.FileHelper;
 import it.iiizio.epubator.infrastructure.providers.SharedPreferenceProviderImpl;
+import it.iiizio.epubator.infrastructure.providers.StorageProviderImpl;
 import it.iiizio.epubator.presentation.presenters.VerifyPresenter;
 import it.iiizio.epubator.presentation.presenters.VerifyPresenterImpl;
 
@@ -67,7 +66,7 @@ public class VerifyActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_verify);
 
-		presenter = new VerifyPresenterImpl(new EpubServiceImpl(), new SharedPreferenceProviderImpl(this));
+		presenter = new VerifyPresenterImpl(new EpubServiceImpl(), new SharedPreferenceProviderImpl(this), new StorageProviderImpl(this));
 
 		setupElements();
 		setupBook();
@@ -93,7 +92,6 @@ public class VerifyActivity extends AppCompatActivity {
 	public void onBackPressed() {
 		exitEpubVerification();
 	}
-
 
 	private void setupElements() {
 		setupWebView();
@@ -228,15 +226,13 @@ public class VerifyActivity extends AppCompatActivity {
 
 		boolean showImages = presenter.showImages();
 		if(showImages) {
-			removeFiles();
-
-			File outputDirectory = new File(getFilesDir(), "page.html");
+			presenter.removeFilesFromTemporalDirectory();
 
 			try {
-				presenter.saveHtmlPage(outputDirectory, htmlPage);
-				presenter.saveImages(epubFile, htmlPage, getFilesDir());
+				presenter.saveHtmlPage(htmlPage);
+				presenter.saveImages(epubFile, htmlPage);
 
-				String url = outputDirectory.getAbsolutePath();
+				String url = presenter.getHtmlPageFilename();
 				wv_verifyEpub.clearCache(true);
 				wv_verifyEpub.loadUrl("file://" + url);
 			} catch (IOException e) {
@@ -249,11 +245,6 @@ public class VerifyActivity extends AppCompatActivity {
 		}
 	}
 
-	private void removeFiles() {
-		File directory = new File(getFilesDir(), "");
-		FileHelper.deleteFilesFromDirectory(directory);
-	}
-
 	private void exitEpubVerificationOnError() {
 		Toast.makeText(getApplicationContext(), getResources().getString(R.string.cannot_read_file), Toast.LENGTH_SHORT).show();
 		exitEpubVerification();
@@ -262,7 +253,7 @@ public class VerifyActivity extends AppCompatActivity {
 	private void exitEpubVerification() {
 		currentPageIndex = DEFAULT_FIRST_PAGE;
 		closeEpub();
-		removeFiles();
+		presenter.removeFilesFromTemporalDirectory();
 		finish();
 	}
 
