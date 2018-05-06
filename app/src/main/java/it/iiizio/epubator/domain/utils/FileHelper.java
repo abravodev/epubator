@@ -39,7 +39,11 @@ public class FileHelper {
     }
 
     public static String getPathWithoutExtension(String filename){
-        return filename.substring(0, filename.lastIndexOf("."));
+    	int extensionPosition = filename.lastIndexOf(".");
+    	if(extensionPosition<0){
+    		return filename; // It's already without extension
+		}
+        return filename.substring(0, extensionPosition);
     }
 
 }

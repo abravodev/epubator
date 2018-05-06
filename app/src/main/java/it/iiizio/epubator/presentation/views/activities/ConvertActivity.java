@@ -148,7 +148,7 @@ public class ConvertActivity extends AppCompatActivity {
 
 	//<editor-fold desc="Private methods">
 	private void updateConversionStatus(int status){
-		String textStatus = getResources().getStringArray(R.array.conversion_result_message)[status];
+		String textStatus = getConversionStatus(status);
 		tv_conversionStatus.setText(textStatus);
 	}
 
@@ -248,7 +248,7 @@ public class ConvertActivity extends AppCompatActivity {
 	}
 
 	private void keepEpub(ConversionSettings settings) {
-		updateProgressText("\n" + getResources().getStringArray(R.array.conversion_result_message)[ConversionStatus.SUCCESS] + "\n");
+		updateProgressText("\n" + getConversionStatus(ConversionStatus.SUCCESS) + "\n");
 		if (settings.getPreferences().addMarkers) {
 			String pageNumberString = getResources().getString(R.string.pagenumber, ">>\n");
 			updateProgressText(getResources().getString(R.string.errors_are_marked_with, "<<@") + pageNumberString);
@@ -272,10 +272,8 @@ public class ConvertActivity extends AppCompatActivity {
 	}
 
 	private boolean conversionInProgress(){
-		if(result == ConversionStatus.IN_PROGRESS){
-			return true;
-		}
-		return result == ConversionStatus.LOADING_FILE;
+		return result == ConversionStatus.IN_PROGRESS
+			|| result == ConversionStatus.LOADING_FILE;
 	}
 
 	private boolean conversionFinished(){
@@ -284,6 +282,10 @@ public class ConvertActivity extends AppCompatActivity {
 
 	private void updateResult(int result){
 		ConvertActivity.result = result;
+	}
+
+	private String getConversionStatus(int conversionStatus){
+		return getResources().getStringArray(R.array.conversion_result_message)[conversionStatus];
 	}
 	//</editor-fold>
 }

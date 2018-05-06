@@ -1,7 +1,6 @@
 package it.iiizio.epubator.presentation.presenters;
 
-import java.io.File;
-
+import it.iiizio.epubator.domain.constants.ImageTypes;
 import it.iiizio.epubator.domain.constants.PreferencesKeys;
 import it.iiizio.epubator.domain.utils.FileHelper;
 import it.iiizio.epubator.infrastructure.providers.PreferenceProvider;
@@ -9,28 +8,35 @@ import it.iiizio.epubator.infrastructure.providers.StorageProvider;
 
 public class MainPresenterImpl implements MainPresenter {
 
-    private final PreferenceProvider viewPreferencesProvider;
+	//<editor-fold desc="Attributes">
+	private final PreferenceProvider viewPreferencesProvider;
     private final PreferenceProvider sharedPreferencesProvider;
     private final StorageProvider storageProvider;
+	//</editor-fold>
 
+	//<editor-fold desc="Constructors">
 	public MainPresenterImpl(PreferenceProvider viewPreferencesProvider, PreferenceProvider sharedPreferencesProvider,
 			 StorageProvider storageProvider) {
 		this.viewPreferencesProvider = viewPreferencesProvider;
 		this.sharedPreferencesProvider = sharedPreferencesProvider;
 		this.storageProvider = storageProvider;
 	}
+	//</editor-fold>
 
 	@Override
     public String getCoverFileWithTheSameName(String filename) {
-        String name = FileHelper.getPathWithoutExtension(filename);
-        String coverFile = "";
+		String coverFile = "";
+		if(filename == null){
+			return coverFile;
+		}
+		String name = FileHelper.getPathWithoutExtension(filename);
 
-        if(new File(name + ".png").exists()) {
-            coverFile = name + ".png";
-        } else if(new File(name + ".jpg").exists()) {
-            coverFile = name + ".jpg";
-        } else if(new File(name + ".jpeg").exists()) {
-            coverFile = name + ".jpeg";
+        if(existImageWithSameName(name, ImageTypes.PNG)) {
+            coverFile = imageWithSameName(name,ImageTypes.PNG);
+        } else if(existImageWithSameName(name, ImageTypes.JPG)) {
+            coverFile = imageWithSameName(name, ImageTypes.JPG);
+        } else if(existImageWithSameName(name , ImageTypes.JPEG)) {
+            coverFile = imageWithSameName(name, ImageTypes.JPEG);
         }
 
         return coverFile;
@@ -48,6 +54,9 @@ public class MainPresenterImpl implements MainPresenter {
 
 	@Override
 	public void updateRecentFolder(String filename) {
+		if(filename == null){
+			return;
+		}
 		String path = filename.substring(0, filename.lastIndexOf('/', filename.length()) + 1);
 		sharedPreferencesProvider.save(PreferencesKeys.PATH, path);
 	}
@@ -66,4 +75,12 @@ public class MainPresenterImpl implements MainPresenter {
 		return sharedPreferencesProvider.getBoolean(PreferencesKeys.CHOOSE_PICTURE);
 	}
 
+	private boolean existImageWithSameName(String filename, String imageType){
+		String imageName = imageWithSameName(filename, imageType);
+		return storageProvider.exists(imageName);
+	}
+
+	private String imageWithSameName(String filename, String imageType){
+		return String.format("%s.%s", filename, imageType);
+	}
 }

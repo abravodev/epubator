@@ -7,4 +7,6 @@ public interface StorageProvider {
 	String getExternalCacheDirectory();
 
 	String getDownloadDirectory();
+
+	boolean exists(String filename);
 }

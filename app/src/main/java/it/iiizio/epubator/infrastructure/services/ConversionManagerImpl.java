@@ -20,6 +20,7 @@ import it.iiizio.epubator.domain.utils.HtmlHelper;
 import it.iiizio.epubator.domain.utils.PdfXmlParser;
 import it.iiizio.epubator.domain.services.ZipWriterService;
 import it.iiizio.epubator.infrastructure.providers.ImageProvider;
+import it.iiizio.epubator.infrastructure.providers.StorageProvider;
 
 public class ConversionManagerImpl implements ConversionManager {
 
@@ -28,13 +29,15 @@ public class ConversionManagerImpl implements ConversionManager {
     private final ImageProvider imageProvider;
     private final PdfReaderService pdfReader;
     private final ZipWriterService zipWriter;
+    private final StorageProvider storageProvider;
     //</editor-fold>
 
     //<editor-fold desc="Constructors">
     public ConversionManagerImpl(PageBuildEvents buildEvents, ImageProvider imageProvider,
-								 PdfReaderService pdfReader, ZipWriterService zipWriter) {
+			 StorageProvider storageProvider, PdfReaderService pdfReader, ZipWriterService zipWriter) {
         this.pageBuildEvents = buildEvents;
         this.imageProvider = imageProvider;
+        this.storageProvider = storageProvider;
         this.pdfReader = pdfReader;
 		this.zipWriter = zipWriter;
 	}
@@ -43,7 +46,7 @@ public class ConversionManagerImpl implements ConversionManager {
 	//<editor-fold desc="Public methods">
     @Override
     public void loadPdfFile(String pdfFilename) throws ConversionException {
-        if (!(new File(pdfFilename).exists())) {
+        if (!storageProvider.exists(pdfFilename)) {
             throw new ConversionException(ConversionStatus.FILE_NOT_FOUND);
         }
 
@@ -157,7 +160,7 @@ public class ConversionManagerImpl implements ConversionManager {
     @Override
     public boolean deleteTemporalFile(ConversionSettings settings) {
         new File(settings.tempFilename).delete();
-        if (new File(settings.oldFilename).exists()) {
+        if (storageProvider.exists(settings.oldFilename)) {
             new File(settings.oldFilename).renameTo(new File(settings.epubFilename));
             return true;
         }

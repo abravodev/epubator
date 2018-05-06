@@ -74,6 +74,13 @@ public class PreferenceProviderImpl implements PreferenceProvider {
 		editor.putString(key, value);
 		editor.commit();
 	}
+
+	@Override
+	public void save(String key, int value) {
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putInt(key, value);
+		editor.commit();
+	}
 	//</editor-fold>
 
 }

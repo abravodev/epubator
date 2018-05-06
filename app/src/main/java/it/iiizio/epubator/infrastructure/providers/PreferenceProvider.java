@@ -24,4 +24,6 @@ public interface PreferenceProvider {
 
 	void save(String key, String value);
 
+	void save(String key, int value);
+
 }

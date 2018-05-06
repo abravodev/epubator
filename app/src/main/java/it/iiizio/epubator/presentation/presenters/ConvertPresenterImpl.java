@@ -22,7 +22,7 @@ public class ConvertPresenterImpl implements ConvertPresenter {
 	@Override
     public boolean deleteTemporalFile(ConversionSettings settings) {
         new File(settings.tempFilename).delete();
-        if (new File(settings.oldFilename).exists()) {
+        if (storageProvider.exists(settings.oldFilename)) {
             new File(settings.oldFilename).renameTo(new File(settings.epubFilename));
             return true;
         }

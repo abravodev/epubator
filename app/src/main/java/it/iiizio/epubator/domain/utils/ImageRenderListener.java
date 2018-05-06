@@ -9,16 +9,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import it.iiizio.epubator.domain.callbacks.ImageRenderedCallback;
+import it.iiizio.epubator.domain.constants.ImageTypes;
 
 public class ImageRenderListener implements RenderListener {
 
 	private final ImageRenderedCallback imageRenderedCallback;
 
-	private final class ImageTypes {
-		private static final String PNG = "png";
-		private static final String GIF = "gif";
-		private static final String JPG = "jpg";
-	}
+
 
 	public ImageRenderListener(ImageRenderedCallback imageRenderedCallback) {
 		this.imageRenderedCallback = imageRenderedCallback;
@@ -40,8 +37,8 @@ public class ImageRenderListener implements RenderListener {
 
 			String imageType = image.getFileType();
 			if (isValidImage(image)) {
-				if (imageType == "jpg") {
-					imageType = "jpeg";
+				if (imageType.equalsIgnoreCase(ImageTypes.JPG)) {
+					imageType = ImageTypes.JPEG;
 				}
 
 				String imageName = String.format("image%s.%s", renderInfo.getRef().getNumber(), imageType);
