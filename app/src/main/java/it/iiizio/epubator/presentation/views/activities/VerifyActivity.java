@@ -128,11 +128,11 @@ public class VerifyActivity extends AppCompatActivity {
 					public void onClick(DialogInterface dialog, int which) {
 						int pageIndex = book.getPageIndex(which)+1;
 						anchor = book.getAnchor(which);
-						if(!book.isValidPage(pageIndex)){
+						if(book.isValidPage(pageIndex)){
+							gotoPage(pageIndex);
+						} else {
 							// TODO: Show message (page not valid)
-							return;
 						}
-						gotoPage(pageIndex);
 					}
 				})
 				.create()
@@ -185,9 +185,6 @@ public class VerifyActivity extends AppCompatActivity {
 		try {
 			epubFile = new ZipFile(filename);
 			book = presenter.getBook(epubFile);
-			if(book.getPagesCount()==0){
-				throw new IOException("Book has no pages");
-			}
 			updateProgressBar(1, book.getPagesCount());
 		} catch (IOException e) {
 			exitEpubVerificationOnError();
@@ -231,13 +228,8 @@ public class VerifyActivity extends AppCompatActivity {
 
 		boolean showImages = presenter.showImages();
 		if(showImages) {
-			presenter.removeFilesFromTemporalDirectory();
-
 			try {
-				presenter.saveHtmlPage(htmlPage);
-				presenter.saveImages(epubFile, htmlPage);
-
-				String url = presenter.getHtmlPageFilename();
+				String url = presenter.saveHtmlPage(epubFile, htmlPage);
 				wv_verifyEpub.clearCache(true);
 				wv_verifyEpub.loadUrl("file://" + url);
 			} catch (IOException e) {

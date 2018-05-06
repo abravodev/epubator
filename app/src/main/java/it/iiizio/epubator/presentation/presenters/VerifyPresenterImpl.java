@@ -28,7 +28,11 @@ public class VerifyPresenterImpl implements VerifyPresenter {
 	//<editor-fold desc="Methods">
 	@Override
     public Book getBook(ZipFile epubFile) throws IOException {
-		return epubService.getBook(epubFile);
+		Book book = epubService.getBook(epubFile);
+		if(book.getPagesCount()==0){
+			throw new IOException("Book has no pages");
+		}
+		return book;
     }
 
     @Override
@@ -37,21 +41,12 @@ public class VerifyPresenterImpl implements VerifyPresenter {
     }
 
     @Override
-    public void saveImages(ZipFile epubFile, String htmlPage) {
-		String imageDirectory = storageProvider.getFileDirectory();
-        epubService.saveImages(epubFile, htmlPage, imageDirectory);
+    public String saveHtmlPage(ZipFile epubFile, String htmlText) throws IOException {
+		removeFilesFromTemporalDirectory();
+		saveHtmlPage(htmlText);
+		saveImages(epubFile, htmlText);
+		return getHtmlPageFilename();
     }
-
-    @Override
-    public void saveHtmlPage(String htmlText) throws IOException {
-		String htmlFile = getHtmlPageFilename();
-		epubService.saveHtmlPage(htmlFile, htmlText);
-    }
-
-	@Override
-	public String getHtmlPageFilename() {
-		return storageProvider.getFile(storageProvider.getFileDirectory(), "page.html");
-	}
 
 	@Override
 	public boolean showImages() {
@@ -61,6 +56,20 @@ public class VerifyPresenterImpl implements VerifyPresenter {
 	@Override
 	public void removeFilesFromTemporalDirectory() {
 		storageProvider.removeAllFromDirectory(storageProvider.getFileDirectory());
+	}
+
+	private void saveHtmlPage(String htmlText) throws IOException {
+		String htmlFile = getHtmlPageFilename();
+		epubService.saveHtmlPage(htmlFile, htmlText);
+	}
+
+	private void saveImages(ZipFile epubFile, String htmlPage) {
+		String imageDirectory = storageProvider.getFileDirectory();
+		epubService.saveImages(epubFile, htmlPage, imageDirectory);
+	}
+
+	private String getHtmlPageFilename() {
+		return storageProvider.getFile(storageProvider.getFileDirectory(), "page.html");
 	}
 	//</editor-fold>
 

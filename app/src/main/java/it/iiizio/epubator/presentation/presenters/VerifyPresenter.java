@@ -11,11 +11,7 @@ public interface VerifyPresenter {
 
     String getHtmlPage(ZipFile epubFile, String htmlFile) throws IOException;
 
-    void saveImages(ZipFile epubFile, String htmlPage);
-
-    void saveHtmlPage(String htmlText) throws IOException;
-
-    String getHtmlPageFilename();
+    String saveHtmlPage(ZipFile epubFile, String htmlText) throws IOException;
 
     boolean showImages();
 
