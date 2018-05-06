@@ -1,10 +1,10 @@
 package it.iizio.epubator.domain.utils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import it.iiizio.epubator.domain.utils.FileHelper;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FileHelperTest {
 

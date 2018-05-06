@@ -1,6 +1,8 @@
 package it.iizio.epubator.presentation.presenters;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import it.iiizio.epubator.domain.constants.PreferencesKeys;
 import it.iiizio.epubator.infrastructure.providers.PreferenceProvider;
@@ -9,8 +11,8 @@ import it.iiizio.epubator.presentation.presenters.MainPresenter;
 import it.iiizio.epubator.presentation.presenters.MainPresenterImpl;
 import it.iizio.epubator.infrastructure.providers.PreferenceProviderFake;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -55,22 +57,9 @@ public class MainPresenterTest {
 		assertEquals("", coverFile);
 	}
 
-	@Test
-	public void getCoverFileWithTheSameName_fileThatExistWithAnImageInSameFolder_returnsImageName_jpg(){
-		getCoverFileWithTheSameName_fileThatExistWithAnImageInSameFolder_returnsImageName("file.pdf", "file.jpg");
-	}
-
-	@Test
-	public void getCoverFileWithTheSameName_fileThatExistWithAnImageInSameFolder_returnsImageName_jpeg(){
-		getCoverFileWithTheSameName_fileThatExistWithAnImageInSameFolder_returnsImageName("file.pdf", "file.jpeg");
-	}
-
-	@Test
-	public void getCoverFileWithTheSameName_fileThatExistWithAnImageInSameFolder_returnsImageName_png(){
-		getCoverFileWithTheSameName_fileThatExistWithAnImageInSameFolder_returnsImageName("file.pdf", "file.png");
-	}
-
-	private void getCoverFileWithTheSameName_fileThatExistWithAnImageInSameFolder_returnsImageName(String fileThatExists, String imageFileWithSameName){
+	@ParameterizedTest
+	@CsvSource({"file.pdf, file.jpg", "file.pdf, file.jpeg", "file.pdf, file.png"})
+	public void getCoverFileWithTheSameName_fileThatExistWithAnImageInSameFolder_returnsImageName(String fileThatExists, String imageFileWithSameName){
 	    // Arrange
 		StorageProvider storageProviderFake = mock(StorageProvider.class);
 		MainPresenter presenter = makePresenter(storageProviderFake);
