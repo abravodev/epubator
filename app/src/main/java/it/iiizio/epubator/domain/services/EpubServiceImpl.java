@@ -6,16 +6,8 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -25,20 +17,30 @@ import java.util.zip.ZipFile;
 
 import it.iiizio.epubator.domain.entities.Book;
 import it.iiizio.epubator.domain.utils.PdfXmlParser;
+import it.iiizio.epubator.infrastructure.providers.StorageProvider;
 
 public class EpubServiceImpl implements EpubService {
 
-	private static final int BUFFER_SIZE = 2048;
+	//<editor-fold desc="Attributes">
+	private final StorageProvider storageProvider;
+	private final PdfXmlParser parser;
+	//</editor-fold>
 
+	//<editor-fold desc="Constructors">
+	public EpubServiceImpl(StorageProvider storageProvider, PdfXmlParser parser) {
+		this.storageProvider = storageProvider;
+		this.parser = parser;
+	}
+	//</editor-fold>
+
+	//<editor-fold desc="Methods">
 	@Override
 	public Book getBook(ZipFile epubFile) throws IOException {
 		List<String> pages = getPages(epubFile);
 		Book book = new Book(pages);
 
-		PdfXmlParser parser = new PdfXmlParser();
-		NodeList nodes = getNodes(epubFile, parser);
+		NodeList nodes = getNodes(epubFile);
 		if (nodes != null) {
-			// looping through all item nodes <item>
 			for (int i = 0; i < nodes.getLength(); i++) {
 				Element chapterElement = (Element) nodes.item(i);
 				String chapterTitle = chapterElement.getTextContent().trim();
@@ -53,10 +55,7 @@ public class EpubServiceImpl implements EpubService {
 
 	@Override
 	public void saveHtmlPage(String htmlFile, String htmlText) throws IOException {
-		FileWriter writer = new FileWriter(htmlFile);
-		writer.append(htmlText);
-		writer.flush();
-		writer.close();
+		storageProvider.addText(htmlFile, htmlText);
 	}
 
 	@Override
@@ -103,26 +102,10 @@ public class EpubServiceImpl implements EpubService {
 
 	private void saveImage(ZipFile epubFile, String imageDirectory, String imageName) throws IOException {
 		ZipEntry entry = epubFile.getEntry("OEBPS/" + imageName);
-		InputStream inputStream = epubFile.getInputStream(entry);
-		File outputFile = new File(imageDirectory + "/" + imageName);
-		saveFile(inputStream, outputFile);
+		storageProvider.save(epubFile.getInputStream(entry), imageDirectory, imageName);
 	}
 
-	private void saveFile(InputStream entry, File outputFile) throws IOException {
-		BufferedInputStream inputStream = new BufferedInputStream(entry, BUFFER_SIZE);
-		FileOutputStream outputStream = new FileOutputStream(outputFile);
-		byte[] buffer = new byte[BUFFER_SIZE];
-		int len;
-		BufferedOutputStream dest = new BufferedOutputStream(outputStream, BUFFER_SIZE);
-		while ((len = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
-			dest.write(buffer, 0, len);
-		}
-		dest.flush();
-		dest.close();
-		inputStream.close();
-	}
-
-	private NodeList getNodes(ZipFile epubFile, PdfXmlParser parser) throws IOException {
+	private NodeList getNodes(ZipFile epubFile) throws IOException {
 		String toc = getTOC(epubFile);
 		return parser.getNavigationPoints(toc);
 	}
@@ -132,13 +115,8 @@ public class EpubServiceImpl implements EpubService {
 	}
 
 	private String getElement(ZipFile epubFile, String elementKey) throws IOException {
-		StringBuilder textElement = new StringBuilder();
-		Reader inputStreamReader = new InputStreamReader(epubFile.getInputStream(epubFile.getEntry(elementKey)));
-		BufferedReader bufferedReader = new BufferedReader(inputStreamReader, BUFFER_SIZE);
-		String line;
-		while ((line = bufferedReader.readLine()) != null) {
-			textElement.append(line);
-		}
-		return textElement.toString();
+		InputStream inputStream = epubFile.getInputStream(epubFile.getEntry(elementKey));
+		return storageProvider.read(inputStream);
 	}
+	//</editor-fold>
 }

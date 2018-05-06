@@ -38,8 +38,11 @@ import java.util.zip.ZipFile;
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.constants.BundleKeys;
 import it.iiizio.epubator.domain.entities.Book;
+import it.iiizio.epubator.domain.services.EpubService;
 import it.iiizio.epubator.domain.services.EpubServiceImpl;
+import it.iiizio.epubator.domain.utils.PdfXmlParserImpl;
 import it.iiizio.epubator.infrastructure.providers.SharedPreferenceProviderImpl;
+import it.iiizio.epubator.infrastructure.providers.StorageProvider;
 import it.iiizio.epubator.infrastructure.providers.StorageProviderImpl;
 import it.iiizio.epubator.presentation.presenters.VerifyPresenter;
 import it.iiizio.epubator.presentation.presenters.VerifyPresenterImpl;
@@ -66,7 +69,7 @@ public class VerifyActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_verify);
 
-		presenter = new VerifyPresenterImpl(new EpubServiceImpl(), new SharedPreferenceProviderImpl(this), new StorageProviderImpl(this));
+		presenter = makePresenter();
 
 		setupElements();
 		setupBook();
@@ -91,6 +94,12 @@ public class VerifyActivity extends AppCompatActivity {
 	@Override
 	public void onBackPressed() {
 		exitEpubVerification();
+	}
+
+	private VerifyPresenter makePresenter(){
+		StorageProvider storageProvider = new StorageProviderImpl(this);
+		EpubService epubService = new EpubServiceImpl(storageProvider, new PdfXmlParserImpl());
+		return new VerifyPresenterImpl(epubService, new SharedPreferenceProviderImpl(this), storageProvider);
 	}
 
 	private void setupElements() {

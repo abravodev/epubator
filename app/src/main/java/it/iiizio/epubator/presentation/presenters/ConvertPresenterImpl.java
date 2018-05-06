@@ -8,7 +8,7 @@ import it.iiizio.epubator.infrastructure.providers.PreferenceProvider;
 import it.iiizio.epubator.infrastructure.providers.StorageProvider;
 
 public class ConvertPresenterImpl implements ConvertPresenter {
-	
+
 	private final PreferenceProvider preferenceProvider;
 	private final StorageProvider storageProvider;
 

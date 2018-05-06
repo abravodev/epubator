@@ -28,16 +28,18 @@ public class ConversionManagerImpl implements ConversionManager {
     private final PdfReaderService pdfReader;
     private final ZipWriterService zipWriter;
     private final StorageProvider storageProvider;
+	private final PdfXmlParser parser;
     //</editor-fold>
 
     //<editor-fold desc="Constructors">
     public ConversionManagerImpl(PageBuildEvents buildEvents, ImageProvider imageProvider,
-			 StorageProvider storageProvider, PdfReaderService pdfReader, ZipWriterService zipWriter) {
+			 StorageProvider storageProvider, PdfReaderService pdfReader, ZipWriterService zipWriter, PdfXmlParser parser) {
         this.pageBuildEvents = buildEvents;
         this.imageProvider = imageProvider;
         this.storageProvider = storageProvider;
         this.pdfReader = pdfReader;
 		this.zipWriter = zipWriter;
+		this.parser = parser;
 	}
     //</editor-fold>
 
@@ -200,11 +202,11 @@ public class ConversionManagerImpl implements ConversionManager {
         int playOrder = 2;
         boolean extractedToc = false;
         if (getTocFromPdf) {
-            PdfXmlParser parser = new PdfXmlParser();
+
             NodeList nodes = parser.getDocumentTitles(pdfReader.getBookmarks());
             if (nodes != null) {
                 extractedToc = nodes.getLength()>0;
-                String tocFromPdf = buildTocFromPdf(nodes, parser, bookTitle, pagesPerFile, playOrder);
+                String tocFromPdf = buildTocFromPdf(nodes, bookTitle, pagesPerFile, playOrder);
                 toc.append(tocFromPdf);
             }
         }
@@ -225,7 +227,7 @@ public class ConversionManagerImpl implements ConversionManager {
         return toc.toString();
     }
 
-    private String buildTocFromPdf(NodeList nodes, PdfXmlParser parser, String bookTitle, int pagesPerFile, int playOrder){
+    private String buildTocFromPdf(NodeList nodes, String bookTitle, int pagesPerFile, int playOrder){
         int lastPage = Integer.MAX_VALUE;
         StringBuilder toc = new StringBuilder();
         StringBuilder sb = new StringBuilder();
@@ -352,16 +354,14 @@ public class ConversionManagerImpl implements ConversionManager {
     }
 
     private String buildXmlEntry(int playOrder, String text, String contentSource){
-        StringBuilder toc = new StringBuilder();
-
-        toc.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
-        toc.append("            <navLabel>\n");
-        toc.append("                <text>" + text + "                </text>\n");
-        toc.append("            </navLabel>\n");
-        toc.append("            <content src=\"" + contentSource + "\"/>\n");
-        toc.append("        </navPoint>\n");
-
-        return toc.toString();
+        return new StringBuilder()
+			.append("        <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n")
+			.append("            <navLabel>\n")
+			.append("                <text>" + text + "                </text>\n")
+			.append("            </navLabel>\n")
+			.append("            <content src=\"" + contentSource + "\"/>\n")
+			.append("        </navPoint>\n")
+			.toString();
     }
 
     private int getPageFile(int pagesPerFile, int lastPage){

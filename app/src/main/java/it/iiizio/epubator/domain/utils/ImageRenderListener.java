@@ -15,8 +15,6 @@ public class ImageRenderListener implements RenderListener {
 
 	private final ImageRenderedCallback imageRenderedCallback;
 
-
-
 	public ImageRenderListener(ImageRenderedCallback imageRenderedCallback) {
 		this.imageRenderedCallback = imageRenderedCallback;
 	}
@@ -24,7 +22,6 @@ public class ImageRenderListener implements RenderListener {
 	@Override
 	public void renderImage(ImageRenderInfo renderInfo) {
 		try {
-
 			PdfImageObject image = renderInfo.getImage();
 			if(image == null){
 				return;
