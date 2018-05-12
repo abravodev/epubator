@@ -36,15 +36,13 @@ public class InfoActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info);
 		presenter = new InfoPresenterImpl();
-
 		setupTextInfo();
 	}
 
 	private void setupTextInfo(){
-		TextView infoTv = (TextView)findViewById(R.id.tv_infoview);
-		infoTv.setTextSize(18);
+		TextView tv_info = (TextView) findViewById(R.id.tv_infoview);
 		InputStream is = this.getResources().openRawResource(R.raw.info);
-		String info = presenter.getInfo(is);
-		infoTv.setText(info);
+		String appInfo = presenter.getInfo(is);
+		tv_info.setText(appInfo);
 	}
 }

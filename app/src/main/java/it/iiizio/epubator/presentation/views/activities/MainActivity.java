@@ -30,7 +30,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
-import java.io.File;
 import java.net.URISyntaxException;
 
 import it.iiizio.epubator.R;
@@ -41,6 +40,7 @@ import it.iiizio.epubator.infrastructure.providers.StorageProviderImpl;
 import it.iiizio.epubator.infrastructure.providers.ViewPreferenceProviderImpl;
 import it.iiizio.epubator.presentation.presenters.MainPresenter;
 import it.iiizio.epubator.presentation.presenters.MainPresenterImpl;
+import it.iiizio.epubator.presentation.utils.IntentHelper;
 import it.iiizio.epubator.presentation.utils.PathUtils;
 import it.iiizio.epubator.presentation.utils.PermissionHelper;
 
@@ -82,10 +82,10 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.prefs: gotoPreferences(); return true;
+			case R.id.prefs: gotoView(PreferencesActivity.class); return true;
 			case R.id.quickstart: showQuickStartDialog(); return true;
-			case R.id.info: gotoInfoView(); return true;
-			case R.id.license: gotoLicenseView(); return true;
+			case R.id.info: gotoView(InfoActivity.class); return true;
+			case R.id.license: gotoView(LicenseActivity.class); return true;
 			case R.id.my_apps: gotoStore(); return true;
 			default: return super.onOptionsItemSelected(item);
 		}
@@ -101,9 +101,8 @@ public class MainActivity extends AppCompatActivity {
 				default: errorWhenChoosingFile(); break;
 			}
 		} else if (resultCode == RESULT_CANCELED){
-			switch (requestCode){
-				case Actions.PICK_A_PIC:
-					Toast.makeText(this, R.string.image_must_be_picked_from_gallery, Toast.LENGTH_LONG).show(); break;
+			if(requestCode == Actions.PICK_A_PIC) {
+				Toast.makeText(this, R.string.image_must_be_picked_from_gallery, Toast.LENGTH_LONG).show();
 			}
 		}
 	}
@@ -137,30 +136,22 @@ public class MainActivity extends AppCompatActivity {
 		});
 	}
 
-	private void gotoPreferences() {
-		startActivity(new Intent(MainActivity.this, PreferencesActivity.class));
+	private void gotoView(Class viewClass){
+		startActivity(new Intent(this, viewClass));
 	}
 
 	private void gotoStore() {
 		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=pub:iiizio")));
 	}
 
-	private void gotoLicenseView() {
-		startActivity(new Intent(MainActivity.this, LicenseActivity.class));
-	}
-
-	private void gotoInfoView() {
-		startActivity(new Intent(MainActivity.this, InfoActivity.class));
-	}
-
 	private void gotoVerifyView(String chosenFile) {
-		Intent verify = new Intent(MainActivity.this, VerifyActivity.class);
+		Intent verify = new Intent(this, VerifyActivity.class);
 		verify.putExtra(BundleKeys.FILENAME, chosenFile);
 		startActivity(verify);
 	}
 
 	private void gotoConversionView() {
-		Intent convert = new Intent(MainActivity.this, ConvertActivity.class);
+		Intent convert = new Intent(this, ConvertActivity.class);
 		convert.putExtra(BundleKeys.FILENAME, filename);
 		convert.putExtra(BundleKeys.COVER, coverFile);
 		convert.putExtra(BundleKeys.START_CONVERSION, true);
@@ -168,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void showQuickStartDialog(){
-		new AlertDialog.Builder(MainActivity.this)
+		new AlertDialog.Builder(this)
 			.setTitle(getResources().getString(R.string.quickstart))
 			.setMessage(getResources().getString(R.string.quickstart_text))
 			.setNeutralButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
@@ -181,12 +172,11 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void selectFileFromSystem(String fileType, int action){
-		File file = new File(presenter.getRecentFolder());
-		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-		intent.setDataAndType(Uri.fromFile(file), fileType);
-
 		try {
-			startActivityForResult(Intent.createChooser(intent, "Select file"), action);
+			String directory = presenter.getRecentFolder();
+			String viewTitle = getString(R.string.select_a_file);
+			Intent intent = IntentHelper.openDocument(directory, fileType, viewTitle);
+			startActivityForResult(intent, action);
 		} catch (ActivityNotFoundException e) {
 			// TODO: Handle rejection
 		}
@@ -201,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void selectImageFileFromSystem(){
-		selectFileFromSystem("image/*", Actions.PICK_A_PIC);
+		selectFileFromSystem(FileTypes.ANY_IMAGE, Actions.PICK_A_PIC);
 	}
 
 	private String getActualPath(Intent result){
@@ -224,10 +214,10 @@ public class MainActivity extends AppCompatActivity {
 	private void convertFile(String chosenFile){
 		filename = chosenFile;
 		presenter.updateRecentFolder(chosenFile);
-		setCoverImage();
+		setCoverImage(chosenFile);
 	}
 
-	private void setCoverImage() {
+	private void setCoverImage(String filename) {
 		if (presenter.userPrefersToUsePicture()) {
             coverFile = "";
             selectImageFileFromSystem();

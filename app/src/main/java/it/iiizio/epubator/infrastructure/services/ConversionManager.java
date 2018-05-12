@@ -33,4 +33,8 @@ public interface ConversionManager {
 
     boolean deleteTemporalFile(ConversionSettings settings);
 
+    void saveOldEpub(ConversionSettings settings);
+
+	void removeCacheFiles(ConversionSettings settings);
+
 }

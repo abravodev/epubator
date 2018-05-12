@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:id="@+id/tv_infoview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="18sp"
         android:padding="@dimen/activity_padding"/>
 
 </ScrollView>

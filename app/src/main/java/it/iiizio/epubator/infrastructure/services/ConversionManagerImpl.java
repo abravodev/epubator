@@ -165,7 +165,19 @@ public class ConversionManagerImpl implements ConversionManager {
         }
         return false;
     }
-    //</editor-fold>
+
+	@Override
+	public void saveOldEpub(ConversionSettings settings) {
+		if (storageProvider.exists(settings.epubFilename)) {
+			storageProvider.rename(settings.epubFilename, settings.oldFilename);
+		}
+	}
+
+	@Override
+	public void removeCacheFiles(ConversionSettings settings) {
+		storageProvider.removeAllFromDirectory(settings.temporalPath);
+	}
+	//</editor-fold>
 
     //<editor-fold desc="Private methods">
     private void addPage(int page, String text) throws ConversionException {

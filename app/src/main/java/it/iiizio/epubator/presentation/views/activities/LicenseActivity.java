@@ -29,17 +29,20 @@ import it.iiizio.epubator.presentation.presenters.LicensePresenterImpl;
 
 public class LicenseActivity extends AppCompatActivity {
 
+	private LicensePresenter presenter;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info);
-		LicensePresenter presenter = new LicensePresenterImpl();
+		presenter = new LicensePresenterImpl();
+		setupTextInfo();
+	}
 
-		// Get license from raw
-		TextView infoTv = (TextView)findViewById(R.id.tv_infoview);
-		infoTv.setTextSize(18);
+	private void setupTextInfo() {
+		TextView tv_info = (TextView)findViewById(R.id.tv_infoview);
 		InputStream is = this.getResources().openRawResource(R.raw.license);
 		String licenseInfo = presenter.getLicenseInfo(is);
-		infoTv.setText(licenseInfo);
+		tv_info.setText(licenseInfo);
 	}
 }

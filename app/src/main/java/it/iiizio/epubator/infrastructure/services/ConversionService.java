@@ -42,7 +42,6 @@ public class ConversionService extends Service implements PageBuildEvents {
     private ConversionManager manager;
     private ConversionTask conversionTask;
     private String currentFile;
-    private StorageProvider storageProvider;
     //</editor-fold>
 
     //<editor-fold desc="Methods">
@@ -65,7 +64,6 @@ public class ConversionService extends Service implements PageBuildEvents {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-		storageProvider = new StorageProviderImpl(this);
 		this.manager = makeManager();
 
         Bundle extras = intent.getExtras();
@@ -142,6 +140,7 @@ public class ConversionService extends Service implements PageBuildEvents {
     //<editor-fold desc="Private methods">
     private ConversionManager makeManager(){
 		ImageProvider imageProvider = new ImageProviderImpl(getApplicationContext());
+		StorageProvider storageProvider = new StorageProviderImpl(this);
 		return new ConversionManagerImpl(this, imageProvider, storageProvider,
 			new PdfReaderServiceImpl(), new ZipWriterServiceImpl(), new PdfXmlParserImpl());
 	}
@@ -153,7 +152,7 @@ public class ConversionService extends Service implements PageBuildEvents {
     }
 
     private Notification makeStartNotification(){
-        return makeNotification(getResources().getString(R.string.conversion_in_progress), true);
+        return makeNotification(getResources().getString(R.string.conversion_in_progress));
     }
 
     private void finishConversion(int result, String progress){
@@ -173,11 +172,11 @@ public class ConversionService extends Service implements PageBuildEvents {
 		NotificationHelper.sendNotification(this, R.string.app_name, notification);
     }
 
-    private Notification makeNotification(String statusTitle, boolean fixed) {
+    private Notification makeNotification(String statusTitle) {
         Intent openConvertActivityIntent = new Intent(this, ConvertActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
                         | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		return makeNotification(statusTitle, fixed, openConvertActivityIntent);
+		return makeNotification(statusTitle, true, openConvertActivityIntent);
     }
 
 	private Notification makeNotification(String statusTitle, boolean fixed,
@@ -215,8 +214,8 @@ public class ConversionService extends Service implements PageBuildEvents {
 
         @Override
         protected Integer doInBackground(Void... voids) {
-            removeCacheFiles();
-            saveOldEPUB();
+			manager.removeCacheFiles(settings);
+			manager.saveOldEpub(settings);
 
             try {
                 EventBus.getDefault().postSticky(new ConversionStatusChangedEvent(ConversionStatus.LOADING_FILE));
@@ -251,16 +250,6 @@ public class ConversionService extends Service implements PageBuildEvents {
             }
             EventBus.getDefault().post(new ConversionFinishedEvent(result, settings));
 			finishConversion(result, getProgress());
-        }
-
-        private void saveOldEPUB() {
-            if (storageProvider.exists(settings.epubFilename)) {
-                storageProvider.rename(settings.epubFilename, settings.oldFilename);
-            }
-        }
-
-        private void removeCacheFiles() {
-		    storageProvider.removeAllFromDirectory(settings.temporalPath);
         }
 
         private void fillEpub(int pagesPerFile) throws ConversionException, OutOfMemoryError {

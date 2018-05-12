@@ -80,4 +80,5 @@
         <item>Error por falta de memoria</item>
     </string-array>
     <string name="image_must_be_picked_from_gallery">Una imagen debe ser escogida de la galería. Si no quiere, puede ir a Ajustes y deshabilitar la opción</string>
+    <string name="select_a_file">Elige un archivo</string>
 </resources>
