@@ -7,8 +7,8 @@ import it.iiizio.epubator.domain.callbacks.ImageRenderedCallback;
 import it.iiizio.epubator.domain.callbacks.PageBuildEvents;
 import it.iiizio.epubator.domain.constants.ZipFileConstants;
 import it.iiizio.epubator.domain.services.PdfReaderService;
-import it.iiizio.epubator.domain.utils.HtmlHelper;
 import it.iiizio.epubator.domain.services.ZipWriterService;
+import it.iiizio.epubator.domain.utils.HtmlHelper;
 
 public class PdfExtraction {
 

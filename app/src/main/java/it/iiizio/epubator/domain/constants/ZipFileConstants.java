@@ -13,6 +13,12 @@ public class ZipFileConstants {
         return "OEBPS/page" + page + ".html";
     }
 
+    public static String getPage(String pageName){
+    	int startPageChar = pageName.lastIndexOf("/")+1;
+    	int endPageChar = pageName.lastIndexOf(".");
+    	return pageName.substring(startPageChar, endPageChar);
+	}
+
     public static String image(String imageName){
     	return "OEBPS/" + imageName;
 	}

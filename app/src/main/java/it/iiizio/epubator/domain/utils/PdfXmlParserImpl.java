@@ -35,6 +35,9 @@ public class PdfXmlParserImpl implements PdfXmlParser {
 	@Override
 	public int getChapterPage(Element chapterElement){
 		String chapterPage = parser.getValue(chapterElement, "Page").split(" ")[0];
+		if(StringUtils.isNullOrEmpty(chapterPage)){
+			return -1;
+		}
 		return Integer.parseInt(chapterPage);
 	}
 

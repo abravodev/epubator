@@ -21,6 +21,9 @@ public class Chapter {
 
 		String chapterTitle = parser.getChapterTitle(chapterElement);
 		int chapterPage = parser.getChapterPage(chapterElement);
+		if(chapterPage<0){
+			return null;
+		}
 		return new Chapter(chapterTitle, chapterPage);
 	}
 

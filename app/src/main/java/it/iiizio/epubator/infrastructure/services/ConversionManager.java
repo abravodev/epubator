@@ -1,9 +1,9 @@
 package it.iiizio.epubator.infrastructure.services;
 
-import it.iiizio.epubator.domain.exceptions.ConversionException;
 import it.iiizio.epubator.domain.entities.ConversionPreferences;
 import it.iiizio.epubator.domain.entities.ConversionSettings;
 import it.iiizio.epubator.domain.entities.PdfExtraction;
+import it.iiizio.epubator.domain.exceptions.ConversionException;
 
 public interface ConversionManager {
 

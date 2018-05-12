@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.entities.FrontCoverDetails;
+import it.iiizio.epubator.domain.utils.StringUtils;
 
 public class ImageProviderImpl implements ImageProvider {
 
@@ -23,7 +24,7 @@ public class ImageProviderImpl implements ImageProvider {
 
 	@Override
 	public byte[] addSelectedCoverImage(String coverImageFilename, FrontCoverDetails coverDetails) {
-		if(coverImageFilename==null){
+		if(StringUtils.isNullOrEmpty(coverImageFilename)){
 			return null;
 		}
 

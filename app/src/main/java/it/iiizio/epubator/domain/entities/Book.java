@@ -3,6 +3,7 @@ package it.iiizio.epubator.domain.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.iiizio.epubator.domain.constants.ZipFileConstants;
 import it.iiizio.epubator.domain.exceptions.NotFoundException;
 
 public class Book {
@@ -66,7 +67,7 @@ public class Book {
 
 	public String getAnchorFromPageName(int pageIndex) throws NotFoundException {
 		String fileName = getPage(pageIndex);
-		return fileName.substring(fileName.lastIndexOf("/") + 1, fileName.lastIndexOf("."));
+		return ZipFileConstants.getPage(fileName);
 	}
 
 	public boolean isValidPage(int page){
