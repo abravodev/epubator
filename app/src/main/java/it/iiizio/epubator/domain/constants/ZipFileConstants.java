@@ -2,7 +2,6 @@ package it.iiizio.epubator.domain.constants;
 
 public class ZipFileConstants {
 
-
     public static final String MIMETYPE = "mimetype";
     public static final String FRONTPAGE = "OEBPS/frontpage.html";
     public static final String FRONTPAGE_IMAGE = "OEBPS/frontpage.png";

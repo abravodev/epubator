@@ -1,9 +1,7 @@
 package it.iizio.epubator.presentation.presenters;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,16 +16,15 @@ import it.iiizio.epubator.infrastructure.providers.StorageProvider;
 import it.iiizio.epubator.presentation.presenters.VerifyPresenter;
 import it.iiizio.epubator.presentation.presenters.VerifyPresenterImpl;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class VerifyPresenterTest {
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
-	@Test
+	@Test // Needed for the use of the @Rule
 	public void getBook_bookWithoutPages_throwsException() throws IOException {
 	    // Arrange
 		EpubService epubService = mock(EpubService.class);
@@ -36,10 +33,12 @@ public class VerifyPresenterTest {
 		Book bookWithoutPages = new Book(new ArrayList<String>());
 		when(epubService.getBook(anyZipFile)).thenReturn(bookWithoutPages);
 
-	    // Act/Assert
-		thrown.expect(IOException.class);
-		thrown.expectMessage(containsString("no pages"));
-		presenter.getBook(anyZipFile);
+		// Act
+		Executable getBook = () -> presenter.getBook(anyZipFile);
+
+	    // Assert
+		IOException exceptionThrown = assertThrows(IOException.class, getBook);
+		assertThat(exceptionThrown.getMessage()).contains("no pages");
 	}
 
 	@Test
@@ -56,7 +55,7 @@ public class VerifyPresenterTest {
 		Book book = presenter.getBook(anyZipFile);
 
 		// Assert
-		Assertions.assertSame(bookWithPages, book);
+		assertEquals(bookWithPages, book);
 	}
 
 	private VerifyPresenter makePresenter(EpubService epubService, PreferenceProvider preferenceProvider, StorageProvider storageProvider) {

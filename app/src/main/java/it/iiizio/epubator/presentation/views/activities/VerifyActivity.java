@@ -38,6 +38,7 @@ import java.util.zip.ZipFile;
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.constants.BundleKeys;
 import it.iiizio.epubator.domain.entities.Book;
+import it.iiizio.epubator.domain.exceptions.NotFoundException;
 import it.iiizio.epubator.domain.services.EpubService;
 import it.iiizio.epubator.domain.services.EpubServiceImpl;
 import it.iiizio.epubator.domain.utils.PdfXmlParserImpl;
@@ -126,7 +127,7 @@ public class VerifyActivity extends AppCompatActivity {
 		builder.setTitle(R.string.index)
 				.setItems(book.getChapters(), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
-						int pageIndex = book.getPageIndex(which)+1;
+						int pageIndex = book.getPageIndex(which);
 						anchor = book.getAnchor(which);
 						if(book.isValidPage(pageIndex)){
 							gotoPage(pageIndex);
@@ -209,11 +210,17 @@ public class VerifyActivity extends AppCompatActivity {
 		bt_nextPage.setEnabled(book.hasNextPage(currentPageIndex));
 		updateProgressBar(pageIndex);
 
-		String fileName = book.getPage(currentPageIndex);
-		if (anchor == null) {
-			anchor = book.getAnchorFromPageName(currentPageIndex);
+		try {
+			String fileName = book.getPage(currentPageIndex);
+			if (anchor == null) {
+				anchor = book.getAnchorFromPageName(currentPageIndex);
+			}
+			showPage(fileName);
+		} catch (NotFoundException e) {
+			// TODO: Show toast error
+			System.err.println(e);
 		}
-		showPage(fileName);
+
 	}
 
 	private void showPage(String htmlFile) {

@@ -3,19 +3,26 @@ package it.iiizio.epubator.domain.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.iiizio.epubator.domain.exceptions.NotFoundException;
+
 public class Book {
 
-    private final List<String> chapters;
+	//<editor-fold desc="Attributes">
+	private final List<String> chapters;
     private final List<String> anchors;
     private final List<String> pages;
+	//</editor-fold>
 
-    public Book(List<String> pages) {
+	//<editor-fold desc="Constructors">
+	public Book(List<String> pages) {
         this.pages = pages;
         chapters = new ArrayList<>();
         anchors = new ArrayList<>();
     }
+	//</editor-fold>
 
-    public void addChapter(String chapter){
+	//<editor-fold desc="Methods">
+	public void addChapter(String chapter){
         chapters.add(chapter);
     }
 
@@ -36,13 +43,17 @@ public class Book {
         return pages.size();
     }
 
-    public String getPage(int index){
+    public String getPage(int index) throws NotFoundException {
+    	if(!isValidPage(index)){
+    		String exceptionMessage = String.format("Page %d not found", index);
+    		throw new NotFoundException(exceptionMessage);
+		}
     	return pages.get(index - 1);
     }
 
     public int getPageIndex(int anchorIndex){
         String[] links = getAnchorLinks(anchorIndex);
-        return pages.indexOf(links[0]);
+        return pages.indexOf(links[0])+1;
     }
 
     public boolean hasPreviousPage(int currentPageIndex){
@@ -53,7 +64,7 @@ public class Book {
     	return currentPageIndex < getPagesCount();
 	}
 
-	public String getAnchorFromPageName(int pageIndex){
+	public String getAnchorFromPageName(int pageIndex) throws NotFoundException {
 		String fileName = getPage(pageIndex);
 		return fileName.substring(fileName.lastIndexOf("/") + 1, fileName.lastIndexOf("."));
 	}
@@ -65,4 +76,5 @@ public class Book {
 	private String[] getAnchorLinks(int index){
 		return anchors.get(index).split("#");
 	}
+	//</editor-fold>
 }

@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -25,7 +29,9 @@ dependencies {
     implementation 'com.android.support:support-v4:25.4.0'
     implementation 'com.android.support:appcompat-v7:25.4.0'
     implementation 'org.greenrobot:eventbus:3.1.1'
+
     testImplementation 'org.junit.vintage:junit-vintage-engine:4.12.0'
+    testImplementation 'org.assertj:assertj-core:3.9.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.2.0'
     testImplementation 'org.mockito:mockito-core:2.18.3'
