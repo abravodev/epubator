@@ -1,5 +1,7 @@
 package it.iiizio.epubator.domain.utils;
 
+import com.google.common.base.Strings;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -35,7 +37,7 @@ public class PdfXmlParserImpl implements PdfXmlParser {
 	@Override
 	public int getChapterPage(Element chapterElement){
 		String chapterPage = parser.getValue(chapterElement, "Page").split(" ")[0];
-		if(StringUtils.isNullOrEmpty(chapterPage)){
+		if(Strings.isNullOrEmpty(chapterPage)){
 			return -1;
 		}
 		return Integer.parseInt(chapterPage);

@@ -33,11 +33,15 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class XMLParser {
 
+	private final DocumentBuilderFactory documentBuilderFactory;
+
+	public XMLParser() {
+		documentBuilderFactory = DocumentBuilderFactory.newInstance();
+	}
+
 	public Document getDomElement(String xml){
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		try {
 			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-
 			InputSource inputSource = new InputSource();
 			inputSource.setCharacterStream(new StringReader(xml));
 			return documentBuilder.parse(inputSource);
@@ -63,7 +67,7 @@ public class XMLParser {
 		}
 
 		NodeList childNodes = elem.getChildNodes();
-			for(int i=0; i<childNodes.getLength(); i++){
+		for(int i=0; i<childNodes.getLength(); i++){
 			Node child = childNodes.item(i);
 			if(child.getNodeType() == Node.TEXT_NODE){
 				return child.getNodeValue();

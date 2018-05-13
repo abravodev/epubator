@@ -8,11 +8,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+import com.google.common.base.Strings;
+
 import java.io.ByteArrayOutputStream;
 
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.entities.FrontCoverDetails;
-import it.iiizio.epubator.domain.utils.StringUtils;
 
 public class ImageProviderImpl implements ImageProvider {
 
@@ -24,7 +25,7 @@ public class ImageProviderImpl implements ImageProvider {
 
 	@Override
 	public byte[] addSelectedCoverImage(String coverImageFilename, FrontCoverDetails coverDetails) {
-		if(StringUtils.isNullOrEmpty(coverImageFilename)){
+		if(Strings.isNullOrEmpty(coverImageFilename)){
 			return null;
 		}
 

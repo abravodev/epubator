@@ -53,6 +53,7 @@ public class ZipWriterServiceImpl implements ZipWriterService  {
 		try {
 			ZipEntry zipEntry = new ZipEntry(filename);
 			zipOutputStream.setMethod(ZipOutputStream.DEFLATED);
+
 			if (store) {
 				zipOutputStream.setMethod(ZipOutputStream.STORED);
 				zipEntry.setSize((long) data.length);
