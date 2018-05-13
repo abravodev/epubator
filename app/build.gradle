@@ -24,16 +24,19 @@ android {
 }
 
 dependencies {
-    implementation 'com.itextpdf:itext-pdfa:5.5.10'
-    implementation 'com.itextpdf:itextg:5.5.9'
-    implementation 'com.android.support:support-v4:25.4.0'
-    implementation 'com.android.support:appcompat-v7:25.4.0'
+    def itextVersion = '5.5.10'
+    def supportVersion = '25.4.0'
+    implementation "com.itextpdf:itext-pdfa:${itextVersion}"
+    implementation "com.itextpdf:itextg:${itextVersion}"
+    implementation "com.android.support:support-v4:${supportVersion}"
+    implementation "com.android.support:appcompat-v7:${supportVersion}"
     implementation 'org.greenrobot:eventbus:3.1.1'
     implementation 'com.google.guava:guava:25.0-android'
 
+    def junitVersion = '5.2.0'
     testImplementation 'org.junit.vintage:junit-vintage-engine:4.12.0'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
     testImplementation 'org.assertj:assertj-core:3.9.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.2.0'
     testImplementation 'org.mockito:mockito-core:2.18.3'
 }

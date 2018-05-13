@@ -214,7 +214,6 @@ public class ConversionManagerImpl implements ConversionManager {
         int playOrder = 2;
         boolean extractedToc = false;
         if (getTocFromPdf) {
-
             NodeList nodes = parser.getDocumentTitles(pdfReader.getBookmarks());
             if (nodes != null) {
                 extractedToc = nodes.getLength()>0;

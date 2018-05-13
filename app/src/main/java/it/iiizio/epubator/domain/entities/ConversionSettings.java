@@ -7,7 +7,12 @@ import it.iiizio.epubator.domain.utils.FileHelper;
 
 public class ConversionSettings implements Serializable {
 
-    public final String pdfFilename;
+	//<editor-fold desc="Attributes">
+	private static final String EPUB_EXT = " - ePUBator.epub";
+	private static final String OLD_EXT = " - ePUBator.old";
+	private static final String TEMP_EXT = " - ePUBator.tmp";
+
+	public final String pdfFilename;
     public final String filename;
     public final String epubFilename;
     public final String oldFilename;
@@ -15,18 +20,14 @@ public class ConversionSettings implements Serializable {
     public final String coverFile;
     public final String temporalPath;
     private final ConversionPreferences preferences;
+	//</editor-fold>
 
-    private static final String EPUB_EXT = " - ePUBator.epub";
-    private static final String OLD_EXT = " - ePUBator.old";
-    private static final String TEMP_EXT = " - ePUBator.tmp";
+	//<editor-fold desc="Constructors">
+	public ConversionSettings(ConversionPreferences preferences, String outputDirectory, String temporalPath,
+		  String pdfFilename, String coverFile){
 
-    public ConversionSettings(ConversionPreferences preferences, String pdfFilename, String temporalPath,
-                              String downloadHistory, String coverFile){
-        String[] parts = FileHelper.getPathAndFilenameOfPdf(pdfFilename);
-        String path = parts[0];
-        this.filename = parts[1];
-
-        this.epubFilename = getEpubFilename(path, this.filename, preferences.saveOnDownloadDirectory, downloadHistory);
+		this.filename = FileHelper.getFilenameFromPdfFile(pdfFilename);
+        this.epubFilename = outputDirectory + this.filename + EPUB_EXT;
         this.oldFilename = temporalPath + this.filename + OLD_EXT;
         this.tempFilename = temporalPath + this.filename + TEMP_EXT;
 
@@ -35,20 +36,9 @@ public class ConversionSettings implements Serializable {
         this.coverFile = coverFile;
         this.preferences = preferences;
     }
+	//</editor-fold>
 
-    /**
-     * Save ePUB in the Download folder as user choice or if PDF folder is not writable
-     * @param path
-     * @param filename
-     * @param saveOnDownloadDirectory
-     * @return
-     */
-    private String getEpubFilename(String path, String filename, boolean saveOnDownloadDirectory, String downloadHistory){
-        boolean writable = FileHelper.folderIsWritable(path);
-        String outputDirectory = (saveOnDownloadDirectory || !writable) ? downloadHistory: path;
-        return outputDirectory + filename + EPUB_EXT;
-    }
-
+	//<editor-fold desc="Methods">
     public String getTitle(){
         return filename.replaceAll("[^\\p{Alnum}]", " ");
     }
@@ -60,4 +50,5 @@ public class ConversionSettings implements Serializable {
     public ConversionPreferences getPreferences() {
         return preferences;
     }
+	//</editor-fold>
 }

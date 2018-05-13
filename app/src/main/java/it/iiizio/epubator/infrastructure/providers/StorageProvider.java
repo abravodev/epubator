@@ -28,4 +28,6 @@ public interface StorageProvider {
 	String read(InputStream inputStream) throws IOException;
 
 	void addText(String filename, String text) throws IOException;
+
+	boolean folderIsWritable(String folder);
 }

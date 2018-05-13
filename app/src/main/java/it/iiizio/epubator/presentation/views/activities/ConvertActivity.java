@@ -37,7 +37,9 @@ import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.constants.BundleKeys;
 import it.iiizio.epubator.domain.constants.ConversionStatus;
 import it.iiizio.epubator.domain.entities.ConversionSettings;
+import it.iiizio.epubator.domain.services.ConversionServiceImpl;
 import it.iiizio.epubator.infrastructure.providers.SharedPreferenceProviderImpl;
+import it.iiizio.epubator.infrastructure.providers.StorageProvider;
 import it.iiizio.epubator.infrastructure.providers.StorageProviderImpl;
 import it.iiizio.epubator.infrastructure.services.ConversionService;
 import it.iiizio.epubator.presentation.events.ConversionCanceledEvent;
@@ -68,7 +70,7 @@ public class ConvertActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_conversion);
 
-		presenter = new ConvertPresenterImpl(new SharedPreferenceProviderImpl(this), new StorageProviderImpl(this));
+		presenter = makePresenter();
 
 		setupElements();
 
@@ -96,7 +98,13 @@ public class ConvertActivity extends AppCompatActivity {
 		updateButtonStates();
 	}
 
-    @Override
+	private ConvertPresenter makePresenter() {
+		StorageProvider storageProvider = new StorageProviderImpl(this);
+		return new ConvertPresenterImpl(new SharedPreferenceProviderImpl(this),
+			new ConversionServiceImpl(storageProvider), new StorageProviderImpl(this));
+	}
+
+	@Override
     public void onResume() {
         super.onResume();
 		EventBus.getDefault().register(this);

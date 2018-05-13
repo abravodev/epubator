@@ -56,6 +56,10 @@ public class PdfExtraction {
 		return pdfReader.getPages();
 	}
 
+	public boolean hadExtractionError(){
+		return extractionError;
+	}
+
 	private String buildSinglePage(int pageIndex) {
 		StringBuilder pageText = new StringBuilder();
 
@@ -67,13 +71,13 @@ public class PdfExtraction {
 		String page = HtmlHelper.stringToHTMLString(pdfReader.getPageText(pageIndex));
 		if (page.length() == 0) {
 			buildEvents.pageFailure(pageIndex);
-			hasExtractionError(true);
+			errorHappened();
 			if (preferences.addMarkers) {
 				pageText.append(pageErrorMarker(pageIndex));
 			}
 		} else {
 			if (page.matches(REGEX_ANY_ERROR)) {
-				hasExtractionError(true);
+				errorHappened();
 				String marker = preferences.addMarkers ? pageTextErrorMarker(pageIndex) : " ";
 				pageText.append(page.replaceAll(REGEX_AN_ERROR, marker));
 			} else {
@@ -138,12 +142,8 @@ public class PdfExtraction {
 		return "&lt;&lt;@" + pageIndex + "&gt;&gt;";
 	}
 
-	private void hasExtractionError(boolean hasError){
-        extractionError = hasError;
-    }
-
-    public boolean hadExtractionError(){
-        return extractionError;
+	private void errorHappened(){
+        extractionError = true;
     }
 
 	private boolean imageNotAddedYet(String image){

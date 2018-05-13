@@ -105,5 +105,18 @@ public class StorageProviderImpl implements StorageProvider {
 		CharSink charSink = Files.asCharSink(file, charset, FileWriteMode.APPEND);
 		charSink.write(text);
 	}
+
+	@Override
+	public boolean folderIsWritable(String folder) {
+		boolean writable = false;
+		try {
+			File checkFile = new File(folder);
+			writable = checkFile.createNewFile();
+			checkFile.delete();
+		} catch (IOException e) {
+			System.err.println(e.getMessage());
+		}
+		return writable;
+	}
 	//</editor-fold>
 }

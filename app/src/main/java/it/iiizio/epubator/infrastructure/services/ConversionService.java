@@ -162,22 +162,22 @@ public class ConversionService extends Service implements PageBuildEvents {
 	}
 
     private void sendFinishNotification(int result, String progress){
-    	String resultMessage = getResources().getStringArray(R.array.conversion_result_message)[result];
-		Intent openConvertActivityIntent = new Intent(this, ConvertActivity.class)
-				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-						| Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		Intent openConvertActivityIntent = gotoConversionViewIntent();
 		openConvertActivityIntent.putExtra(BundleKeys.CONVERSION_TEXT, progress);
-        Notification notification = makeNotification(resultMessage, false, openConvertActivityIntent);
+		String resultMessage = getResources().getStringArray(R.array.conversion_result_message)[result];
+		Notification notification = makeNotification(resultMessage, false, openConvertActivityIntent);
         notification.defaults |= Notification.DEFAULT_VIBRATE;
 		NotificationHelper.sendNotification(this, R.string.app_name, notification);
     }
 
     private Notification makeNotification(String statusTitle) {
-        Intent openConvertActivityIntent = new Intent(this, ConvertActivity.class)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		return makeNotification(statusTitle, true, openConvertActivityIntent);
+		return makeNotification(statusTitle, true, gotoConversionViewIntent());
     }
+
+    private Intent gotoConversionViewIntent(){
+    	return new Intent(this, ConvertActivity.class)
+			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+	}
 
 	private Notification makeNotification(String statusTitle, boolean fixed,
 			  Intent openConvertActivityIntent) {

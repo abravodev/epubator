@@ -100,7 +100,7 @@ public class BookTest {
 	}
 
 	@Test
-	public void getPage_anyPageFromAnEmptyBook_throwsException() throws NotFoundException {
+	public void getPage_anyPageFromAnEmptyBook_throwsException() {
 	    // Arrange
 		Book emptyBook = makeEmptyBook();
 		int anyPageIndex = 1;
@@ -113,7 +113,7 @@ public class BookTest {
 	}
 
 	@Test
-	public void getPage_secondPageFromABookWithOnePage_throwsException() throws NotFoundException {
+	public void getPage_secondPageFromABookWithOnePage_throwsException() {
 	    // Arrange
 		Book bookWithOnePage = makeBookWithOnePage();
 		int pageIndex = 2;
@@ -139,21 +139,6 @@ public class BookTest {
 
 	    // Assert
 		assertEquals(1, pageIndex);
-	}
-
-	@Test
-	public void getAnchorFromPageName_firstPageIndex_returnsFirstPageName() throws NotFoundException {
-	    // Arrange
-		String firstPage = "page1";
-		int pageIndex = 1;
-		String firstPageFilename = ZipFileConstants.page(1);
-		Book anyBook = makeBook(firstPageFilename);
-
-	    // Act
-		String anchorName = anyBook.getAnchorFromPageName(pageIndex);
-
-	    // Assert
-		assertEquals(firstPage, anchorName);
 	}
 
 	@Test
@@ -219,6 +204,21 @@ public class BookTest {
 
 	    // Assert
 		assertFalse(hasNextPage);
+	}
+
+	@Test
+	public void getAnchorFromPageName_firstPageIndex_returnsFirstPageName() throws NotFoundException {
+		// Arrange
+		String firstPage = "page1";
+		int pageIndex = 1;
+		String firstPageFilename = ZipFileConstants.page(1);
+		Book anyBook = makeBook(firstPageFilename);
+
+		// Act
+		String anchorName = anyBook.getAnchorFromPageName(pageIndex);
+
+		// Assert
+		assertEquals(firstPage, anchorName);
 	}
 
 	@Test
