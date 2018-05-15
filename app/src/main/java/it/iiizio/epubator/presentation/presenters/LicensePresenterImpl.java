@@ -3,19 +3,23 @@ package it.iiizio.epubator.presentation.presenters;
 import java.io.IOException;
 import java.io.InputStream;
 
+import it.iiizio.epubator.infrastructure.providers.FileProvider;
+
 public class LicensePresenterImpl implements LicensePresenter {
-    @Override
+
+	private final FileProvider fileProvider;
+
+	public LicensePresenterImpl(FileProvider fileProvider) {
+		this.fileProvider = fileProvider;
+	}
+
+	@Override
     public String getLicenseInfo(InputStream is) {
         try {
-            byte[] buffer = new byte[is.available()];
-            is.read(buffer);
-            is.close();
-            // Remove unwanted newlines
-            return new String(buffer, "utf-8").replaceAll("(?<!\n)\n(?!\n)", " ");
+        	return fileProvider.read(is);
         } catch (IOException e) {
-            e.printStackTrace();
+			System.err.println(e);
+            return "";
         }
-
-        return "";
     }
 }

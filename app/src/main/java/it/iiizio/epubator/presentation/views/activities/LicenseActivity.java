@@ -24,6 +24,7 @@ import android.widget.TextView;
 import java.io.InputStream;
 
 import it.iiizio.epubator.R;
+import it.iiizio.epubator.infrastructure.providers.FileProviderImpl;
 import it.iiizio.epubator.presentation.presenters.LicensePresenter;
 import it.iiizio.epubator.presentation.presenters.LicensePresenterImpl;
 
@@ -35,7 +36,7 @@ public class LicenseActivity extends AppCompatActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info);
-		presenter = new LicensePresenterImpl();
+		presenter = new LicensePresenterImpl(new FileProviderImpl());
 		setupTextInfo();
 	}
 

@@ -14,18 +14,18 @@ import java.util.zip.ZipFile;
 import it.iiizio.epubator.domain.constants.ZipFileConstants;
 import it.iiizio.epubator.domain.entities.Book;
 import it.iiizio.epubator.domain.utils.PdfXmlParser;
-import it.iiizio.epubator.infrastructure.providers.StorageProvider;
+import it.iiizio.epubator.infrastructure.providers.FileProvider;
 
 public class EpubServiceImpl implements EpubService {
 
 	//<editor-fold desc="Attributes">
-	private final StorageProvider storageProvider;
+	private final FileProvider fileProvider;
 	private final PdfXmlParser pdfParser;
 	//</editor-fold>
 
 	//<editor-fold desc="Constructors">
-	public EpubServiceImpl(StorageProvider storageProvider, PdfXmlParser parser) {
-		this.storageProvider = storageProvider;
+	public EpubServiceImpl(FileProvider fileProvider, PdfXmlParser parser) {
+		this.fileProvider = fileProvider;
 		this.pdfParser = parser;
 	}
 	//</editor-fold>
@@ -52,7 +52,7 @@ public class EpubServiceImpl implements EpubService {
 
 	@Override
 	public void saveHtmlPage(String htmlFile, String htmlText) throws IOException {
-		storageProvider.addText(htmlFile, htmlText);
+		fileProvider.addText(htmlFile, htmlText);
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class EpubServiceImpl implements EpubService {
 	private void saveImage(ZipFile epubFile, String imageDirectory, String imageName) {
 		try {
 			InputStream entry = getEntry(epubFile, ZipFileConstants.image(imageName));
-			storageProvider.save(entry, imageDirectory, imageName);
+			fileProvider.save(entry, imageDirectory, imageName);
 		} catch (IOException e) {
 			String errorMessage = String.format("Failed to fetch image '%s'", imageName);
 			System.err.println(errorMessage);
@@ -103,7 +103,7 @@ public class EpubServiceImpl implements EpubService {
 
 	private String getElement(ZipFile epubFile, String elementKey) throws IOException {
 		InputStream inputStream = getEntry(epubFile, elementKey);
-		return storageProvider.read(inputStream);
+		return fileProvider.read(inputStream);
 	}
 
 	private InputStream getEntry(ZipFile zipFile, String entryName) throws IOException {

@@ -3,23 +3,23 @@ package it.iiizio.epubator.presentation.presenters;
 import java.io.IOException;
 import java.io.InputStream;
 
+import it.iiizio.epubator.infrastructure.providers.FileProvider;
+
 public class InfoPresenterImpl implements InfoPresenter {
 
-    @Override
-    public String getInfo(InputStream is) {
-        StringBuilder sb = new StringBuilder();
-        int i;
-        try {
-            i = is.read();
-            while (i != -1) {
-                sb.append((char) i);
-                i = is.read();
-            }
-        } catch (IOException e) {
-            // Auto-generated catch block
-            e.printStackTrace();
-        }
+	private final FileProvider fileProvider;
 
-        return sb.toString();
-    }
+	public InfoPresenterImpl(FileProvider fileProvider) {
+		this.fileProvider = fileProvider;
+	}
+
+	@Override
+    public String getInfo(InputStream is) {
+		try {
+			return fileProvider.read(is);
+		} catch (IOException e) {
+			System.err.println(e);
+			return "";
+		}
+	}
 }

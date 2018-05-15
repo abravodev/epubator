@@ -17,8 +17,8 @@ import it.iiizio.epubator.domain.services.PdfReaderService;
 import it.iiizio.epubator.domain.services.ZipWriterService;
 import it.iiizio.epubator.domain.utils.HtmlHelper;
 import it.iiizio.epubator.domain.utils.PdfXmlParser;
+import it.iiizio.epubator.infrastructure.providers.FileProvider;
 import it.iiizio.epubator.infrastructure.providers.ImageProvider;
-import it.iiizio.epubator.infrastructure.providers.StorageProvider;
 
 public class ConversionManagerImpl implements ConversionManager {
 
@@ -27,13 +27,13 @@ public class ConversionManagerImpl implements ConversionManager {
     private final ImageProvider imageProvider;
     private final PdfReaderService pdfReader;
     private final ZipWriterService zipWriter;
-    private final StorageProvider storageProvider;
+    private final FileProvider storageProvider;
 	private final PdfXmlParser parser;
     //</editor-fold>
 
     //<editor-fold desc="Constructors">
     public ConversionManagerImpl(PageBuildEvents buildEvents, ImageProvider imageProvider,
-			 StorageProvider storageProvider, PdfReaderService pdfReader, ZipWriterService zipWriter, PdfXmlParser parser) {
+			FileProvider storageProvider, PdfReaderService pdfReader, ZipWriterService zipWriter, PdfXmlParser parser) {
         this.pageBuildEvents = buildEvents;
         this.imageProvider = imageProvider;
         this.storageProvider = storageProvider;

@@ -24,6 +24,7 @@ import android.widget.TextView;
 import java.io.InputStream;
 
 import it.iiizio.epubator.R;
+import it.iiizio.epubator.infrastructure.providers.FileProviderImpl;
 import it.iiizio.epubator.presentation.presenters.InfoPresenter;
 import it.iiizio.epubator.presentation.presenters.InfoPresenterImpl;
 
@@ -35,7 +36,7 @@ public class InfoActivity extends AppCompatActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info);
-		presenter = new InfoPresenterImpl();
+		presenter = new InfoPresenterImpl(new FileProviderImpl());
 		setupTextInfo();
 	}
 

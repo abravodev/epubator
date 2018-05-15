@@ -111,6 +111,7 @@ public class ConvertPresenterTest {
 	private ConvertPresenter makePresenter(PreferenceProvider preferenceProvider, StorageProvider storageProvider, ConversionService conversionService){
 		preferenceProvider = preferenceProvider != null ? preferenceProvider : mock(PreferenceProvider.class);
 		storageProvider = storageProvider!=null ? storageProvider : mock(StorageProvider.class);
-		return new ConvertPresenterImpl(preferenceProvider, new ConversionServiceImpl(storageProvider), storageProvider);
+		conversionService = conversionService!=null ? conversionService : mock(ConversionService.class);
+		return new ConvertPresenterImpl(preferenceProvider, conversionService, storageProvider);
 	}
 }

@@ -25,10 +25,9 @@ import it.iiizio.epubator.domain.exceptions.ConversionException;
 import it.iiizio.epubator.domain.services.PdfReaderServiceImpl;
 import it.iiizio.epubator.domain.services.ZipWriterServiceImpl;
 import it.iiizio.epubator.domain.utils.PdfXmlParserImpl;
+import it.iiizio.epubator.infrastructure.providers.FileProviderImpl;
 import it.iiizio.epubator.infrastructure.providers.ImageProvider;
 import it.iiizio.epubator.infrastructure.providers.ImageProviderImpl;
-import it.iiizio.epubator.infrastructure.providers.StorageProvider;
-import it.iiizio.epubator.infrastructure.providers.StorageProviderImpl;
 import it.iiizio.epubator.presentation.events.ConversionCanceledEvent;
 import it.iiizio.epubator.presentation.events.ConversionFinishedEvent;
 import it.iiizio.epubator.presentation.events.ConversionStatusChangedEvent;
@@ -140,8 +139,7 @@ public class ConversionService extends Service implements PageBuildEvents {
     //<editor-fold desc="Private methods">
     private ConversionManager makeManager(){
 		ImageProvider imageProvider = new ImageProviderImpl(getApplicationContext());
-		StorageProvider storageProvider = new StorageProviderImpl(this);
-		return new ConversionManagerImpl(this, imageProvider, storageProvider,
+		return new ConversionManagerImpl(this, imageProvider, new FileProviderImpl(),
 			new PdfReaderServiceImpl(), new ZipWriterServiceImpl(), new PdfXmlParserImpl());
 	}
 
