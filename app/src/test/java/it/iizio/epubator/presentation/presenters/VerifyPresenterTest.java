@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.zip.ZipFile;
 
 import it.iiizio.epubator.domain.entities.Book;
+import it.iiizio.epubator.domain.entities.EBook;
 import it.iiizio.epubator.domain.services.EpubService;
 import it.iiizio.epubator.infrastructure.providers.PreferenceProvider;
 import it.iiizio.epubator.infrastructure.providers.StorageProvider;
@@ -30,7 +31,7 @@ public class VerifyPresenterTest {
 		EpubService epubService = mock(EpubService.class);
 		VerifyPresenter presenter = makePresenter(epubService, null, null);
 		ZipFile anyZipFile = mock(ZipFile.class);
-		Book bookWithoutPages = new Book(new ArrayList<String>());
+		EBook bookWithoutPages = makeEmptyBook(anyZipFile);
 		when(epubService.getBook(anyZipFile)).thenReturn(bookWithoutPages);
 
 		// Act
@@ -47,8 +48,7 @@ public class VerifyPresenterTest {
 		EpubService epubService = mock(EpubService.class);
 		VerifyPresenter presenter = makePresenter(epubService, null, null);
 		ZipFile anyZipFile = mock(ZipFile.class);
-		List<String> bookPages = new ArrayList<>(Arrays.asList("Page1"));
-		Book bookWithPages = new Book(bookPages);
+		EBook bookWithPages = makeBook(anyZipFile, "Page1");
 		when(epubService.getBook(anyZipFile)).thenReturn(bookWithPages);
 
 		// Act
@@ -64,5 +64,14 @@ public class VerifyPresenterTest {
 		storageProvider = storageProvider == null ? mock(StorageProvider.class) : storageProvider;
 
 		return new VerifyPresenterImpl(epubService, preferenceProvider, storageProvider);
+	}
+
+	private EBook makeEmptyBook(ZipFile zipFile){
+		return makeBook(zipFile);
+	}
+
+	private EBook makeBook(ZipFile zipFile, String... pages){
+		List<String> bookPages = new ArrayList<>(Arrays.asList(pages));
+		return new EBook(zipFile, bookPages);
 	}
 }

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.zip.ZipFile;
 
 import it.iiizio.epubator.domain.constants.PreferencesKeys;
-import it.iiizio.epubator.domain.entities.Book;
+import it.iiizio.epubator.domain.entities.EBook;
 import it.iiizio.epubator.domain.services.EpubService;
 import it.iiizio.epubator.infrastructure.providers.PreferenceProvider;
 import it.iiizio.epubator.infrastructure.providers.StorageProvider;
@@ -27,8 +27,8 @@ public class VerifyPresenterImpl implements VerifyPresenter {
 
 	//<editor-fold desc="Methods">
 	@Override
-    public Book getBook(ZipFile epubFile) throws IOException {
-		Book book = epubService.getBook(epubFile);
+    public EBook getBook(ZipFile epubFile) throws IOException {
+		EBook book = epubService.getBook(epubFile);
 		if(book.getPagesCount()==0){
 			throw new IOException("Book has no pages");
 		}
@@ -56,6 +56,11 @@ public class VerifyPresenterImpl implements VerifyPresenter {
 	@Override
 	public void removeFilesFromTemporalDirectory() {
 		storageProvider.removeAllFromDirectory(storageProvider.getFileDirectory());
+	}
+
+	@Override
+	public void closeBook(EBook book) throws IOException {
+		book.getFile().close();
 	}
 
 	private void saveHtmlPage(String htmlText) throws IOException {

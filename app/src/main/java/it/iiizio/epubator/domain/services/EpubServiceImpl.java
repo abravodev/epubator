@@ -12,7 +12,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import it.iiizio.epubator.domain.constants.ZipFileConstants;
-import it.iiizio.epubator.domain.entities.Book;
+import it.iiizio.epubator.domain.entities.EBook;
 import it.iiizio.epubator.domain.utils.PdfXmlParser;
 import it.iiizio.epubator.infrastructure.providers.FileProvider;
 
@@ -32,9 +32,9 @@ public class EpubServiceImpl implements EpubService {
 
 	//<editor-fold desc="Methods">
 	@Override
-	public Book getBook(ZipFile epubFile) throws IOException {
+	public EBook getBook(ZipFile epubFile) throws IOException {
 		List<String> pages = getPages(epubFile);
-		Book book = new Book(pages);
+		EBook book = new EBook(epubFile, pages);
 
 		NodeList nodes = getNodes(epubFile);
 		if (nodes != null) {

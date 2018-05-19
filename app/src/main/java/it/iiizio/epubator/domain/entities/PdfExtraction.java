@@ -43,7 +43,6 @@ public class PdfExtraction {
 		StringBuilder pageText = new StringBuilder();
 
 		int endPage = Math.min(pageIndex + preferences.pagesPerFile - 1, getPages());
-
 		for (int j = pageIndex; j <= endPage; j++) {
 			String singlePageText = buildSinglePage(j);
 			pageText.append(singlePageText);

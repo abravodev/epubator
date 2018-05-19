@@ -37,7 +37,7 @@ import java.util.zip.ZipFile;
 
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.constants.BundleKeys;
-import it.iiizio.epubator.domain.entities.Book;
+import it.iiizio.epubator.domain.entities.EBook;
 import it.iiizio.epubator.domain.exceptions.NotFoundException;
 import it.iiizio.epubator.domain.services.EpubService;
 import it.iiizio.epubator.domain.services.EpubServiceImpl;
@@ -52,9 +52,8 @@ public class VerifyActivity extends AppCompatActivity {
 
 	//<editor-fold desc="Attributes">
 	private static final int DEFAULT_FIRST_PAGE = 1;
-	private static ZipFile epubFile = null;
 	private static int currentPageIndex = DEFAULT_FIRST_PAGE;
-	private Book book;
+	private EBook book;
 	private String anchor;
 
 	private WebView wv_verifyEpub;
@@ -184,8 +183,7 @@ public class VerifyActivity extends AppCompatActivity {
 		String filename = getIntent().getStringExtra(BundleKeys.FILENAME);
 
 		try {
-			epubFile = new ZipFile(filename);
-			book = presenter.getBook(epubFile);
+			book = presenter.getBook(new ZipFile(filename));
 			updateProgressBar(1, book.getPagesCount());
 		} catch (IOException e) {
 			exitEpubVerificationOnError();
@@ -228,7 +226,7 @@ public class VerifyActivity extends AppCompatActivity {
 
 		String htmlPage = null;
 		try {
-			htmlPage = presenter.getHtmlPage(epubFile, htmlFile);
+			htmlPage = presenter.getHtmlPage(book.getFile(), htmlFile);
 		} catch (IOException e) {
 			exitEpubVerificationOnError();
 		}
@@ -236,7 +234,7 @@ public class VerifyActivity extends AppCompatActivity {
 		boolean showImages = presenter.showImages();
 		if(showImages) {
 			try {
-				String url = presenter.saveHtmlPage(epubFile, htmlPage);
+				String url = presenter.saveHtmlPage(book.getFile(), htmlPage);
 				wv_verifyEpub.clearCache(true);
 				wv_verifyEpub.loadUrl("file://" + url);
 			} catch (IOException e) {
@@ -263,8 +261,8 @@ public class VerifyActivity extends AppCompatActivity {
 
 	private void closeEpub() {
 		try {
-			epubFile.close();
-		} catch (Exception e) {
+			presenter.closeBook(book);
+		} catch (IOException e) {
 			// TODO: Show message (book could not be closed)
 		}
 	}

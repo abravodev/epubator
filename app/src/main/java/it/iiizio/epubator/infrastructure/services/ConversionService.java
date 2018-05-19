@@ -264,7 +264,7 @@ public class ConversionService extends Service implements PageBuildEvents {
             manager.addContainer();
 
             String title = settings.getTitle();
-            String bookId = settings.getBookId();
+            String bookId = settings.generateBookId();
 
             publishProgress(getResources().getString(R.string.toc));
             manager.addToc(bookId, title, settings.getPreferences().tocFromPdf, pagesPerFile);

@@ -43,7 +43,7 @@ public class ConversionSettings implements Serializable {
         return filename.replaceAll("[^\\p{Alnum}]", " ");
     }
 
-    public String getBookId(){
+    public String generateBookId(){
         return getTitle() + " - " + new Date().hashCode();
     }
 

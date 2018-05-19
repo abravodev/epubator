@@ -3,11 +3,11 @@ package it.iiizio.epubator.presentation.presenters;
 import java.io.IOException;
 import java.util.zip.ZipFile;
 
-import it.iiizio.epubator.domain.entities.Book;
+import it.iiizio.epubator.domain.entities.EBook;
 
 public interface VerifyPresenter {
 
-    Book getBook(ZipFile epubFile) throws IOException;
+    EBook getBook(ZipFile epubFile) throws IOException;
 
     String getHtmlPage(ZipFile epubFile, String htmlFile) throws IOException;
 
@@ -16,4 +16,6 @@ public interface VerifyPresenter {
     boolean showImages();
 
     void removeFilesFromTemporalDirectory();
+
+    void closeBook(EBook book) throws IOException;
 }

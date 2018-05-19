@@ -3,11 +3,11 @@ package it.iiizio.epubator.domain.services;
 import java.io.IOException;
 import java.util.zip.ZipFile;
 
-import it.iiizio.epubator.domain.entities.Book;
+import it.iiizio.epubator.domain.entities.EBook;
 
 public interface EpubService {
 
-	Book getBook(ZipFile epubFile) throws IOException;
+	EBook getBook(ZipFile epubFile) throws IOException;
 
 	void saveHtmlPage(String htmlFile, String htmlText) throws IOException;
 
