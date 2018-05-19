@@ -109,4 +109,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="status">Status</string>
     <string name="image_must_be_picked_from_gallery">An image must be picked from gallery. If you don\'t want to, you can go to Settings and disable the option</string>
     <string name="select_a_file">Select a file</string>
+
+    <string name="extraction">Extraction</string>
+    <string name="images">Images</string>
+    <string name="cover">Cover</string>
 </resources>

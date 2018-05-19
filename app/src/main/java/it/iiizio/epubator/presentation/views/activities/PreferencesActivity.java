@@ -17,16 +17,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package it.iiizio.epubator.presentation.views.activities;
 
+import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
+import android.support.v7.app.AppCompatActivity;
 
-import it.iiizio.epubator.R;
+import it.iiizio.epubator.presentation.views.fragment.PreferencesFragment;
 
-public class PreferencesActivity extends PreferenceActivity {
+public class PreferencesActivity extends AppCompatActivity {
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.prefs);
+
+		FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+		fragmentTransaction.replace(android.R.id.content, new PreferencesFragment());
+		fragmentTransaction.commit();
 	}
+
 }
