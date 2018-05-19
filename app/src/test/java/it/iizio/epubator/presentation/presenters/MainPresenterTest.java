@@ -215,7 +215,7 @@ public class MainPresenterTest {
 		sharedPreferencesProvider.save(PreferencesKeys.CHOOSE_PICTURE, true);
 
 	    // Act
-		boolean userPrefersToChoosePicture = presenter.userPrefersToUsePicture();
+		boolean userPrefersToChoosePicture = presenter.userPrefersToChoosePicture();
 
 	    // Assert
 		assertEquals(true, userPrefersToChoosePicture);
@@ -229,7 +229,7 @@ public class MainPresenterTest {
 		sharedPreferencesProvider.save(PreferencesKeys.CHOOSE_PICTURE, false);
 
 	    // Act
-		boolean userPrefersToChoosePicture = presenter.userPrefersToUsePicture();
+		boolean userPrefersToChoosePicture = presenter.userPrefersToChoosePicture();
 
 	    // Assert
 		assertEquals(false, userPrefersToChoosePicture);

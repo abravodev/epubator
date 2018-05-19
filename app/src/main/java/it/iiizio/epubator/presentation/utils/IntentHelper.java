@@ -14,4 +14,8 @@ public class IntentHelper {
 		return Intent.createChooser(intent, title);
 	}
 
+	public static Intent openMarket(String publisher){
+		String marketUrl = String.format("market://search?q=pub:%s", publisher);
+		return new Intent(Intent.ACTION_VIEW, Uri.parse(marketUrl));
+	}
 }

@@ -71,7 +71,7 @@ public class MainPresenterImpl implements MainPresenter {
 	}
 
 	@Override
-	public boolean userPrefersToUsePicture() {
+	public boolean userPrefersToChoosePicture() {
 		return sharedPreferencesProvider.getBoolean(PreferencesKeys.CHOOSE_PICTURE);
 	}
 

@@ -21,7 +21,6 @@ import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -49,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
 	//<editor-fold desc="Attributes">
 	private static final int REQUEST_PERMISSION_CODE = 23;
 	private String filename = "";
-	private String coverFile = "";
 	private MainPresenter presenter;
 	//</editor-fold>
 
@@ -136,28 +134,6 @@ public class MainActivity extends AppCompatActivity {
 		});
 	}
 
-	private void gotoView(Class viewClass){
-		startActivity(new Intent(this, viewClass));
-	}
-
-	private void gotoStore() {
-		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=pub:iiizio")));
-	}
-
-	private void gotoVerifyView(String chosenFile) {
-		Intent verify = new Intent(this, VerifyActivity.class);
-		verify.putExtra(BundleKeys.FILENAME, chosenFile);
-		startActivity(verify);
-	}
-
-	private void gotoConversionView() {
-		Intent convert = new Intent(this, ConvertActivity.class);
-		convert.putExtra(BundleKeys.FILENAME, filename);
-		convert.putExtra(BundleKeys.COVER, coverFile);
-		convert.putExtra(BundleKeys.START_CONVERSION, true);
-		startActivity(convert);
-	}
-
 	private void showQuickStartDialog(){
 		new AlertDialog.Builder(this)
 			.setTitle(getResources().getString(R.string.quickstart))
@@ -206,9 +182,34 @@ public class MainActivity extends AppCompatActivity {
 		Toast.makeText(this, R.string.cannot_choose_file, Toast.LENGTH_SHORT).show();
 	}
 
+	private void gotoConversionView(String selectedCoverFile){
+		gotoConversionView(filename, selectedCoverFile);
+	}
+
+	private void gotoConversionView(String filename, String coverFile) {
+		Intent convert = new Intent(this, ConvertActivity.class);
+		convert.putExtra(BundleKeys.FILENAME, filename);
+		convert.putExtra(BundleKeys.COVER, coverFile);
+		convert.putExtra(BundleKeys.START_CONVERSION, true);
+		startActivity(convert);
+	}
+
+	private void gotoView(Class viewClass){
+		startActivity(new Intent(this, viewClass));
+	}
+
+	private void gotoStore() {
+		startActivity(IntentHelper.openMarket("iiizio"));
+	}
+
+	private void gotoVerifyView(String chosenFile) {
+		Intent verify = new Intent(this, VerifyActivity.class);
+		verify.putExtra(BundleKeys.FILENAME, chosenFile);
+		startActivity(verify);
+	}
+
 	private void getImageFromGallery(String selectedImage) {
-		coverFile = selectedImage;
-		gotoConversionView();
+		gotoConversionView(selectedImage);
 	}
 
 	private void convertFile(String chosenFile){
@@ -218,14 +219,13 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void setCoverImage(String filename) {
-		if (presenter.userPrefersToUsePicture()) {
-            coverFile = "";
+		if (presenter.userPrefersToChoosePicture()) {
             selectImageFileFromSystem();
             return;
         }
 
-		coverFile = presenter.getCoverFileWithTheSameName(filename);
-        gotoConversionView();
+		String coverFile = presenter.getCoverFileWithTheSameName(filename);
+        gotoConversionView(filename, coverFile);
 	}
 
 	private void verifyFile(String chosenFile){

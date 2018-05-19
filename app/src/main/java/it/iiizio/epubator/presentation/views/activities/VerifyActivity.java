@@ -192,13 +192,13 @@ public class VerifyActivity extends AppCompatActivity {
 
 	private void gotoPreviousPage(){
 		if(book.hasPreviousPage(currentPageIndex)){
-			gotoPage(currentPageIndex -1);
+			gotoPage(currentPageIndex - 1);
 		}
 	}
 
 	private void gotoNextPage(){
 		if(book.hasNextPage(currentPageIndex)){
-			gotoPage(currentPageIndex +1);
+			gotoPage(currentPageIndex + 1);
 		}
 	}
 

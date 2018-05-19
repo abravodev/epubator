@@ -10,7 +10,7 @@ public interface MainPresenter {
 
     void updateRecentFolder(String filename);
 
-    boolean userPrefersToUsePicture();
+    boolean userPrefersToChoosePicture();
 
     String getRecentFolder();
 }
