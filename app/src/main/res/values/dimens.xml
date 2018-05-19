@@ -4,4 +4,5 @@
     <dimen name="activity_small_padding">5dp</dimen>
     <dimen name="activity_small_margin">5dp</dimen>
     <dimen name="label_small_margin">2dp</dimen>
+    <dimen name="logotype_margin">30dp</dimen>
 </resources>

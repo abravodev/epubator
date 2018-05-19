@@ -118,7 +118,7 @@ public class ImageProviderImpl implements ImageProvider {
 	}
 
 	private Bitmap getAppLogo() {
-		return BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
+		return BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
 	}
 
 	private BitmapFactory.Options getBitmapOptions(String coverImageFilename, int maxWidth, int maxHeight) {
