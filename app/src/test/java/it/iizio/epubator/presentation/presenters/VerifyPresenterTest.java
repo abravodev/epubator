@@ -30,12 +30,12 @@ public class VerifyPresenterTest {
 	    // Arrange
 		EpubService epubService = mock(EpubService.class);
 		VerifyPresenter presenter = makePresenter(epubService, null, null);
-		ZipFile anyZipFile = mock(ZipFile.class);
-		EBook bookWithoutPages = makeEmptyBook(anyZipFile);
-		when(epubService.getBook(anyZipFile)).thenReturn(bookWithoutPages);
+		String anyEpubFilename = "anyEpubFilename";
+		EBook bookWithoutPages = makeEmptyBook();
+		when(epubService.getBook(anyEpubFilename)).thenReturn(bookWithoutPages);
 
 		// Act
-		Executable getBook = () -> presenter.getBook(anyZipFile);
+		Executable getBook = () -> presenter.getBook(anyEpubFilename);
 
 	    // Assert
 		IOException exceptionThrown = assertThrows(IOException.class, getBook);
@@ -47,12 +47,12 @@ public class VerifyPresenterTest {
 		// Arrange
 		EpubService epubService = mock(EpubService.class);
 		VerifyPresenter presenter = makePresenter(epubService, null, null);
-		ZipFile anyZipFile = mock(ZipFile.class);
-		EBook bookWithPages = makeBook(anyZipFile, "Page1");
-		when(epubService.getBook(anyZipFile)).thenReturn(bookWithPages);
+		String anyEpubFilename = "anyEpubFilename";
+		EBook bookWithPages = makeBook("Page1");
+		when(epubService.getBook(anyEpubFilename)).thenReturn(bookWithPages);
 
 		// Act
-		Book book = presenter.getBook(anyZipFile);
+		Book book = presenter.getBook(anyEpubFilename);
 
 		// Assert
 		assertEquals(bookWithPages, book);
@@ -66,12 +66,12 @@ public class VerifyPresenterTest {
 		return new VerifyPresenterImpl(epubService, preferenceProvider, storageProvider);
 	}
 
-	private EBook makeEmptyBook(ZipFile zipFile){
-		return makeBook(zipFile);
+	private EBook makeEmptyBook(){
+		return makeBook();
 	}
 
-	private EBook makeBook(ZipFile zipFile, String... pages){
+	private EBook makeBook(String... pages){
 		List<String> bookPages = new ArrayList<>(Arrays.asList(pages));
-		return new EBook(zipFile, bookPages);
+		return new EBook(mock(ZipFile.class), bookPages);
 	}
 }

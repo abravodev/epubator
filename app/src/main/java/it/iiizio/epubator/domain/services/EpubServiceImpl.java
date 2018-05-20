@@ -32,7 +32,8 @@ public class EpubServiceImpl implements EpubService {
 
 	//<editor-fold desc="Methods">
 	@Override
-	public EBook getBook(ZipFile epubFile) throws IOException {
+	public EBook getBook(String filename) throws IOException {
+		ZipFile epubFile = new ZipFile(filename);
 		List<String> pages = getPages(epubFile);
 		EBook book = new EBook(epubFile, pages);
 

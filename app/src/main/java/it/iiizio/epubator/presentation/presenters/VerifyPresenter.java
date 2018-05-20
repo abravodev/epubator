@@ -7,7 +7,7 @@ import it.iiizio.epubator.domain.entities.EBook;
 
 public interface VerifyPresenter {
 
-    EBook getBook(ZipFile epubFile) throws IOException;
+    EBook getBook(String filename) throws IOException;
 
     String getHtmlPage(ZipFile epubFile, String htmlFile) throws IOException;
 

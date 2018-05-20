@@ -33,7 +33,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.util.zip.ZipFile;
 
 import it.iiizio.epubator.R;
 import it.iiizio.epubator.domain.constants.BundleKeys;
@@ -183,7 +182,7 @@ public class VerifyActivity extends AppCompatActivity {
 		String filename = getIntent().getStringExtra(BundleKeys.FILENAME);
 
 		try {
-			book = presenter.getBook(new ZipFile(filename));
+			book = presenter.getBook(filename);
 			updateProgressBar(1, book.getPagesCount());
 		} catch (IOException e) {
 			exitEpubVerificationOnError();
@@ -224,11 +223,12 @@ public class VerifyActivity extends AppCompatActivity {
 	private void showPage(String htmlFile) {
 		wv_verifyEpub.clearView();
 
-		String htmlPage = null;
+		String htmlPage;
 		try {
 			htmlPage = presenter.getHtmlPage(book.getFile(), htmlFile);
 		} catch (IOException e) {
 			exitEpubVerificationOnError();
+			return;
 		}
 
 		boolean showImages = presenter.showImages();

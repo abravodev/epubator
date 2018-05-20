@@ -27,8 +27,8 @@ public class VerifyPresenterImpl implements VerifyPresenter {
 
 	//<editor-fold desc="Methods">
 	@Override
-    public EBook getBook(ZipFile epubFile) throws IOException {
-		EBook book = epubService.getBook(epubFile);
+    public EBook getBook(String filename) throws IOException {
+		EBook book = epubService.getBook(filename);
 		if(book.getPagesCount()==0){
 			throw new IOException("Book has no pages");
 		}

@@ -7,7 +7,7 @@ import it.iiizio.epubator.domain.entities.EBook;
 
 public interface EpubService {
 
-	EBook getBook(ZipFile epubFile) throws IOException;
+	EBook getBook(String filename) throws IOException;
 
 	void saveHtmlPage(String htmlFile, String htmlText) throws IOException;
 
