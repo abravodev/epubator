@@ -44,3 +44,4 @@ Since I'm not the creator of the app, I cannot update the version of the one at 
 
 ## Contributors
 - [abravodev](https://github.com/abravodev/): Redesigned the app, made major refactor of its structure, created Github project...
+- [yasujizr](https://github.com/Yasujizr): Design for app logos (launcher icon, main view, epub's covers)
