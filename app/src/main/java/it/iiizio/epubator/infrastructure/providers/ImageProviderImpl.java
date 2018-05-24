@@ -96,11 +96,18 @@ public class ImageProviderImpl implements ImageProvider {
 		}
 	}
 
+	/**
+	 * It prints the app logo on the bottom right corner of the coverImage
+	 * @param coverDetails
+	 * @param coverImage
+	 */
 	private void paintLogoOnTheCover(FrontCoverDetails coverDetails, Canvas coverImage) {
 		Bitmap coverImageFile = getAppLogo();
+		int margin = 5;
+		int leftStart = coverDetails.getWidth() - (coverImageFile.getWidth() + margin);
+		int topStart = coverDetails.getHeight() - (coverImageFile.getHeight() + margin);
 		coverImage.drawBitmap(coverImageFile,
-				coverDetails.getWidth() - coverImageFile.getWidth(),
-				coverDetails.getHeight()- coverImageFile.getHeight(),
+				leftStart, topStart,
 				new Paint(Paint.FILTER_BITMAP_FLAG));
 	}
 
@@ -118,7 +125,7 @@ public class ImageProviderImpl implements ImageProvider {
 	}
 
 	private Bitmap getAppLogo() {
-		return BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
+		return BitmapFactory.decodeResource(context.getResources(), R.drawable.logo);
 	}
 
 	private BitmapFactory.Options getBitmapOptions(String coverImageFilename, int maxWidth, int maxHeight) {
